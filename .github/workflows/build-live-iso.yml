@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            cpio debootstrap xorriso squashfs-tools \
+            cpio debootstrap debian-archive-keyring xorriso squashfs-tools \
             dosfstools mtools syslinux-utils isolinux curl
 
           # Ubuntu 24.04 todavía distribuye un live-build antiguo que genera
@@ -43,6 +43,7 @@ jobs:
             -o /tmp/live-build.deb
           echo "58e09779881cbcc631c49ceb703413e0247a87db01823e597b2a1c40a2afd8f4  /tmp/live-build.deb" | sha256sum -c -
           sudo dpkg -i /tmp/live-build.deb
+          test -s /usr/share/keyrings/debian-archive-keyring.gpg
           lb --version
 
       - name: Validar scripts
