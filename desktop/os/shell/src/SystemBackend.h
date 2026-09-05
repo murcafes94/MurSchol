@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
+#include <QStringList>
 #include <QTimer>
 
 class SystemBackend final : public QObject

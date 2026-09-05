@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QFile>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QStorageInfo>

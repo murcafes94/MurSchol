@@ -1,11 +1,13 @@
 #include "AppIndexModel.h"
 
+#include <algorithm>
+#include <utility>
+
 #include <QDir>
 #include <QFile>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSet>
-#include <QStandardPaths>
 
 AppIndexModel::AppIndexModel(QObject *parent) : QAbstractListModel(parent)
 {
