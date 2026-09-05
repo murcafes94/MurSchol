@@ -3,119 +3,371 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/murschol_bg"
-    android:paddingLeft="24dp"
-    android:paddingTop="18dp"
-    android:paddingRight="24dp"
-    android:paddingBottom="18dp">
+    android:background="@drawable/desktop_background"
+    android:paddingLeft="20dp"
+    android:paddingTop="14dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingBottom="10dp">
 
-        <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/murschol"
+            android:textColor="@color/murschol_text"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.10" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="26dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:background="@color/murschol_border" />
+
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="@string/tagline"
+            android:textColor="@color/murschol_muted"
+            android:textSize="12sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/homeScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="14dp">
 
             <TextView
+                android:id="@+id/dateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/murschol"
-                android:textColor="@color/murschol_text"
-                android:textSize="24sp"
+                android:textColor="@color/murschol_muted"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.08" />
 
             <TextView
+                android:id="@+id/greetingText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/subtitle"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/murschol_text"
+                android:textSize="34sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/welcome_line"
                 android:textColor="@color/murschol_muted"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:layout_marginTop="18dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/tileMoodle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.55"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/card_burgundy"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_school"
+                        android:tint="@color/murschol_burgundy_icon"
+                        android:contentDescription="@string/aula_virtual" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/aula_virtual"
+                        android:textColor="@color/murschol_text"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Moodle"
+                        android:textColor="@color/murschol_muted"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/button_primary"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="8dp"
+                        android:paddingRight="18dp"
+                        android:paddingBottom="8dp"
+                        android:text="Abrir  →"
+                        android:textColor="#FFF7F2"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/card_neutral"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_calendar"
+                            android:tint="@color/murschol_blue_icon"
+                            android:contentDescription="@string/proximo" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:text="@string/proximo"
+                            android:textColor="@color/murschol_text"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/card_inner"
+                        android:padding="14dp"
+                        android:text="@string/calendar_placeholder"
+                        android:textColor="@color/murschol_text"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/calendar_hint"
+                        android:textColor="@color/murschol_muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:columnCount="@integer/quick_columns"
+                android:alignmentMode="alignMargins"
+                android:useDefaultMargins="true">
+
+                <TextView
+                    android:id="@+id/tileLibrary"
+                    style="@style/MurScholQuickTile"
+                    android:background="@drawable/card_green"
+                    android:drawableTop="@drawable/ic_book"
+                    android:drawableTint="@color/murschol_green_icon"
+                    android:text="@string/biblioteca" />
+
+                <TextView
+                    android:id="@+id/tileNotes"
+                    style="@style/MurScholQuickTile"
+                    android:background="@drawable/card_ochre"
+                    android:drawableTop="@drawable/ic_note"
+                    android:drawableTint="@color/murschol_ochre_icon"
+                    android:text="@string/apuntes" />
+
+                <TextView
+                    android:id="@+id/tileFiles"
+                    style="@style/MurScholQuickTile"
+                    android:background="@drawable/card_blue"
+                    android:drawableTop="@drawable/ic_folder"
+                    android:drawableTint="@color/murschol_blue_icon"
+                    android:text="@string/archivos" />
+
+                <TextView
+                    android:id="@+id/tileInternet"
+                    style="@style/MurScholQuickTile"
+                    android:background="@drawable/card_blue"
+                    android:drawableTop="@drawable/ic_globe"
+                    android:drawableTint="@color/murschol_blue_icon"
+                    android:text="@string/internet" />
+            </GridLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="@string/continuar"
+                android:textColor="@color/murschol_text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/continueNotCan"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/card_neutral"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_note"
+                    android:tint="@color/murschol_ochre_icon"
+                    android:contentDescription="@string/apuntes" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NotCan"
+                        android:textColor="@color/murschol_text"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notcan_hint"
+                        android:textColor="@color/murschol_muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Continuar  →"
+                    android:textColor="@color/murschol_accent"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
+    </ScrollView>
 
-        <TextView
-            android:id="@+id/timeText"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/dock_background"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/murschol_text"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+            <TextView
+                android:id="@+id/homeButton"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_home"
+                android:text="MurSchol" />
+
+            <TextView
+                android:id="@+id/searchButton"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_search"
+                android:text="Buscar" />
+
+            <TextView
+                android:id="@+id/dockMoodle"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_school"
+                android:text="Aula Virtual" />
+
+            <TextView
+                android:id="@+id/dockLibrary"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_book"
+                android:text="Biblioteca" />
+
+            <TextView
+                android:id="@+id/dockNotes"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_note"
+                android:text="Apuntes" />
+
+            <TextView
+                android:id="@+id/dockInternet"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_globe"
+                android:text="Internet" />
+
+            <TextView
+                android:id="@+id/dockYoutube"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_play"
+                android:text="YouTube" />
+
+            <TextView
+                android:id="@+id/appsButton"
+                style="@style/MurScholDockItem"
+                android:drawableTop="@drawable/ic_grid"
+                android:text="Apps" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <TextView
-        android:id="@+id/dateText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textColor="@color/murschol_muted"
-        android:textSize="16sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Tu escritorio de estudio"
-        android:textColor="@color/murschol_text"
-        android:textSize="28sp"
-        android:textStyle="bold" />
-
-    <GridLayout
-        android:id="@+id/tileGrid"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="22dp"
-        android:columnCount="@integer/tile_columns"
-        android:alignmentMode="alignMargins"
-        android:useDefaultMargins="true">
-
-        <TextView
-            android:id="@+id/tileMoodle"
-            style="@style/MurScholTile"
-            android:text="@string/aula_virtual" />
-
-        <TextView
-            android:id="@+id/tileLibrary"
-            style="@style/MurScholTile"
-            android:text="@string/biblioteca" />
-
-        <TextView
-            android:id="@+id/tileNotes"
-            style="@style/MurScholTile"
-            android:text="@string/apuntes" />
-
-        <TextView
-            android:id="@+id/tileInternet"
-            style="@style/MurScholTile"
-            android:text="@string/internet" />
-
-        <TextView
-            android:id="@+id/tileFiles"
-            style="@style/MurScholTile"
-            android:text="@string/archivos" />
-
-        <TextView
-            android:id="@+id/tileYoutube"
-            style="@style/MurScholTile"
-            android:text="@string/youtube" />
-    </GridLayout>
-
-    <TextView
-        android:id="@+id/appsButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@drawable/button_background"
-        android:gravity="center"
-        android:text="@string/apps"
-        android:textColor="@color/murschol_text"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:clickable="true"
-        android:focusable="true" />
+        android:id="@+id/tileYoutube"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone" />
 
 </LinearLayout>
