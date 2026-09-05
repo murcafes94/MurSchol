@@ -1,8 +1,17 @@
 <resources>
-    <color name="murschol_bg">#111312</color>
-    <color name="murschol_surface">#1B1E1C</color>
+    <color name="murschol_bg">#0E1212</color>
+    <color name="murschol_surface">#171C1C</color>
+    <color name="murschol_surface2">#202626</color>
     <color name="murschol_text">#F4F0E8</color>
-    <color name="murschol_muted">#AFB4AF</color>
-    <color name="murschol_accent">#D0AA64</color>
-    <color name="murschol_border">#303430</color>
+    <color name="murschol_muted">#AEB5B0</color>
+    <color name="murschol_accent">#D1868C</color>
+    <color name="murschol_border">#323939</color>
+    <color name="murschol_burgundy">#472326</color>
+    <color name="murschol_green">#18352D</color>
+    <color name="murschol_ochre">#3B2E1B</color>
+    <color name="murschol_blue">#1B2F3E</color>
+    <color name="murschol_burgundy_icon">#F0C3C6</color>
+    <color name="murschol_green_icon">#80D2B3</color>
+    <color name="murschol_ochre_icon">#E7C27F</color>
+    <color name="murschol_blue_icon">#9BC7E8</color>
 </resources>
