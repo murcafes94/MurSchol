@@ -20,6 +20,7 @@ ApplicationWindow {
 
     SystemBackend { id: systemBackend }
     AppIndexModel { id: appModel }
+    UniversalSearchModel { id: universalSearch }
 
     Shortcut { sequence: "Meta+Space"; onActivated: root.startOpen = !root.startOpen }
     Shortcut { sequence: "Meta+1"; onActivated: systemBackend.setWorkspace("Estudio") }
@@ -142,6 +143,7 @@ ApplicationWindow {
         anchors.bottom: dock.top
         anchors.bottomMargin: 14
         appModel: appModel
+        searchModel: universalSearch
         backend: systemBackend
         onCloseRequested: root.startOpen = false
     }
