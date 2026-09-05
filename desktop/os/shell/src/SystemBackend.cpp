@@ -2,32 +2,89 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QStorageInfo>
+#include <QSysInfo>
 #include <QTextStream>
+#include <QThread>
+
+namespace {
+QString readTrimmedFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return {};
+    return QString::fromUtf8(file.readAll()).trimmed();
+}
+
+QString unquote(QString value)
+{
+    value = value.trimmed();
+    if (value.size() >= 2 && value.startsWith('"') && value.endsWith('"'))
+        value = value.mid(1, value.size() - 2);
+    return value;
+}
+}
 
 SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
 {
+    detectStaticSystemInfo();
     detectCapabilities();
 
     QSettings settings;
     m_profile = settings.value(QStringLiteral("performance/profile")).toString();
 
     refreshStats();
-    if (m_profile.isEmpty()) {
-        if (m_totalMemoryGb < 3.5)
-            m_profile = QStringLiteral("Ligero");
-        else if (m_totalMemoryGb < 8.0)
-            m_profile = QStringLiteral("Normal");
-        else
-            m_profile = QStringLiteral("Rendimiento");
-    }
+    if (m_profile.isEmpty())
+        m_profile = recommendedProfile();
 
     connect(&m_timer, &QTimer::timeout, this, &SystemBackend::refreshStats);
     m_timer.start(1500);
+}
+
+void SystemBackend::detectStaticSystemInfo()
+{
+    m_kernelVersion = QSysInfo::kernelVersion();
+    m_cpuThreads = qMax(1, QThread::idealThreadCount());
+
+    QFile osRelease(QStringLiteral("/etc/os-release"));
+    if (osRelease.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&osRelease);
+        QString fallback;
+        while (!in.atEnd()) {
+            const QString line = in.readLine();
+            if (line.startsWith(QStringLiteral("PRETTY_NAME="))) {
+                m_distroName = unquote(line.mid(QStringLiteral("PRETTY_NAME=").size()));
+                break;
+            }
+            if (line.startsWith(QStringLiteral("NAME=")))
+                fallback = unquote(line.mid(QStringLiteral("NAME=").size()));
+        }
+        if (m_distroName == QStringLiteral("Linux") && !fallback.isEmpty())
+            m_distroName = fallback;
+    }
+
+    QFile cpuInfo(QStringLiteral("/proc/cpuinfo"));
+    if (cpuInfo.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&cpuInfo);
+        while (!in.atEnd()) {
+            const QString line = in.readLine();
+            if (line.startsWith(QStringLiteral("model name"), Qt::CaseInsensitive)
+                || line.startsWith(QStringLiteral("hardware"), Qt::CaseInsensitive)) {
+                const int colon = line.indexOf(':');
+                if (colon >= 0) {
+                    const QString model = line.mid(colon + 1).trimmed();
+                    if (!model.isEmpty())
+                        m_cpuModel = model;
+                }
+                break;
+            }
+        }
+    }
 }
 
 void SystemBackend::detectCapabilities()
@@ -35,7 +92,20 @@ void SystemBackend::detectCapabilities()
     m_waydroidAvailable = !QStandardPaths::findExecutable(QStringLiteral("waydroid")).isEmpty();
     m_wineAvailable = !QStandardPaths::findExecutable(QStringLiteral("wine")).isEmpty();
     m_flatpakAvailable = !QStandardPaths::findExecutable(QStringLiteral("flatpak")).isEmpty();
-    m_bottlesAvailable = !QStandardPaths::findExecutable(QStringLiteral("bottles")).isEmpty();
+
+    const bool nativeBottles = !QStandardPaths::findExecutable(QStringLiteral("bottles")).isEmpty();
+    const bool userFlatpakBottles = QFileInfo::exists(QDir::homePath() + QStringLiteral("/.local/share/flatpak/app/com.usebottles.bottles"));
+    const bool systemFlatpakBottles = QFileInfo::exists(QStringLiteral("/var/lib/flatpak/app/com.usebottles.bottles"));
+    m_bottlesAvailable = nativeBottles || userFlatpakBottles || systemFlatpakBottles;
+}
+
+QString SystemBackend::recommendedProfile() const
+{
+    if (m_totalMemoryGb > 0.0 && (m_totalMemoryGb < 3.5 || m_cpuThreads <= 2))
+        return QStringLiteral("Ligero");
+    if (m_totalMemoryGb > 0.0 && (m_totalMemoryGb < 8.0 || m_cpuThreads <= 4))
+        return QStringLiteral("Normal");
+    return QStringLiteral("Rendimiento");
 }
 
 void SystemBackend::refreshStats()
@@ -79,17 +149,54 @@ void SystemBackend::refreshStats()
     if (root.bytesTotal() > 0)
         m_diskUsage = qBound(0, int(100.0 * double(root.bytesTotal() - root.bytesAvailable()) / double(root.bytesTotal())), 100);
 
+    refreshBattery();
     emit statsChanged();
+}
+
+void SystemBackend::refreshBattery()
+{
+    m_batteryAvailable = false;
+    m_batteryPercent = -1;
+    m_charging = false;
+
+    const QDir powerDir(QStringLiteral("/sys/class/power_supply"));
+    const QStringList entries = powerDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString &entry : entries) {
+        const QString base = powerDir.filePath(entry);
+        if (readTrimmedFile(base + QStringLiteral("/type")) != QStringLiteral("Battery"))
+            continue;
+
+        m_batteryAvailable = true;
+        bool ok = false;
+        const int capacity = readTrimmedFile(base + QStringLiteral("/capacity")).toInt(&ok);
+        if (ok)
+            m_batteryPercent = qBound(0, capacity, 100);
+
+        const QString status = readTrimmedFile(base + QStringLiteral("/status"));
+        m_charging = status.compare(QStringLiteral("Charging"), Qt::CaseInsensitive) == 0
+                     || status.compare(QStringLiteral("Full"), Qt::CaseInsensitive) == 0;
+        break;
+    }
 }
 
 void SystemBackend::setProfile(const QString &profile)
 {
+    if (profile != QStringLiteral("Ligero")
+        && profile != QStringLiteral("Normal")
+        && profile != QStringLiteral("Rendimiento"))
+        return;
     if (profile == m_profile)
         return;
+
     m_profile = profile;
     QSettings().setValue(QStringLiteral("performance/profile"), profile);
     emit profileChanged();
     updateStatus(QStringLiteral("Perfil cambiado a %1").arg(profile));
+}
+
+void SystemBackend::applyRecommendedProfile()
+{
+    setProfile(recommendedProfile());
 }
 
 bool SystemBackend::startFirstAvailable(const QStringList &commands, const QStringList &arguments)
@@ -120,17 +227,24 @@ void SystemBackend::openAndroid()
         updateStatus(QStringLiteral("Android todavía no está instalado"));
         return;
     }
-    QProcess::startDetached(QStringLiteral("waydroid"), { QStringLiteral("show-full-ui") });
+    if (QProcess::startDetached(QStringLiteral("waydroid"), { QStringLiteral("show-full-ui") }))
+        updateStatus(QStringLiteral("Iniciando Android bajo demanda"));
 }
 
 void SystemBackend::openWindowsManager()
 {
-    if (m_bottlesAvailable) {
+    if (!QStandardPaths::findExecutable(QStringLiteral("bottles")).isEmpty()) {
         QProcess::startDetached(QStringLiteral("bottles"));
+        updateStatus(QStringLiteral("Abriendo entorno Windows"));
         return;
     }
-    if (m_flatpakAvailable) {
+    if (m_bottlesAvailable && m_flatpakAvailable) {
         QProcess::startDetached(QStringLiteral("flatpak"), { QStringLiteral("run"), QStringLiteral("com.usebottles.bottles") });
+        updateStatus(QStringLiteral("Abriendo entorno Windows"));
+        return;
+    }
+    if (m_wineAvailable) {
+        updateStatus(QStringLiteral("Wine está disponible; el gestor gráfico se añadirá en App Manager"));
         return;
     }
     updateStatus(QStringLiteral("Bottles/Wine todavía no está preparado"));
