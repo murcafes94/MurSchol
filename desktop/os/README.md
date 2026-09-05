@@ -1,101 +1,66 @@
 # MurSchol OS Desktop
 
-MurSchol OS Desktop es la variante para PC de MurSchol: un sistema Linux ligero, coherente con MurSchol Mobile y capaz de presentar aplicaciones Linux, Android y Windows dentro de una sola experiencia de escritorio.
+Sistema para PC de la familia MurSchol.
 
-## Base técnica decidida
+## Estado actual
 
-- **Kernel:** Linux.
-- **Base inicial:** Debian 13 minimal (`amd64`).
-- **Sesión gráfica:** Wayland.
-- **Compositor objetivo:** uno ligero basado en wlroots/labwc durante las primeras fases; el shell MurSchol se construirá de forma independiente para poder sustituir la base gráfica más adelante.
-- **Shell:** MurSchol Desktop, con interfaz propia.
-- **Linux:** aplicaciones nativas, Flatpak y AppImage.
-- **Android:** Waydroid bajo demanda.
-- **Windows:** Wine/Bottles bajo demanda.
+Se inició **MurSchol Desktop 0.2**, el primer shell real del proyecto para Linux. La implementación comienza directamente con **C++20 + Qt 6/QML** para evitar depender de un runtime Python en el escritorio final y mantener una base ligera.
 
-## Principio de diseño
+### Ya implementado en el prototipo
 
-El usuario no debe tener que pensar en si una aplicación es Linux, Android o Windows. Inicio, búsqueda y dock las presentan como aplicaciones de MurSchol. El origen técnico solo aparece en información avanzada o en el Centro del Sistema.
+- barra superior propia;
+- dock inferior;
+- menú Inicio;
+- indexado real de aplicaciones Linux desde archivos `.desktop`;
+- búsqueda de aplicaciones por nombre;
+- lanzamiento de aplicaciones instaladas;
+- monitor básico de CPU, RAM y disco;
+- detección de Waydroid, Wine, Bottles y Flatpak;
+- MurSchol System Center inicial;
+- perfiles Ligero / Normal / Rendimiento;
+- espacios de trabajo como primera capa visual;
+- atajos para Archivos y Terminal;
+- compilación automática con GitHub Actions.
 
-## Objetivo de ligereza
+## Base prevista
 
-MurSchol se diseña primero para hardware modesto y luego se amplía para equipos potentes.
+- kernel Linux;
+- Debian 13 minimal como primera base de distribución;
+- Wayland;
+- compositor ligero por validar;
+- MurSchol Desktop como shell propio.
 
-- Objetivo de escritorio recién iniciado: **aprox. 450–500 MB de RAM o menos**, sujeto a medición real.
-- Objetivo mínimo de referencia: **2 GB RAM, CPU x86-64 de 2 núcleos y almacenamiento HDD/SSD**.
-- Waydroid, Wine/Bottles, indexadores pesados y servicios no esenciales no deben arrancar permanentemente.
-- Efectos visuales costosos (blur, transparencias complejas, animaciones extensas) se desactivarán en el perfil ligero.
+No se instalará GNOME o KDE completo como dependencia del producto final.
 
-## Perfiles de hardware
+## Filosofía de recursos
 
-### Ligero
+Android (Waydroid) y Windows (Wine/Bottles) serán componentes bajo demanda. MurSchol debe arrancar con servicios mínimos y activar capas adicionales solo cuando una aplicación las necesite.
 
-Para equipos de aproximadamente 2 GB de RAM:
+Perfiles iniciales:
 
-- Linux nativo como prioridad.
-- efectos mínimos;
-- animaciones reducidas;
-- Android apagado hasta que el usuario abra una APK;
-- Windows iniciado solo al ejecutar una aplicación compatible;
-- servicios opcionales suspendidos cuando no se utilizan.
+- **Ligero**: efectos mínimos, indexación limitada, servicios opcionales bajo demanda.
+- **Normal**: equilibrio para equipos de 4 GB o más.
+- **Rendimiento**: más caché y multitarea cuando el hardware lo permita.
 
-### Normal
+## Compilar
 
-Para 4 GB de RAM:
+En Debian/Ubuntu de desarrollo:
 
-- experiencia visual completa moderada;
-- Android y Windows bajo demanda;
-- multitarea estándar.
+```bash
+sudo apt install cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+cmake -S desktop/os/shell -B build/desktop -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build/desktop --parallel
+./build/desktop/murschol-desktop
+```
 
-### Rendimiento
+Si no se dispone de una PC Linux, GitHub Actions compila automáticamente el shell y publica un artefacto de prueba.
 
-Para 8 GB o más:
+## Próximos hitos
 
-- todos los subsistemas disponibles;
-- multitarea amplia;
-- efectos opcionales completos.
-
-Los perfiles serán una política del mismo sistema, no tres distribuciones distintas.
-
-## Interfaz de escritorio
-
-La interfaz diaria será limpia y no mostrará paneles técnicos permanentemente.
-
-- barra superior discreta con reloj, red, sonido, batería/energía y acceso al centro de control;
-- dock inferior centrado y adaptable;
-- menú Inicio con búsqueda, aplicaciones fijadas y recientes;
-- búsqueda universal mediante `Super + Espacio`;
-- ventanas con bordes suaves y controles consistentes;
-- modos claro y oscuro;
-- escritorio libre para carpetas, documentos y accesos directos;
-- Centro del Sistema separado para Android, Windows, repositorios, recursos y diagnósticos.
-
-## Instalación de aplicaciones
-
-MurSchol App Manager detectará el tipo de archivo y elegirá la capa adecuada:
-
-- `.apk` → Waydroid;
-- `.exe` / `.msi` → Wine o Bottles;
-- `.deb` → APT/MurSchol Packages;
-- `.AppImage` → ejecución Linux;
-- Flatpak → integración con repositorio configurado.
-
-El gestor de aplicaciones deberá comprobar compatibilidad y dependencias antes de ejecutar cambios destructivos.
-
-## Distribución y repositorios
-
-Se prevén canales propios separados para minimizar errores y conservar estabilidad:
-
-- `stable/core` — componentes esenciales de MurSchol;
-- `stable/apps` — aplicaciones aprobadas;
-- `stable/updates` — correcciones y seguridad;
-- `testing` — candidatos a próxima versión;
-- `experimental` — integración y compatibilidad en pruebas.
-
-Los repositorios externos no se habilitarán silenciosamente. Deberán mostrar origen, nivel de confianza y permitir desactivación.
-
-## Filosofía
-
-MurSchol toma como referencias de diseño la simplicidad de sistemas centrados en una experiencia única, la eficiencia de sistemas alternativos ligeros, los gestores de repositorios bien separados y el despliegue automatizado mediante perfiles. No pretende copiar su interfaz ni su código: estas ideas se reinterpretan para un entorno académico, offline-first y de bajos recursos.
-
-Consulta también `docs/DESKTOP_VISION.md` y `docs/REPOSITORY_POLICY.md`.
+1. convertir el prototipo en una sesión Wayland completa;
+2. conectar Wi‑Fi, Bluetooth, audio, brillo y energía;
+3. búsqueda universal de archivos y acciones;
+4. espacios de trabajo funcionales;
+5. modo estudio (PDF + NotCan / Moodle + apuntes);
+6. App Manager unificado para Linux/Android/Windows;
+7. Live ISO de MurSchol OS.
