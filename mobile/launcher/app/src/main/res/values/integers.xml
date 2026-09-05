@@ -1,3 +1,4 @@
 <resources>
     <integer name="tile_columns">2</integer>
+    <integer name="quick_columns">2</integer>
 </resources>
