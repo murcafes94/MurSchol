@@ -17,10 +17,12 @@ ApplicationWindow {
 
     property bool startOpen: false
     property bool systemOpen: false
+    property bool appManagerOpen: false
 
     SystemBackend { id: systemBackend }
     AppIndexModel { id: appModel }
     UniversalSearchModel { id: universalSearch }
+    AppManagerBackend { id: appManagerBackend }
 
     Shortcut { sequence: "Meta+Space"; onActivated: root.startOpen = !root.startOpen }
     Shortcut { sequence: "Meta+1"; onActivated: systemBackend.setWorkspace("Estudio") }
@@ -31,6 +33,7 @@ ApplicationWindow {
         onActivated: {
             root.startOpen = false
             root.systemOpen = false
+            root.appManagerOpen = false
         }
     }
 
@@ -60,7 +63,11 @@ ApplicationWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         backend: systemBackend
-        onSystemClicked: root.systemOpen = !root.systemOpen
+        onSystemClicked: {
+            root.systemOpen = !root.systemOpen
+            root.startOpen = false
+            root.appManagerOpen = false
+        }
     }
 
     ColumnLayout {
@@ -130,10 +137,25 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 18
-        onStartClicked: root.startOpen = !root.startOpen
+        onStartClicked: {
+            root.startOpen = !root.startOpen
+            root.systemOpen = false
+            root.appManagerOpen = false
+        }
         onFilesClicked: systemBackend.openFiles()
         onTerminalClicked: systemBackend.openTerminal()
-        onSystemClicked: root.systemOpen = !root.systemOpen
+        onAndroidClicked: systemBackend.openAndroid()
+        onWindowsClicked: systemBackend.openWindowsManager()
+        onAppManagerClicked: {
+            root.appManagerOpen = !root.appManagerOpen
+            root.startOpen = false
+            root.systemOpen = false
+        }
+        onSystemClicked: {
+            root.systemOpen = !root.systemOpen
+            root.startOpen = false
+            root.appManagerOpen = false
+        }
     }
 
     StartMenu {
@@ -156,6 +178,25 @@ ApplicationWindow {
         anchors.topMargin: 12
         anchors.rightMargin: 20
         backend: systemBackend
+    }
+
+    Rectangle {
+        z: 40
+        visible: root.appManagerOpen
+        anchors.fill: parent
+        color: "#7a02070c"
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.appManagerOpen = false
+        }
+    }
+
+    AppManagerPanel {
+        z: 41
+        visible: root.appManagerOpen
+        anchors.centerIn: parent
+        backend: appManagerBackend
+        onCloseRequested: root.appManagerOpen = false
     }
 
     Label {

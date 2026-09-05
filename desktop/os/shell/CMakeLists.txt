@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(MurScholDesktop VERSION 0.2.2 LANGUAGES CXX)
+project(MurScholDesktop VERSION 0.2.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,6 +16,8 @@ qt_add_executable(murschol-desktop
     src/AppIndexModel.h
     src/UniversalSearchModel.cpp
     src/UniversalSearchModel.h
+    src/AppManagerBackend.cpp
+    src/AppManagerBackend.h
 )
 
 qt_add_qml_module(murschol-desktop
@@ -30,6 +32,7 @@ qt_add_qml_module(murschol-desktop
         qml/components/WorkspacePanel.qml
         qml/components/StudyModePanel.qml
         qml/components/AdaptiveProfile.qml
+        qml/components/AppManagerPanel.qml
 )
 
 target_include_directories(murschol-desktop PRIVATE src)
