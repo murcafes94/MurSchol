@@ -41,11 +41,11 @@ jobs:
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Rename APK
-        run: cp mobile/launcher/app/build/outputs/apk/debug/app-debug.apk MurSchol-Launcher-0.1-Simplex-debug.apk
+        run: cp mobile/launcher/app/build/outputs/apk/debug/app-debug.apk MurSchol-Launcher-0.2-debug.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MurSchol-Launcher-0.1-Simplex
-          path: MurSchol-Launcher-0.1-Simplex-debug.apk
+          name: MurSchol-Launcher-0.2
+          path: MurSchol-Launcher-0.2-debug.apk
           retention-days: 30
