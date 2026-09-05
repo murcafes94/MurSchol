@@ -6,6 +6,10 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
+        <package android:name="com.notcan.app" />
+        <package android:name="com.amazon.kindle" />
+        <package android:name="com.flyersoft.moonreader" />
+        <package android:name="com.flyersoft.moonreaderp" />
     </queries>
 
     <application
