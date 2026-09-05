@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MurSchol Launcher</string>
+    <string name="murschol">MURSCHOL</string>
+    <string name="subtitle">Simplex · 0.1</string>
+    <string name="aula_virtual">🎓\nAula Virtual</string>
+    <string name="biblioteca">📖\nBiblioteca</string>
+    <string name="apuntes">📝\nApuntes</string>
+    <string name="internet">🌐\nInternet</string>
+    <string name="archivos">📁\nArchivos</string>
+    <string name="youtube">▶\nYouTube</string>
+    <string name="apps">Todas las apps</string>
+</resources>

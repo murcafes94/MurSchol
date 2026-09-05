@@ -1,0 +1,27 @@
+<resources>
+    <style name="Theme.MurSchol" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/murschol_bg</item>
+        <item name="android:navigationBarColor">@color/murschol_bg</item>
+        <item name="android:statusBarColor">@color/murschol_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:colorAccent">@color/murschol_accent</item>
+    </style>
+
+    <style name="MurScholTile">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_rowWeight">1</item>
+        <item name="android:layout_gravity">fill</item>
+        <item name="android:minHeight">118dp</item>
+        <item name="android:background">@drawable/tile_background</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/murschol_text</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

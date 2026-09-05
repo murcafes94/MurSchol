@@ -1,0 +1,8 @@
+<resources>
+    <color name="murschol_bg">#111312</color>
+    <color name="murschol_surface">#1B1E1C</color>
+    <color name="murschol_text">#F4F0E8</color>
+    <color name="murschol_muted">#AFB4AF</color>
+    <color name="murschol_accent">#D0AA64</color>
+    <color name="murschol_border">#303430</color>
+</resources>
