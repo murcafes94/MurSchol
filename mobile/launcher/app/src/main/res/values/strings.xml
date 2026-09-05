@@ -1,12 +1,19 @@
 <resources>
     <string name="app_name">MurSchol Launcher</string>
     <string name="murschol">MURSCHOL</string>
-    <string name="subtitle">Simplex · 0.1</string>
-    <string name="aula_virtual">🎓\nAula Virtual</string>
-    <string name="biblioteca">📖\nBiblioteca</string>
-    <string name="apuntes">📝\nApuntes</string>
-    <string name="internet">🌐\nInternet</string>
-    <string name="archivos">📁\nArchivos</string>
-    <string name="youtube">▶\nYouTube</string>
-    <string name="apps">Todas las apps</string>
+    <string name="subtitle">0.2</string>
+    <string name="tagline">Estudia. Profundiza. Vive mejor.</string>
+    <string name="welcome_line">Un escritorio tranquilo para estudiar, leer y organizarte.</string>
+    <string name="aula_virtual">Aula Virtual</string>
+    <string name="biblioteca">Biblioteca</string>
+    <string name="apuntes">Apuntes</string>
+    <string name="internet">Internet</string>
+    <string name="archivos">Archivos</string>
+    <string name="youtube">YouTube</string>
+    <string name="apps">Apps</string>
+    <string name="proximo">Próximo</string>
+    <string name="calendar_placeholder">Sin clases configuradas</string>
+    <string name="calendar_hint">Más adelante MurSchol podrá mostrar aquí tus clases y entregas.</string>
+    <string name="continuar">Continuar</string>
+    <string name="notcan_hint">Retoma tus apuntes y materias</string>
 </resources>
