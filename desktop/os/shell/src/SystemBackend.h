@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <QTimer>
 
-class SystemBackend final : public QObject
+class SystemBackend : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int cpuUsage READ cpuUsage NOTIFY statsChanged)

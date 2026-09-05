@@ -9,7 +9,7 @@ struct MurScholAppEntry {
     QString source;
 };
 
-class AppIndexModel final : public QAbstractListModel
+class AppIndexModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
