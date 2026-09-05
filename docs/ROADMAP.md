@@ -34,24 +34,33 @@
 
 ### MurSchol Desktop
 
-- [ ] Incorporar al repositorio el prototipo del shell MurSchol.
-- [ ] Dock inferior adaptable.
-- [ ] Menú Inicio.
+- [x] Incorporar al repositorio el prototipo del shell MurSchol en C++20 + Qt 6/QML.
+- [x] Dock inferior inicial adaptable.
+- [x] Menú Inicio.
+- [x] Indexador de aplicaciones `.desktop`.
+- [x] Búsqueda universal — primera fase local: aplicaciones, nombres de archivos y acciones.
+- [x] MurSchol System Center — primera fase con hardware, recursos y compatibilidad.
+- [x] Perfil adaptativo Ligero / Normal / Rendimiento con recomendación por hardware.
+- [x] Espacios Estudio / Trabajos / Personal con estado persistente y atajos.
+- [x] Modo estudio — primera fase de perfiles y preferencias.
 - [ ] Centro de control real conectado a red/audio/energía.
-- [ ] Búsqueda universal.
-- [ ] Indexador de aplicaciones `.desktop`.
+- [ ] Búsqueda de contenido dentro de documentos, opcional y de bajo consumo.
 - [ ] Modo claro/oscuro.
-- [ ] Perfil gráfico Ligero sin blur ni efectos costosos.
-- [ ] MurSchol System Center.
+- [ ] Aplicar físicamente el perfil Ligero a todos los efectos del compositor.
+- [ ] Espacios de trabajo gestionados por el compositor.
+- [ ] Modo estudio con composición real de ventanas.
 
 ### Aplicaciones
 
-- [ ] Linux nativo, Flatpak y AppImage.
-- [ ] Waydroid bajo demanda para APK.
-- [ ] Wine/Bottles bajo demanda para EXE/MSI.
-- [ ] MurSchol App Manager con instalación unificada.
+- [x] Lanzamiento de aplicaciones Linux instaladas mediante `.desktop`.
+- [x] Detección e inicio básico de Waydroid bajo demanda.
+- [x] Detección e inicio básico de Wine/Bottles bajo demanda.
+- [ ] AppImage y Flatpak integrados explícitamente en App Manager.
+- [ ] MurSchol App Manager con instalación unificada para Linux/Android/Windows.
+- [ ] Asociación de `.apk`, `.exe`, `.msi`, `.deb` y `.AppImage` con App Manager.
 - [ ] Niveles de compatibilidad por aplicación.
-- [ ] Integración con Moodle, Biblioteca y modo estudio.
+- [ ] MurSchol Store.
+- [ ] Integración profunda con Moodle, Biblioteca, NotCan y modo estudio.
 
 ### Distribución
 
@@ -63,3 +72,9 @@
 - [ ] Instalador gráfico.
 - [ ] Primera imagen instalable para pruebas en hardware real.
 - [ ] Pruebas en equipos de 2 GB, 4 GB y 8 GB de RAM.
+
+### Compilación continua
+
+- [x] GitHub Actions para compilar el shell sin depender de una PC Linux local.
+- [x] Empaquetado automático del prototipo Linux x86-64 como artefacto de prueba.
+- [ ] Workflow para construir una Live ISO reproducible.
