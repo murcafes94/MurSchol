@@ -29,8 +29,8 @@
 - [x] Definir objetivo de bajo consumo y perfiles Ligero/Normal/Rendimiento.
 - [x] Definir experiencia unificada Linux + Android + Windows.
 - [x] Definir política inicial de repositorios stable/testing/experimental.
-- [ ] Crear scripts reproducibles de bootstrap de la base Debian.
-- [ ] Elegir y validar compositor Wayland ligero para la primera imagen.
+- [x] Crear scripts reproducibles de bootstrap de la primera base Live Debian.
+- [ ] Validar **labwc** como compositor Wayland ligero en el primer arranque real/virtual.
 
 ### MurSchol Desktop
 
@@ -70,7 +70,9 @@
 - [ ] Caché segura para paquetes y componentes opcionales.
 - [ ] Repositorio MurSchol de pruebas.
 - [ ] Actualizaciones firmadas.
-- [ ] Live ISO.
+- [x] **MurSchol OS 0.1 Live amd64** generado como primera alpha de prueba.
+- [ ] Validar arranque BIOS/UEFI y sesión MurSchol en máquina virtual.
+- [ ] Validar arranque desde USB en hardware real.
 - [ ] Instalador gráfico.
 - [ ] Primera imagen instalable para pruebas en hardware real.
 - [ ] Pruebas en equipos de 2 GB, 4 GB y 8 GB de RAM.
@@ -79,4 +81,5 @@
 
 - [x] GitHub Actions para compilar el shell sin depender de una PC Linux local.
 - [x] Empaquetado automático del prototipo Linux x86-64 como artefacto de prueba.
-- [ ] Workflow para construir una Live ISO reproducible.
+- [x] Workflow reproducible para construir y verificar la Live ISO.
+- [x] Verificación SHA-256 automática antes de publicar el artefacto de la ISO.
