@@ -4,23 +4,31 @@ Sistema para PC de la familia MurSchol.
 
 ## Estado actual
 
-Se inició **MurSchol Desktop 0.2**, el primer shell real del proyecto para Linux. La implementación comienza directamente con **C++20 + Qt 6/QML** para evitar depender de un runtime Python en el escritorio final y mantener una base ligera.
+**MurSchol Desktop 0.2.2** es el primer shell real del proyecto para Linux. La implementación usa **C++20 + Qt 6/QML** para evitar depender de un runtime Python en el escritorio final y mantener una base ligera.
 
 ### Ya implementado en el prototipo
 
-- barra superior propia;
+- barra superior propia con reloj, CPU, RAM, batería y espacio activo;
 - dock inferior;
 - menú Inicio;
 - indexado real de aplicaciones Linux desde archivos `.desktop`;
-- búsqueda de aplicaciones por nombre;
 - lanzamiento de aplicaciones instaladas;
-- monitor básico de CPU, RAM y disco;
+- **búsqueda universal local** de aplicaciones, documentos y acciones;
+- búsqueda limitada a Escritorio, Documentos y Descargas para evitar un indexador pesado;
+- acción opcional para buscar en Internet mediante el navegador predeterminado;
+- monitor real de CPU, RAM y disco;
+- detección de distribución, kernel, CPU, núcleos/hilos y batería;
 - detección de Waydroid, Wine, Bottles y Flatpak;
 - MurSchol System Center inicial;
-- perfiles Ligero / Normal / Rendimiento;
-- espacios de trabajo como primera capa visual;
+- perfil recomendado automáticamente según RAM y CPU;
+- perfiles Ligero / Normal / Rendimiento persistentes;
+- espacios de trabajo seleccionables: Estudio / Trabajos / Personal;
+- atajos `Super + 1`, `Super + 2` y `Super + 3` para los espacios;
+- primera capa funcional de **Modo estudio** con perfiles PDF + NotCan, Moodle + Apuntes y Lectura;
 - atajos para Archivos y Terminal;
 - compilación automática con GitHub Actions.
+
+> Los espacios y el Modo estudio ya guardan estado y preferencias. La colocación real de ventanas se conectará cuando MurSchol Desktop controle el compositor Wayland.
 
 ## Base prevista
 
@@ -42,12 +50,14 @@ Perfiles iniciales:
 - **Normal**: equilibrio para equipos de 4 GB o más.
 - **Rendimiento**: más caché y multitarea cuando el hardware lo permita.
 
+La búsqueda local evita por ahora un servicio de indexación en segundo plano: mantiene un índice acotado de nombres de archivos y lo actualiza cuando el usuario lo solicita.
+
 ## Compilar
 
 En Debian/Ubuntu de desarrollo:
 
 ```bash
-sudo apt install cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+sudo apt install cmake ninja-build g++ qt6-base-dev qt6-declarative-dev libxkbcommon-dev
 cmake -S desktop/os/shell -B build/desktop -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build/desktop --parallel
 ./build/desktop/murschol-desktop
@@ -57,10 +67,10 @@ Si no se dispone de una PC Linux, GitHub Actions compila automáticamente el she
 
 ## Próximos hitos
 
-1. convertir el prototipo en una sesión Wayland completa;
-2. conectar Wi‑Fi, Bluetooth, audio, brillo y energía;
-3. búsqueda universal de archivos y acciones;
-4. espacios de trabajo funcionales;
-5. modo estudio (PDF + NotCan / Moodle + apuntes);
-6. App Manager unificado para Linux/Android/Windows;
-7. Live ISO de MurSchol OS.
+1. MurSchol App Manager para `.apk`, `.exe`, `.msi`, AppImage y paquetes Linux;
+2. convertir el prototipo en una sesión Wayland completa;
+3. conectar Wi‑Fi, Bluetooth, audio, brillo y energía;
+4. convertir los espacios de trabajo en escritorios reales;
+5. hacer que Modo estudio organice físicamente las ventanas;
+6. preparar scripts reproducibles de Debian 13 minimal;
+7. primera Live ISO de MurSchol OS.
