@@ -14,6 +14,8 @@ class SystemBackend : public QObject
     Q_PROPERTY(int diskUsage READ diskUsage NOTIFY statsChanged)
     Q_PROPERTY(QString profile READ profile WRITE setProfile NOTIFY profileChanged)
     Q_PROPERTY(QString recommendedProfile READ recommendedProfile NOTIFY statsChanged)
+    Q_PROPERTY(QString workspace READ workspace WRITE setWorkspace NOTIFY workspaceChanged)
+    Q_PROPERTY(QString studyLayout READ studyLayout WRITE setStudyLayout NOTIFY studyLayoutChanged)
     Q_PROPERTY(bool waydroidAvailable READ waydroidAvailable CONSTANT)
     Q_PROPERTY(bool wineAvailable READ wineAvailable CONSTANT)
     Q_PROPERTY(bool bottlesAvailable READ bottlesAvailable CONSTANT)
@@ -36,6 +38,8 @@ public:
     int diskUsage() const { return m_diskUsage; }
     QString profile() const { return m_profile; }
     QString recommendedProfile() const;
+    QString workspace() const { return m_workspace; }
+    QString studyLayout() const { return m_studyLayout; }
     QString statusText() const { return m_statusText; }
 
     bool waydroidAvailable() const { return m_waydroidAvailable; }
@@ -53,6 +57,8 @@ public:
 
     Q_INVOKABLE void setProfile(const QString &profile);
     Q_INVOKABLE void applyRecommendedProfile();
+    Q_INVOKABLE void setWorkspace(const QString &workspace);
+    Q_INVOKABLE void setStudyLayout(const QString &layout);
     Q_INVOKABLE void openFiles();
     Q_INVOKABLE void openTerminal();
     Q_INVOKABLE void openAndroid();
@@ -63,6 +69,8 @@ public:
 signals:
     void statsChanged();
     void profileChanged();
+    void workspaceChanged();
+    void studyLayoutChanged();
     void statusChanged();
 
 private slots:
@@ -81,6 +89,8 @@ private:
     double m_totalMemoryGb = 0.0;
     int m_diskUsage = 0;
     QString m_profile;
+    QString m_workspace = QStringLiteral("Estudio");
+    QString m_studyLayout = QStringLiteral("PDF + NotCan");
     QString m_statusText = QStringLiteral("MurSchol listo");
     bool m_waydroidAvailable = false;
     bool m_wineAvailable = false;

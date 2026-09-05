@@ -22,7 +22,16 @@ ApplicationWindow {
     AppIndexModel { id: appModel }
 
     Shortcut { sequence: "Meta+Space"; onActivated: root.startOpen = !root.startOpen }
-    Shortcut { sequence: "Escape"; onActivated: { root.startOpen = false; root.systemOpen = false } }
+    Shortcut { sequence: "Meta+1"; onActivated: systemBackend.setWorkspace("Estudio") }
+    Shortcut { sequence: "Meta+2"; onActivated: systemBackend.setWorkspace("Trabajos") }
+    Shortcut { sequence: "Meta+3"; onActivated: systemBackend.setWorkspace("Personal") }
+    Shortcut {
+        sequence: "Escape"
+        onActivated: {
+            root.startOpen = false
+            root.systemOpen = false
+        }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -34,9 +43,14 @@ ApplicationWindow {
     }
 
     Rectangle {
-        width: parent.width * 0.62; height: parent.height * 0.62
-        anchors.right: parent.right; anchors.bottom: parent.bottom
-        color: "#0d2133"; opacity: 0.35; rotation: -8; radius: 40
+        width: parent.width * 0.62
+        height: parent.height * 0.62
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: "#0d2133"
+        opacity: systemBackend.profile === "Ligero" ? 0.18 : 0.35
+        rotation: -8
+        radius: systemBackend.profile === "Ligero" ? 20 : 40
     }
 
     TopBar {
@@ -59,20 +73,50 @@ ApplicationWindow {
         Label { text: "Aprender. Crear. Sin límites."; color: "#b6c7d4"; font.pixelSize: 17 }
         Rectangle { width: 72; height: 3; radius: 2; color: "#22d6cf" }
         Label {
-            width: 360; wrapMode: Text.WordWrap
+            width: 390
+            wrapMode: Text.WordWrap
             text: "“Concédeme agudeza para entender y facilidad para aprender.”\n— Santo Tomás de Aquino"
-            color: "#d5e8ee"; opacity: 0.84; font.pixelSize: 15; font.italic: true
+            color: "#d5e8ee"
+            opacity: 0.84
+            font.pixelSize: 15
+            font.italic: true
+        }
+        Rectangle {
+            width: activeSpace.implicitWidth + 24
+            height: 30
+            radius: 15
+            color: "#153442"
+            border.color: "#2b5969"
+            Label {
+                id: activeSpace
+                anchors.centerIn: parent
+                text: "Espacio activo: " + systemBackend.workspace
+                color: "#7edfd9"
+                font.pixelSize: 11
+                font.bold: true
+            }
         }
     }
 
     WorkspacePanel {
+        visible: root.width >= 1200
         anchors.left: parent.left
         anchors.bottom: dock.top
         anchors.leftMargin: 30
         anchors.bottomMargin: 18
+        backend: systemBackend
+    }
+
+    StudyModePanel {
+        visible: root.width >= 1380
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: dock.top
+        anchors.bottomMargin: 18
+        backend: systemBackend
     }
 
     AdaptiveProfile {
+        visible: root.width >= 1200
         anchors.right: parent.right
         anchors.bottom: dock.top
         anchors.rightMargin: 30

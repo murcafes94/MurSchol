@@ -37,6 +37,8 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
 
     QSettings settings;
     m_profile = settings.value(QStringLiteral("performance/profile")).toString();
+    m_workspace = settings.value(QStringLiteral("workspace/active"), QStringLiteral("Estudio")).toString();
+    m_studyLayout = settings.value(QStringLiteral("study/layout"), QStringLiteral("PDF + NotCan")).toString();
 
     refreshStats();
     if (m_profile.isEmpty())
@@ -197,6 +199,36 @@ void SystemBackend::setProfile(const QString &profile)
 void SystemBackend::applyRecommendedProfile()
 {
     setProfile(recommendedProfile());
+}
+
+void SystemBackend::setWorkspace(const QString &workspace)
+{
+    if (workspace != QStringLiteral("Estudio")
+        && workspace != QStringLiteral("Trabajos")
+        && workspace != QStringLiteral("Personal"))
+        return;
+    if (workspace == m_workspace)
+        return;
+
+    m_workspace = workspace;
+    QSettings().setValue(QStringLiteral("workspace/active"), workspace);
+    emit workspaceChanged();
+    updateStatus(QStringLiteral("Espacio activo: %1").arg(workspace));
+}
+
+void SystemBackend::setStudyLayout(const QString &layout)
+{
+    if (layout != QStringLiteral("PDF + NotCan")
+        && layout != QStringLiteral("Moodle + Apuntes")
+        && layout != QStringLiteral("Lectura"))
+        return;
+    if (layout == m_studyLayout)
+        return;
+
+    m_studyLayout = layout;
+    QSettings().setValue(QStringLiteral("study/layout"), layout);
+    emit studyLayoutChanged();
+    updateStatus(QStringLiteral("Modo estudio: %1").arg(layout));
 }
 
 bool SystemBackend::startFirstAvailable(const QStringList &commands, const QStringList &arguments)

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(MurScholDesktop VERSION 0.2.0 LANGUAGES CXX)
+project(MurScholDesktop VERSION 0.2.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,6 +26,7 @@ qt_add_qml_module(murschol-desktop
         qml/components/StartMenu.qml
         qml/components/SystemCenter.qml
         qml/components/WorkspacePanel.qml
+        qml/components/StudyModePanel.qml
         qml/components/AdaptiveProfile.qml
 )
 
