@@ -31,8 +31,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            live-build debootstrap xorriso squashfs-tools \
-            dosfstools mtools syslinux-utils isolinux
+            cpio debootstrap xorriso squashfs-tools \
+            dosfstools mtools syslinux-utils isolinux curl
+
+          # Ubuntu 24.04 todavía distribuye un live-build antiguo que genera
+          # la ruta de seguridad obsoleta "trixie/updates". Para construir
+          # Debian 13 usamos el paquete oficial actual de Trixie y verificamos
+          # su SHA-256 antes de instalarlo.
+          curl -fsSL \
+            https://deb.debian.org/debian/pool/main/l/live-build/live-build_20250505+deb13u1_all.deb \
+            -o /tmp/live-build.deb
+          echo "58e09779881cbcc631c49ceb703413e0247a87db01823e597b2a1c40a2afd8f4  /tmp/live-build.deb" | sha256sum -c -
+          sudo dpkg -i /tmp/live-build.deb
+          lb --version
 
       - name: Validar scripts
         run: |
