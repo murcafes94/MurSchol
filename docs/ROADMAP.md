@@ -55,9 +55,11 @@
 - [x] Lanzamiento de aplicaciones Linux instaladas mediante `.desktop`.
 - [x] Detección e inicio básico de Waydroid bajo demanda.
 - [x] Detección e inicio básico de Wine/Bottles bajo demanda.
-- [ ] AppImage y Flatpak integrados explícitamente en App Manager.
-- [ ] MurSchol App Manager con instalación unificada para Linux/Android/Windows.
-- [ ] Asociación de `.apk`, `.exe`, `.msi`, `.deb` y `.AppImage` con App Manager.
+- [x] AppImage y Flatpak integrados en la primera versión de App Manager.
+- [x] MurSchol App Manager — primera fase de instalación unificada Linux/Android/Windows.
+- [x] Detección de `.apk`, `.exe`, `.msi`, `.deb`, `.AppImage` y `.flatpakref`.
+- [ ] Asociación de esos formatos con App Manager a nivel de sistema.
+- [ ] Crear perfiles aislados de Wine/Bottles por aplicación cuando corresponda.
 - [ ] Niveles de compatibilidad por aplicación.
 - [ ] MurSchol Store.
 - [ ] Integración profunda con Moodle, Biblioteca, NotCan y modo estudio.
