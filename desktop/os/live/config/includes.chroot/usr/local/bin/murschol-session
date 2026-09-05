@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=MurSchol
+export XDG_SESSION_DESKTOP=MurSchol
+export QT_QPA_PLATFORM=wayland
+export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+
+exec dbus-run-session labwc

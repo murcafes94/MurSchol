@@ -1,0 +1,62 @@
+# Núcleo Live / sesión
+live-config
+live-config-systemd
+live-tools
+user-setup
+keyboard-configuration
+iproute2
+linux-image-amd64
+sudo
+locales
+ca-certificates
+curl
+xdg-utils
+dbus-user-session
+
+# Sesión gráfica mínima Wayland
+lightdm
+lightdm-gtk-greeter
+labwc
+xwayland
+qt6-wayland
+qml6-module-qtquick
+qml6-module-qtquick-controls
+qml6-module-qtquick-layouts
+qml6-module-qtqml-workerscript
+fonts-noto-core
+fonts-noto-color-emoji
+
+# Red, audio, energía y Bluetooth
+network-manager
+network-manager-gnome
+pipewire
+pipewire-audio
+wireplumber
+pavucontrol
+alsa-utils
+upower
+brightnessctl
+bluez
+blueman
+polkitd
+
+# Aplicaciones esenciales para la primera prueba
+thunar
+gvfs
+foot
+firefox-esr
+
+# Herramientas necesarias para compilar MurSchol Desktop dentro del chroot
+cmake
+ninja-build
+g++
+qt6-base-dev
+qt6-declarative-dev
+
+# Firmware habitual para portátiles y equipos de escritorio
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-mediatek
+firmware-amd-graphics
+firmware-misc-nonfree

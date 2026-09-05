@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Propaga el entorno de la sesión a servicios iniciados por systemd/dbus.
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
+
+# El shell es el escritorio principal. Labwc permanece como compositor ligero.
+/usr/local/bin/murschol-desktop &

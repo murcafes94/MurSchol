@@ -1,0 +1,61 @@
+name: Build MurSchol Live ISO
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'desktop/os/live/**'
+      - 'desktop/os/shell/**'
+      - '.github/workflows/build-live-iso.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-live-iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Liberar espacio del runner
+        run: |
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/share/dotnet || true
+          df -h
+
+      - name: Instalar herramientas de live-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            live-build debootstrap xorriso squashfs-tools \
+            dosfstools mtools syslinux-utils isolinux
+
+      - name: Validar scripts
+        run: |
+          bash -n desktop/os/live/build-live.sh
+          sh -n desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
+          sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+
+      - name: Construir MurSchol OS Live 0.1
+        run: sudo ./desktop/os/live/build-live.sh
+
+      - name: Verificar ISO
+        run: |
+          ls -lh desktop/os/live/MurSchol-OS-0.1-Live-amd64.iso*
+          cd desktop/os/live
+          sha256sum -c MurSchol-OS-0.1-Live-amd64.iso.sha256
+
+      - name: Publicar ISO de prueba
+        uses: actions/upload-artifact@v4
+        with:
+          name: MurSchol-OS-0.1-Live-amd64
+          path: |
+            desktop/os/live/MurSchol-OS-0.1-Live-amd64.iso
+            desktop/os/live/MurSchol-OS-0.1-Live-amd64.iso.sha256
+          compression-level: 0
+          retention-days: 14

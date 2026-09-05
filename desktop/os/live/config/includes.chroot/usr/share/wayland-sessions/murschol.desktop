@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=MurSchol OS
+Comment=Sesión Wayland de MurSchol
+Exec=/usr/local/bin/murschol-session
+TryExec=/usr/local/bin/murschol-session
+Type=Application
+DesktopNames=MurSchol

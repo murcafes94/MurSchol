@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+echo "[MurSchol] Compilando shell dentro de Debian Live..."
+cmake -S /usr/src/murschol-shell \
+      -B /tmp/murschol-build \
+      -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local
+
+cmake --build /tmp/murschol-build --parallel "$(nproc)"
+cmake --install /tmp/murschol-build
+
+cat > /usr/share/applications/murschol-desktop.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Desktop
+Comment=Escritorio principal de MurSchol OS
+Exec=/usr/local/bin/murschol-desktop
+Terminal=false
+Categories=System;Education;
+EOF
+
+chmod 0755 /usr/local/bin/murschol-desktop
+rm -rf /tmp/murschol-build /usr/src/murschol-shell
+
+echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
