@@ -217,14 +217,9 @@ Rectangle {
                     model: root.appModel
 
                     delegate: Button {
+                        id: appButton
                         width: grid.cellWidth - 10
                         height: 100
-                        text: appName
-                        icon.name: iconName
-                        icon.width: 34
-                        icon.height: 34
-                        display: AbstractButton.TextUnderIcon
-                        spacing: 8
 
                         onClicked: {
                             root.appModel.launch(index)
@@ -233,23 +228,37 @@ Rectangle {
 
                         background: Rectangle {
                             radius: 18
-                            color: parent.hovered ? "#21475a" : "#132b38"
+                            color: appButton.hovered ? "#21475a" : "#132b38"
                             border.width: 1
-                            border.color: parent.hovered ? "#3f7c91" : "#294b5c"
+                            border.color: appButton.hovered ? "#3f7c91" : "#294b5c"
                             Behavior on color { ColorAnimation { duration: 100 } }
                         }
 
                         contentItem: ColumnLayout {
-                            spacing: 5
+                            spacing: 4
                             Item { Layout.fillHeight: true }
                             Rectangle {
                                 Layout.alignment: Qt.AlignHCenter
-                                width: 44
-                                height: 44
-                                radius: 13
-                                color: "#1c4356"
+                                width: 48
+                                height: 48
+                                radius: 14
+                                color: appButton.hovered ? "#23556b" : "#1a4051"
+
+                                Image {
+                                    id: appThemeIcon
+                                    anchors.centerIn: parent
+                                    width: 34
+                                    height: 34
+                                    source: "image://theme/" + iconName
+                                    sourceSize.width: 40
+                                    sourceSize.height: 40
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                }
+
                                 Label {
                                     anchors.centerIn: parent
+                                    visible: appThemeIcon.status === Image.Error
                                     text: appName.length > 0 ? appName.substring(0, 1).toUpperCase() : "•"
                                     color: "#7ceae4"
                                     font.pixelSize: 18
