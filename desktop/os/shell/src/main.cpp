@@ -20,7 +20,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<AppManagerBackend>("MurScholShell", 1, 0, "AppManagerBackend");
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/qt/qml/MurScholShell/qml/Main.qml")));
+
+    // Con Qt 6.4 mantenemos QTP0001 en su comportamiento antiguo, por lo que
+    // qt_add_qml_module() incrusta el módulo bajo :/MurScholShell/... y no bajo
+    // :/qt/qml/MurScholShell/.... Cargar la ruta real evita que la sesión Live
+    // falle con "No such file or directory" al iniciar Main.qml.
+    engine.load(QUrl(QStringLiteral("qrc:/MurScholShell/qml/Main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 
