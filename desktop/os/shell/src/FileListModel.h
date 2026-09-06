@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include <QList>
+#include <QStandardPaths>
 #include <QString>
 
 struct MurScholFileEntry {
