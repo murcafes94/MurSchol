@@ -6,6 +6,7 @@
 #include "AppIndexModel.h"
 #include "UniversalSearchModel.h"
 #include "AppManagerBackend.h"
+#include "ThemeIconProvider.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<AppManagerBackend>("MurScholShell", 1, 0, "AppManagerBackend");
 
     QQmlApplicationEngine engine;
+    engine.addImageProvider(QStringLiteral("theme"), new ThemeIconProvider);
 
     // Con Qt 6.4 mantenemos QTP0001 en su comportamiento antiguo, por lo que
     // qt_add_qml_module() incrusta el módulo bajo :/MurScholShell/... y no bajo
