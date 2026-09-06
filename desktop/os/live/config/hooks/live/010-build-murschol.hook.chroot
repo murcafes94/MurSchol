@@ -21,7 +21,39 @@ Terminal=false
 Categories=System;Education;
 EOF
 
+cat > /usr/share/applications/murschol-files.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Files
+GenericName=Gestor de archivos
+Comment=Explora y organiza tus archivos en MurSchol OS
+Exec=/usr/local/bin/murschol-files
+Icon=system-file-manager
+Terminal=false
+MimeType=inode/directory;
+Categories=System;FileTools;Utility;
+Keywords=archivos;carpetas;documentos;files;folders;
+EOF
+
+cat > /usr/share/applications/murschol-edge.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Microsoft Edge
+GenericName=Navegador web
+Comment=Abre Edge o instálalo desde el repositorio oficial de Microsoft
+Exec=/usr/local/bin/murschol-edge %U
+Icon=web-browser
+Terminal=false
+Categories=Network;WebBrowser;
+Keywords=edge;internet;navegador;browser;
+StartupNotify=true
+EOF
+
 chmod 0755 /usr/local/bin/murschol-desktop
+chmod 0755 /usr/local/bin/murschol-files
+chmod 0755 /usr/local/bin/murschol-edge
+chmod 0755 /usr/local/lib/murschol/install-edge-root
+
 if [ -x /usr/local/bin/murschol-panel ]; then
   chmod 0755 /usr/local/bin/murschol-panel
   echo "[MurSchol] Panel global wlr-layer-shell instalado."
@@ -29,6 +61,11 @@ else
   echo "[MurSchol] Aviso: panel global no disponible; el shell conservará el dock integrado."
 fi
 
+# MurSchol Files será el gestor predeterminado para carpetas nuevas y existentes.
+update-desktop-database /usr/share/applications 2>/dev/null || true
+
 rm -rf /tmp/murschol-build /usr/src/murschol-shell
 
 echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
+echo "[MurSchol] MurSchol Files instalado en /usr/local/bin/murschol-files"
+echo "[MurSchol] Microsoft Edge disponible como instalación bajo demanda."
