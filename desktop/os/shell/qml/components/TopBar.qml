@@ -7,9 +7,10 @@ Rectangle {
     property var backend
     property date now: new Date()
     signal systemClicked()
-    height: 58
-    color: "#d80b1722"
-    border.color: "#183848"
+
+    height: 46
+    color: "#e1091722"
+    border.color: "#173544"
 
     Timer {
         interval: 30000
@@ -20,62 +21,100 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 22
-        anchors.rightMargin: 16
-        spacing: 14
+        anchors.leftMargin: 16
+        anchors.rightMargin: 14
+        spacing: 10
 
         Rectangle {
-            width: 36; height: 36; radius: 11
-            color: "#123544"; border.color: "#29d9d1"
-            Label { anchors.centerIn: parent; text: "MS"; color: "#c8fffb"; font.bold: true }
-        }
-
-        Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 18; font.bold: true }
-        Label {
-            visible: root.width > 980
-            text: "Ligero • Versátil • Preparado para el futuro"
-            color: "#7f99a7"; font.pixelSize: 12
-        }
-
-        Rectangle {
-            visible: root.width > 1120
+            width: 30
             height: 30
-            width: workspaceLabel.implicitWidth + 24
-            radius: 15
-            color: "#173947"
-            border.color: "#2f6877"
-            Label {
-                id: workspaceLabel
-                anchors.centerIn: parent
-                text: "Espacio: " + backend.workspace
-                color: "#9fe7e2"
-                font.pixelSize: 11
-                font.bold: true
-            }
+            radius: 9
+            color: "#123544"
+            border.color: "#29d9d1"
+            Label { anchors.centerIn: parent; text: "MS"; color: "#c8fffb"; font.bold: true; font.pixelSize: 10 }
+        }
+
+        Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 15; font.bold: true }
+        Label {
+            visible: root.width > 1120
+            text: "Aprender hoy, un mundo mejor mañana"
+            color: "#748f9c"
+            font.pixelSize: 9
         }
 
         Item { Layout.fillWidth: true }
 
-        Label { text: Qt.formatDateTime(root.now, "ddd, d MMM  hh:mm"); color: "#d2e0e5" }
-        Label { visible: root.width > 1050; text: "CPU " + backend.cpuUsage + "%"; color: "#8edbd5"; font.pixelSize: 12 }
-        Label { visible: root.width > 1050; text: "RAM " + backend.memoryUsage + "%"; color: "#a9d7a7"; font.pixelSize: 12 }
+        Rectangle {
+            visible: root.width > 960
+            height: 26
+            width: workspaceLabel.implicitWidth + 20
+            radius: 13
+            color: "#143441"
+            border.color: "#2f6877"
+            Label {
+                id: workspaceLabel
+                anchors.centerIn: parent
+                text: backend.workspace
+                color: "#9fe7e2"
+                font.pixelSize: 9
+                font.bold: true
+            }
+        }
+
+        Label {
+            text: Qt.formatDateTime(root.now, "ddd, d MMM  hh:mm")
+            color: "#d9e5e9"
+            font.pixelSize: 11
+        }
+
+        Rectangle {
+            visible: root.width > 1180
+            width: 60
+            height: 24
+            radius: 12
+            color: "#122a35"
+            Label {
+                anchors.centerIn: parent
+                text: "CPU " + backend.cpuUsage + "%"
+                color: "#81d9d4"
+                font.pixelSize: 8
+            }
+        }
+
+        Rectangle {
+            visible: root.width > 1180
+            width: 60
+            height: 24
+            radius: 12
+            color: "#122a35"
+            Label {
+                anchors.centerIn: parent
+                text: "RAM " + backend.memoryUsage + "%"
+                color: "#a9d7a7"
+                font.pixelSize: 8
+            }
+        }
+
         Label {
             visible: backend.batteryAvailable
             text: (backend.charging ? "⚡ " : "") + backend.batteryPercent + "%"
             color: backend.batteryPercent <= 20 ? "#efb36a" : "#d1e6d8"
-            font.pixelSize: 12
+            font.pixelSize: 10
             font.bold: backend.batteryPercent <= 20
         }
 
         Button {
+            width: 34
+            height: 32
             text: "⚙"
             onClicked: root.systemClicked()
-            background: Rectangle { radius: 10; color: parent.hovered ? "#294758" : "#172934" }
+            background: Rectangle { radius: 10; color: parent.hovered ? "#294758" : "transparent" }
             contentItem: Label {
-                text: parent.text; color: "white"
+                text: parent.text
+                color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
+                font.pixelSize: 15
             }
         }
     }
