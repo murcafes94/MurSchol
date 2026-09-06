@@ -6,5 +6,17 @@ export XDG_CURRENT_DESKTOP=MurSchol
 export XDG_SESSION_DESKTOP=MurSchol
 export QT_QPA_PLATFORM=wayland
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+export WLR_RENDERER_ALLOW_SOFTWARE=1
 
-exec dbus-run-session labwc
+# VirtualBox suele arrancar Wayland sin aceleración 3D en esta alpha.
+# En ese caso forzamos renderizado por software para evitar pantalla negra.
+PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)"
+case "$PRODUCT_NAME" in
+  *VirtualBox*)
+    export WLR_RENDERER=pixman
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export QT_QUICK_BACKEND=software
+    ;;
+esac
+
+exec dbus-run-session labwc >> /tmp/murschol-session.log 2>&1
