@@ -247,6 +247,12 @@ void SystemBackend::openFiles()
         updateStatus(QStringLiteral("No se pudo abrir Archivos"));
 }
 
+void SystemBackend::openBrowser()
+{
+    if (!startFirstAvailable({QStringLiteral("firefox-esr"), QStringLiteral("firefox"), QStringLiteral("chromium"), QStringLiteral("google-chrome"), QStringLiteral("brave-browser")}))
+        updateStatus(QStringLiteral("No se encontró un navegador"));
+}
+
 void SystemBackend::openTerminal()
 {
     if (!startFirstAvailable({QStringLiteral("foot"), QStringLiteral("kgx"), QStringLiteral("konsole"), QStringLiteral("gnome-terminal"), QStringLiteral("xfce4-terminal"), QStringLiteral("xterm")}))
