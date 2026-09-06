@@ -254,13 +254,27 @@ bool SystemBackend::startFirstAvailable(const QStringList &commands, const QStri
 
 void SystemBackend::openFiles()
 {
+    // Abrimos primero el gestor propio. Thunar queda como respaldo durante la alpha.
+    if (startFirstAvailable({QStringLiteral("murschol-files"), QStringLiteral("thunar")}))
+        return;
+
     if (!QProcess::startDetached(QStringLiteral("xdg-open"), { QDir::homePath() }))
         updateStatus(QStringLiteral("No se pudo abrir Archivos"));
 }
 
 void SystemBackend::openBrowser()
 {
-    if (!startFirstAvailable({QStringLiteral("firefox-esr"), QStringLiteral("firefox"), QStringLiteral("chromium"), QStringLiteral("google-chrome"), QStringLiteral("brave-browser")}))
+    // Edge es la primera opción cuando el usuario lo instala; Firefox ESR sigue
+    // disponible como navegador libre y como respaldo de la Live ISO.
+    if (!startFirstAvailable({
+            QStringLiteral("microsoft-edge-stable"),
+            QStringLiteral("microsoft-edge"),
+            QStringLiteral("firefox-esr"),
+            QStringLiteral("firefox"),
+            QStringLiteral("chromium"),
+            QStringLiteral("google-chrome"),
+            QStringLiteral("brave-browser")
+        }))
         updateStatus(QStringLiteral("No se encontró un navegador"));
 }
 
