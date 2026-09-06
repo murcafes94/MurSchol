@@ -38,7 +38,7 @@ lb config \
   --iso-application "MurSchol OS 0.1 Live" \
   --iso-publisher "MurSchol" \
   --iso-volume "MURSCHOL_0_1" \
-  --bootappend-live "boot=live components username=murschol hostname=murschol locales=es_EC.UTF-8 keyboard-layouts=latam timezone=America/Guayaquil quiet"
+  --bootappend-live "boot=live components username=user hostname=murschol locales=es_EC.UTF-8 keyboard-layouts=latam timezone=America/Guayaquil quiet"
 
 lb build
 
