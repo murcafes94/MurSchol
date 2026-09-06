@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+if command -v microsoft-edge-stable >/dev/null 2>&1; then
+    exec microsoft-edge-stable "$@"
+fi
+
+if ! command -v foot >/dev/null 2>&1; then
+    echo "Microsoft Edge no está instalado."
+    echo "Ejecuta: sudo /usr/local/lib/murschol/install-edge-root"
+    exit 1
+fi
+
+exec foot -T "MurSchol - Microsoft Edge" sh -c '
+    echo "Microsoft Edge no está instalado todavía."
+    echo
+    echo "MurSchol lo descargará desde el repositorio oficial de Microsoft."
+    echo "Se necesita conexión a Internet y aproximadamente 200 MB de descarga."
+    echo
+    printf "¿Instalar Microsoft Edge ahora? [s/N] "
+    read answer
+    case "$answer" in
+        s|S|si|sí|Si|Sí)
+            sudo /usr/local/lib/murschol/install-edge-root
+            echo
+            echo "Microsoft Edge instalado. Pulsa Enter para abrirlo."
+            read _
+            exec microsoft-edge-stable
+            ;;
+        *)
+            echo "Instalación cancelada."
+            sleep 1
+            ;;
+    esac
+'
