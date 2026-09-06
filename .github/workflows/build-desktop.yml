@@ -28,11 +28,11 @@ jobs:
         run: cmake --install build/desktop --prefix dist/murschol-desktop
 
       - name: Package
-        run: tar -C dist -czf MurSchol-Desktop-0.2.3-linux-x86_64.tar.gz murschol-desktop
+        run: tar -C dist -czf MurSchol-Desktop-0.3.0-linux-x86_64.tar.gz murschol-desktop
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MurSchol-Desktop-0.2.3-linux-x86_64
-          path: MurSchol-Desktop-0.2.3-linux-x86_64.tar.gz
+          name: MurSchol-Desktop-0.3.0-linux-x86_64
+          path: MurSchol-Desktop-0.3.0-linux-x86_64.tar.gz
           retention-days: 30
