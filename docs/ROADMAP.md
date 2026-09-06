@@ -47,7 +47,8 @@
 - [x] Espacios Estudio / Trabajos / Personal con estado persistente y atajos.
 - [x] Modo estudio — primera fase de perfiles y preferencias.
 - [x] Guía visible de multitarea: Alt+Tab y división con Super+flechas.
-- [ ] Convertir el dock en una superficie global `wlr-layer-shell` para que aparezca sobre aplicaciones maximizadas.
+- [x] Primera implementación del dock global `wlr-layer-shell` mediante LayerShellQt.
+- [ ] Validar el dock global sobre aplicaciones maximizadas en VirtualBox y hardware real.
 - [ ] Visor gráfico de aplicaciones abiertas integrado en MurSchol.
 - [ ] Centro de control real conectado a red/audio/energía.
 - [ ] Búsqueda de contenido dentro de documentos, opcional y de bajo consumo.
@@ -66,9 +67,36 @@
 - [ ] Enviar ventanas entre Estudio / Trabajos / Personal desde la interfaz.
 - [ ] Presets reales PDF + NotCan, Moodle + Apuntes y Lectura.
 
+### MurSchol Files
+
+- [x] Definir la visión funcional en `docs/MURSCHOL_FILES.md`.
+- [x] Crear el primer ejecutable nativo `murschol-files` en Qt 6/C++20.
+- [x] Navegación por Inicio, Documentos, Descargas, Imágenes, Música y Videos.
+- [x] Barra de ruta y búsqueda dentro de la carpeta actual.
+- [x] Vista lista y cuadrícula.
+- [x] Mostrar tamaño, fecha e iconos por tipo de archivo.
+- [x] Crear carpetas y abrir archivos mediante su asociación.
+- [x] Hacer MurSchol Files el gestor predeterminado de `inode/directory` en la Live ISO.
+- [x] Mantener Thunar temporalmente como respaldo de seguridad.
+- [ ] Historial atrás/adelante.
+- [ ] Selección simple y múltiple.
+- [ ] Copiar, cortar, pegar, mover, renombrar y borrar.
+- [ ] Papelera y confirmaciones seguras para operaciones destructivas.
+- [ ] Arrastrar y soltar.
+- [ ] Panel de vista previa opcional.
+- [ ] Miniaturas con caché limitada y desactivables en perfil Ligero.
+- [ ] Pestañas.
+- [ ] Vista dividida.
+- [ ] Favoritos y etiquetas.
+- [ ] Unidades USB y discos externos.
+- [ ] Compresión y extracción.
+- [ ] SMB/Samba, WebDAV y SFTP.
+- [ ] Integración futura con MurSchol Cloud / Nextcloud, Biblioteca y NotCan.
+
 ### Iconografía
 
 - [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
+- [x] Utilizar iconos reales del tema Linux como base funcional en la alpha.
 - [ ] Integrar el set SVG definitivo en el shell.
 - [ ] Sustituir fallbacks provisionales del dock y menús.
 - [ ] Compartir iconos con NotCan y el resto del ecosistema MurSchol cuando corresponda.
@@ -77,6 +105,9 @@
 
 - [x] Lanzamiento de aplicaciones Linux instaladas mediante `.desktop`.
 - [x] Acceso directo al navegador desde el dock.
+- [x] Firefox ESR incluido como navegador libre y de respaldo en la Live ISO.
+- [x] Microsoft Edge preparado como instalación opcional bajo demanda desde el repositorio oficial de Microsoft.
+- [x] Priorizar Edge desde el botón Navegador cuando esté instalado.
 - [x] Detección e inicio básico de Waydroid bajo demanda.
 - [x] Detección e inicio básico de Wine/Bottles bajo demanda.
 - [x] AppImage y Flatpak integrados en la primera versión de App Manager.
