@@ -36,3 +36,28 @@ jobs:
           name: MurSchol-Desktop-0.3.0-linux-x86_64
           path: MurSchol-Desktop-0.3.0-linux-x86_64.tar.gz
           retention-days: 30
+
+  validate-debian-panel:
+    name: Validar panel global en Debian 13
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compilar MurSchol Desktop + panel en Debian Trixie
+        run: |
+          docker run --rm \
+            -v "$PWD:/src" \
+            -w /src \
+            debian:trixie-slim \
+            sh -lc '
+              set -eu
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                ca-certificates cmake ninja-build g++ \
+                qt6-base-dev qt6-declarative-dev \
+                liblayershellqtinterface-dev layer-shell-qt
+              cmake -S desktop/os/shell -B build/panel-debian -G Ninja -DCMAKE_BUILD_TYPE=Release
+              cmake --build build/panel-debian --parallel "$(nproc)"
+              test -x build/panel-debian/murschol-desktop
+              test -x build/panel-debian/murschol-panel
+            '
