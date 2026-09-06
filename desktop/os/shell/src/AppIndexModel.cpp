@@ -29,13 +29,20 @@ QVariant AppIndexModel::data(const QModelIndex &index, int role) const
     case ExecRole: return app.exec;
     case IconRole: return app.icon;
     case SourceRole: return app.source;
+    case CategoriesRole: return app.categories;
     default: return {};
     }
 }
 
 QHash<int, QByteArray> AppIndexModel::roleNames() const
 {
-    return {{NameRole, "appName"}, {ExecRole, "appExec"}, {IconRole, "iconName"}, {SourceRole, "appSource"}};
+    return {
+        {NameRole, "appName"},
+        {ExecRole, "appExec"},
+        {IconRole, "iconName"},
+        {SourceRole, "appSource"},
+        {CategoriesRole, "appCategories"}
+    };
 }
 
 void AppIndexModel::setFilter(const QString &filter)
@@ -44,6 +51,16 @@ void AppIndexModel::setFilter(const QString &filter)
         return;
     m_filter = filter;
     emit filterChanged();
+    rebuildVisible();
+}
+
+void AppIndexModel::setCategoryFilter(const QString &category)
+{
+    const QString normalized = category.trimmed().isEmpty() ? QStringLiteral("Todas") : category.trimmed();
+    if (m_categoryFilter == normalized)
+        return;
+    m_categoryFilter = normalized;
+    emit categoryFilterChanged();
     rebuildVisible();
 }
 
@@ -74,8 +91,10 @@ MurScholAppEntry AppIndexModel::parseDesktopFile(const QString &path)
         if (key == QStringLiteral("Name") && entry.name.isEmpty()) entry.name = value;
         else if (key == QStringLiteral("Exec")) entry.exec = value;
         else if (key == QStringLiteral("Icon")) entry.icon = value;
+        else if (key == QStringLiteral("Categories")) entry.categories = value;
         else if (key == QStringLiteral("Type")) applicationType = (value == QStringLiteral("Application"));
-        else if ((key == QStringLiteral("NoDisplay") || key == QStringLiteral("Hidden")) && value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0) hidden = true;
+        else if ((key == QStringLiteral("NoDisplay") || key == QStringLiteral("Hidden"))
+                 && value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0) hidden = true;
     }
 
     if (!applicationType || hidden || entry.name.isEmpty() || entry.exec.isEmpty())
@@ -91,6 +110,42 @@ QString AppIndexModel::cleanExec(QString command)
     command.remove(QRegularExpression(QStringLiteral("\\s+%[fFuUdDnNickvm]")));
     command.remove(QRegularExpression(QStringLiteral("%[fFuUdDnNickvm]")));
     return command.trimmed();
+}
+
+bool AppIndexModel::matchesCategory(const MurScholAppEntry &app, const QString &category)
+{
+    if (category.isEmpty() || category == QStringLiteral("Todas"))
+        return true;
+
+    const QString cats = app.categories.toLower();
+    const QString name = app.name.toLower();
+
+    if (category == QStringLiteral("Educación"))
+        return cats.contains(QStringLiteral("education"))
+               || name.contains(QStringLiteral("moodle"))
+               || name.contains(QStringLiteral("biblioteca"))
+               || name.contains(QStringLiteral("notcan"));
+    if (category == QStringLiteral("Productividad"))
+        return cats.contains(QStringLiteral("office"))
+               || cats.contains(QStringLiteral("utility"))
+               || cats.contains(QStringLiteral("texteditor"))
+               || cats.contains(QStringLiteral("development"));
+    if (category == QStringLiteral("Multimedia"))
+        return cats.contains(QStringLiteral("audiovideo"))
+               || cats.contains(QStringLiteral("audio"))
+               || cats.contains(QStringLiteral("video"))
+               || cats.contains(QStringLiteral("graphics"));
+    if (category == QStringLiteral("Internet"))
+        return cats.contains(QStringLiteral("network"))
+               || cats.contains(QStringLiteral("webbrowser"))
+               || cats.contains(QStringLiteral("email"));
+    if (category == QStringLiteral("Sistema"))
+        return cats.contains(QStringLiteral("system"))
+               || cats.contains(QStringLiteral("settings"));
+    if (category == QStringLiteral("Accesibilidad"))
+        return cats.contains(QStringLiteral("accessibility"));
+
+    return true;
 }
 
 void AppIndexModel::refresh()
@@ -128,7 +183,8 @@ void AppIndexModel::rebuildVisible()
     beginResetModel();
     m_visible.clear();
     for (const auto &app : std::as_const(m_all)) {
-        if (m_filter.isEmpty() || app.name.contains(m_filter, Qt::CaseInsensitive))
+        const bool textMatch = m_filter.isEmpty() || app.name.contains(m_filter, Qt::CaseInsensitive);
+        if (textMatch && matchesCategory(app, m_categoryFilter))
             m_visible.append(app);
     }
     endResetModel();
