@@ -22,6 +22,13 @@ Categories=System;Education;
 EOF
 
 chmod 0755 /usr/local/bin/murschol-desktop
+if [ -x /usr/local/bin/murschol-panel ]; then
+  chmod 0755 /usr/local/bin/murschol-panel
+  echo "[MurSchol] Panel global wlr-layer-shell instalado."
+else
+  echo "[MurSchol] Aviso: panel global no disponible; el shell conservará el dock integrado."
+fi
+
 rm -rf /tmp/murschol-build /usr/src/murschol-shell
 
 echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
