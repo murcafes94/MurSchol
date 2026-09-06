@@ -56,6 +56,19 @@ jobs:
                 ca-certificates cmake ninja-build g++ \
                 qt6-base-dev qt6-declarative-dev \
                 liblayershellqtinterface-dev layer-shell-qt
+
+              # qmlformat analiza el archivo antes de compilar. No escribimos el
+              # resultado; solo queremos detectar errores de sintaxis en el panel
+              # y en las superficies principales que se comparten con él.
+              for qml in \
+                desktop/os/shell/qml/Panel.qml \
+                desktop/os/shell/qml/components/Dock.qml \
+                desktop/os/shell/qml/components/StartMenu.qml \
+                desktop/os/shell/qml/components/SystemCenter.qml \
+                desktop/os/shell/qml/components/AppManagerPanel.qml; do
+                /usr/lib/qt6/bin/qmlformat "$qml" >/dev/null
+              done
+
               cmake -S desktop/os/shell -B build/panel-debian -G Ninja -DCMAKE_BUILD_TYPE=Release
               cmake --build build/panel-debian --parallel "$(nproc)"
               test -x build/panel-debian/murschol-desktop
