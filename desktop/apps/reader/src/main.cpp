@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QQuickStyle::setStyle(QStringLiteral("Basic"));
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/qt/qml/MurScholReader/qml/Main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/MurScholReader/qml/Main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 
