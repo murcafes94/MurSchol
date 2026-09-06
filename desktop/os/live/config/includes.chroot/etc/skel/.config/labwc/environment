@@ -1,0 +1,6 @@
+# Entorno por defecto de la alpha MurSchol OS.
+# El asistente de primera configuración permitirá cambiar estas opciones.
+XKB_DEFAULT_LAYOUT=latam
+MOZ_ENABLE_WAYLAND=1
+GDK_BACKEND=wayland,x11
+XCURSOR_SIZE=24
