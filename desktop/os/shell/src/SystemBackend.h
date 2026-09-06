@@ -60,6 +60,7 @@ public:
     Q_INVOKABLE void setWorkspace(const QString &workspace);
     Q_INVOKABLE void setStudyLayout(const QString &layout);
     Q_INVOKABLE void openFiles();
+    Q_INVOKABLE void openBrowser();
     Q_INVOKABLE void openTerminal();
     Q_INVOKABLE void openAndroid();
     Q_INVOKABLE void openWindowsManager();
