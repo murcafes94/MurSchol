@@ -18,6 +18,8 @@ qt_add_executable(murschol-desktop
     src/UniversalSearchModel.h
     src/AppManagerBackend.cpp
     src/AppManagerBackend.h
+    src/ThemeIconProvider.cpp
+    src/ThemeIconProvider.h
 )
 
 qt_add_qml_module(murschol-desktop
