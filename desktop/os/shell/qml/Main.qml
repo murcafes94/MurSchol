@@ -12,6 +12,7 @@ ApplicationWindow {
     minimumHeight: 640
     visible: true
     visibility: Window.Maximized
+    flags: Qt.FramelessWindowHint
     title: "MurSchol OS"
     color: "#07131f"
 
