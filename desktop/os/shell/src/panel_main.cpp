@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QQuickWindow>
 #include <QWindow>
 
 #include <LayerShellQt/Shell>
@@ -14,12 +15,16 @@
 
 int main(int argc, char *argv[])
 {
-    LayerShellQt::Shell::useLayerShell();
-
     QGuiApplication app(argc, argv);
     app.setApplicationName("MurSchol Panel");
     app.setOrganizationName("MurSchol");
     QQuickStyle::setStyle("Basic");
+
+    // LayerShellQt solo necesita configurarse antes de crear la primera
+    // superficie Wayland. Hacerlo tras QGuiApplication sigue el patrón de uso
+    // habitual y evita inicialización gráfica antes de tiempo.
+    LayerShellQt::Shell::useLayerShell();
+    QQuickWindow::setDefaultAlphaBuffer(true);
 
     qmlRegisterType<SystemBackend>("MurScholShell", 1, 0, "SystemBackend");
     qmlRegisterType<AppIndexModel>("MurScholShell", 1, 0, "AppIndexModel");
