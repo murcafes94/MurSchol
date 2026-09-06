@@ -30,29 +30,53 @@
 - [x] Definir experiencia unificada Linux + Android + Windows.
 - [x] Definir política inicial de repositorios stable/testing/experimental.
 - [x] Crear scripts reproducibles de bootstrap de la primera base Live Debian.
-- [ ] Validar **labwc** como compositor Wayland ligero en el primer arranque real/virtual.
+- [x] Validar **labwc** como compositor Wayland ligero en el primer arranque virtual.
+- [ ] Validar labwc en hardware físico y varios controladores gráficos.
 
 ### MurSchol Desktop
 
 - [x] Incorporar al repositorio el prototipo del shell MurSchol en C++20 + Qt 6/QML.
-- [x] Dock inferior inicial adaptable.
-- [x] Menú Inicio.
-- [x] Indexador de aplicaciones `.desktop`.
+- [x] MurSchol Desktop 0.3.0 como primera revisión visual tras prueba en VirtualBox.
+- [x] Dock inferior flotante con auto-ocultado y activación desde el borde inferior-centro.
+- [x] Menú Inicio renovado con categorías y búsqueda.
+- [x] Indexador de aplicaciones `.desktop` con lectura de `Categories`.
 - [x] Búsqueda universal — primera fase local: aplicaciones, nombres de archivos y acciones.
 - [x] MurSchol System Center — primera fase con hardware, recursos y compatibilidad.
-- [x] Perfil adaptativo Ligero / Normal / Rendimiento con recomendación por hardware.
+- [x] Selector de rendimiento rediseñado con recomendación Ligero / Normal / Rendimiento.
+- [x] Eliminar la decoración externa del shell para que MurSchol Desktop use su propia barra visual.
 - [x] Espacios Estudio / Trabajos / Personal con estado persistente y atajos.
 - [x] Modo estudio — primera fase de perfiles y preferencias.
+- [x] Guía visible de multitarea: Alt+Tab y división con Super+flechas.
+- [ ] Convertir el dock en una superficie global `wlr-layer-shell` para que aparezca sobre aplicaciones maximizadas.
+- [ ] Visor gráfico de aplicaciones abiertas integrado en MurSchol.
 - [ ] Centro de control real conectado a red/audio/energía.
 - [ ] Búsqueda de contenido dentro de documentos, opcional y de bajo consumo.
 - [ ] Modo claro/oscuro.
 - [ ] Aplicar físicamente el perfil Ligero a todos los efectos del compositor.
-- [ ] Espacios de trabajo gestionados por el compositor.
+- [ ] Espacios de trabajo gestionados por el compositor y sincronizados con el shell.
 - [ ] Modo estudio con composición real de ventanas.
+
+### Multitarea y ventanas
+
+- [x] Aprovechar el cambio de ventanas nativo de labwc con `Alt+Tab`.
+- [x] Mantener controles estándar de minimizar, maximizar/restaurar y cerrar para aplicaciones normales.
+- [x] Permitir división rápida de ventanas con los atajos nativos `Super + flechas`.
+- [ ] Mostrar miniaturas de ventanas abiertas desde el dock.
+- [ ] Activar una ventana existente al pulsar su icono del dock.
+- [ ] Enviar ventanas entre Estudio / Trabajos / Personal desde la interfaz.
+- [ ] Presets reales PDF + NotCan, Moodle + Apuntes y Lectura.
+
+### Iconografía
+
+- [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
+- [ ] Integrar el set SVG definitivo en el shell.
+- [ ] Sustituir fallbacks provisionales del dock y menús.
+- [ ] Compartir iconos con NotCan y el resto del ecosistema MurSchol cuando corresponda.
 
 ### Aplicaciones
 
 - [x] Lanzamiento de aplicaciones Linux instaladas mediante `.desktop`.
+- [x] Acceso directo al navegador desde el dock.
 - [x] Detección e inicio básico de Waydroid bajo demanda.
 - [x] Detección e inicio básico de Wine/Bottles bajo demanda.
 - [x] AppImage y Flatpak integrados en la primera versión de App Manager.
@@ -71,7 +95,8 @@
 - [ ] Repositorio MurSchol de pruebas.
 - [ ] Actualizaciones firmadas.
 - [x] **MurSchol OS 0.1 Live amd64** generado como primera alpha de prueba.
-- [ ] Validar arranque BIOS/UEFI y sesión MurSchol en máquina virtual.
+- [x] Validar arranque y sesión MurSchol en VirtualBox.
+- [ ] Validar arranque BIOS/UEFI en varias configuraciones.
 - [ ] Validar arranque desde USB en hardware real.
 - [ ] Instalador gráfico.
 - [ ] Primera imagen instalable para pruebas en hardware real.
