@@ -13,12 +13,12 @@ Rectangle {
     signal appManagerClicked()
     signal systemClicked()
 
-    width: 520
-    height: 78
-    radius: 25
-    color: "#e80b1a27"
+    width: 432
+    height: 66
+    radius: 21
+    color: "#ee0b1824"
     border.width: 1
-    border.color: "#3c6f83"
+    border.color: "#486a7a"
 
     Rectangle {
         anchors.fill: parent
@@ -26,77 +26,106 @@ Rectangle {
         radius: root.radius - 1
         color: "transparent"
         border.width: 1
-        border.color: "#153748"
-        opacity: 0.9
+        border.color: "#132f3d"
+        opacity: 0.92
     }
 
     HoverHandler { id: dockHover }
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 6
 
         Repeater {
             model: [
-                {label:"Inicio", icon:"start-here", fallback:"⌂", action:"start"},
+                {label:"Inicio", icon:"", fallback:"MS", action:"start"},
                 {label:"Archivos", icon:"system-file-manager", fallback:"▰", action:"files"},
                 {label:"Navegador", icon:"firefox-esr", fallback:"◎", action:"browser"},
                 {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal"},
-                {label:"Instalar", icon:"system-software-install", fallback:"+", action:"install"},
+                {label:"Instalar aplicaciones", icon:"system-software-install", fallback:"+", action:"install"},
                 {label:"Sistema", icon:"preferences-system", fallback:"⚙", action:"system"}
             ]
 
             delegate: Button {
                 id: dockButton
                 required property var modelData
-                width: 72
-                height: 62
+                width: 58
+                height: 54
+                scale: hovered ? 1.06 : 1.0
 
                 ToolTip.visible: hovered
                 ToolTip.text: modelData.label
-                ToolTip.delay: 500
+                ToolTip.delay: 420
 
-                background: Rectangle {
-                    radius: 18
-                    color: dockButton.hovered ? "#284b60" : (dockButton.down ? "#315e73" : "transparent")
-                    border.width: dockButton.hovered ? 1 : 0
-                    border.color: "#4d8093"
-                    Behavior on color { ColorAnimation { duration: 120 } }
+                Behavior on scale {
+                    NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
                 }
 
-                contentItem: ColumnLayout {
-                    spacing: 1
-                    Item {
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: 34
-                        Layout.preferredHeight: 34
+                background: Rectangle {
+                    radius: 15
+                    color: dockButton.down
+                           ? "#31596c"
+                           : (dockButton.hovered ? "#253f4e" : "transparent")
+                    border.width: dockButton.hovered ? 1 : 0
+                    border.color: "#466d7e"
+                    Behavior on color { ColorAnimation { duration: 110 } }
+                }
 
-                        Image {
-                            id: themeIcon
-                            anchors.centerIn: parent
-                            width: 29
-                            height: 29
-                            source: "image://theme/" + modelData.icon
-                            sourceSize.width: 32
-                            sourceSize.height: 32
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
-                        }
+                contentItem: Item {
+                    anchors.fill: parent
+
+                    Rectangle {
+                        visible: modelData.action === "start"
+                        anchors.centerIn: parent
+                        width: 34
+                        height: 34
+                        radius: 11
+                        color: dockButton.hovered ? "#1d6270" : "#164653"
+                        border.width: 1
+                        border.color: dockButton.hovered ? "#59ddd6" : "#2e7380"
 
                         Label {
                             anchors.centerIn: parent
-                            visible: themeIcon.status === Image.Error
-                            text: modelData.fallback
-                            color: dockButton.hovered ? "#7bf0e8" : "#e9f4f7"
-                            font.pixelSize: modelData.action === "terminal" ? 14 : 20
+                            text: "MS"
+                            color: "#ddfffc"
                             font.bold: true
+                            font.pixelSize: 11
                         }
                     }
+
+                    Image {
+                        id: themeIcon
+                        visible: modelData.action !== "start"
+                        anchors.centerIn: parent
+                        width: 29
+                        height: 29
+                        source: modelData.icon.length > 0 ? "image://theme/" + modelData.icon : ""
+                        sourceSize.width: 34
+                        sourceSize.height: 34
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                    }
+
                     Label {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: modelData.label
-                        color: "#d9e6eb"
-                        font.pixelSize: 9
+                        anchors.centerIn: parent
+                        visible: modelData.action !== "start" && themeIcon.status === Image.Error
+                        text: modelData.fallback
+                        color: dockButton.hovered ? "#78eee7" : "#e4eff3"
+                        font.pixelSize: modelData.action === "terminal" ? 13 : 19
+                        font.bold: true
+                    }
+
+                    // Reserva visual para el futuro estado de aplicaciones abiertas:
+                    // el punto se activará cuando el modelo de ventanas de labwc esté conectado.
+                    Rectangle {
+                        visible: false
+                        width: 5
+                        height: 5
+                        radius: 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 2
+                        color: "#63e4de"
                     }
                 }
 
@@ -115,13 +144,13 @@ Rectangle {
     }
 
     Rectangle {
-        width: 54
+        width: 46
         height: 3
         radius: 2
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 4
-        color: "#61dcd6"
-        opacity: 0.75
+        anchors.bottomMargin: 3
+        color: "#56d8d2"
+        opacity: 0.58
     }
 }
