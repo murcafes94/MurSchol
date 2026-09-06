@@ -1,0 +1,5 @@
+[Default Applications]
+inode/directory=murschol-files.desktop;
+
+[Added Associations]
+inode/directory=murschol-files.desktop;thunar.desktop;
