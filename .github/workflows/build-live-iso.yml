@@ -11,6 +11,12 @@ on:
 permissions:
   contents: read
 
+# La ISO es pesada de construir. Cuando llega un commit nuevo a la misma rama,
+# cancelamos la compilación anterior para publicar solo la versión más reciente.
+concurrency:
+  group: murschol-live-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-live-iso:
     runs-on: ubuntu-latest
@@ -32,7 +38,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             cpio debootstrap debian-archive-keyring xorriso squashfs-tools \
-            dosfstools mtools syslinux-utils isolinux curl
+            dosfstools mtools syslinux-utils isolinux curl libxml2-utils
 
           # Ubuntu 24.04 todavía distribuye un live-build antiguo que genera
           # la ruta de seguridad obsoleta "trixie/updates". Para construir
@@ -46,12 +52,13 @@ jobs:
           test -s /usr/share/keyrings/debian-archive-keyring.gpg
           lb --version
 
-      - name: Validar scripts
+      - name: Validar scripts y configuración
         run: |
           bash -n desktop/os/live/build-live.sh
           sh -n desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          xmllint --noout desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
 
       - name: Construir MurSchol OS Live 0.1
         run: sudo ./desktop/os/live/build-live.sh
