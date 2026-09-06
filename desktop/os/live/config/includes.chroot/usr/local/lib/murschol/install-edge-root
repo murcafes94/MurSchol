@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+if command -v microsoft-edge-stable >/dev/null 2>&1; then
+    exit 0
+fi
+
+install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+    -o /etc/apt/keyrings/microsoft-edge.asc
+chmod 0644 /etc/apt/keyrings/microsoft-edge.asc
+
+cat > /etc/apt/sources.list.d/microsoft-edge.list <<'EOF'
+deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft-edge.asc] https://packages.microsoft.com/repos/edge stable main
+EOF
+
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y microsoft-edge-stable
