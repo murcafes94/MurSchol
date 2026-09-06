@@ -8,13 +8,14 @@ import "components"
 Window {
     id: root
     width: 980
-    height: startOpen ? 720 : (appManagerOpen ? 610 : (dockRaised ? 98 : 8))
+    height: (startOpen || systemOpen) ? 720 : (appManagerOpen ? 610 : (dockRaised ? 98 : 8))
     visible: false
     color: "transparent"
     flags: Qt.FramelessWindowHint
     title: "MurSchol Panel"
 
     property bool startOpen: false
+    property bool systemOpen: false
     property bool appManagerOpen: false
     property bool dockRaised: true
 
@@ -29,7 +30,7 @@ Window {
     }
 
     function scheduleHide() {
-        if (!startOpen && !appManagerOpen && !dock.pointerInside)
+        if (!startOpen && !systemOpen && !appManagerOpen && !dock.pointerInside)
             hideTimer.restart()
     }
 
@@ -38,7 +39,7 @@ Window {
         interval: 850
         repeat: false
         onTriggered: {
-            if (!root.startOpen && !root.appManagerOpen && !dock.pointerInside)
+            if (!root.startOpen && !root.systemOpen && !root.appManagerOpen && !dock.pointerInside)
                 root.dockRaised = false
         }
     }
@@ -78,6 +79,15 @@ Window {
             root.startOpen = false
             root.scheduleHide()
         }
+    }
+
+    SystemCenter {
+        visible: root.systemOpen
+        anchors.right: parent.right
+        anchors.bottom: dock.top
+        anchors.rightMargin: 16
+        anchors.bottomMargin: 14
+        backend: backend
     }
 
     Rectangle {
@@ -125,6 +135,7 @@ Window {
 
         onStartClicked: {
             root.startOpen = !root.startOpen
+            root.systemOpen = false
             root.appManagerOpen = false
             root.showDock()
         }
@@ -134,13 +145,13 @@ Window {
         onAppManagerClicked: {
             root.appManagerOpen = !root.appManagerOpen
             root.startOpen = false
+            root.systemOpen = false
             root.showDock()
         }
         onSystemClicked: {
-            root.startOpen = true
+            root.systemOpen = !root.systemOpen
+            root.startOpen = false
             root.appManagerOpen = false
-            startMenu.selectedCategory = "Sistema"
-            appModel.categoryFilter = "Sistema"
             root.showDock()
         }
     }
