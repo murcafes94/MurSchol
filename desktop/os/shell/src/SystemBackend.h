@@ -20,6 +20,7 @@ class SystemBackend : public QObject
     Q_PROPERTY(bool wineAvailable READ wineAvailable CONSTANT)
     Q_PROPERTY(bool bottlesAvailable READ bottlesAvailable CONSTANT)
     Q_PROPERTY(bool flatpakAvailable READ flatpakAvailable CONSTANT)
+    Q_PROPERTY(bool externalPanel READ externalPanel CONSTANT)
     Q_PROPERTY(QString distroName READ distroName CONSTANT)
     Q_PROPERTY(QString kernelVersion READ kernelVersion CONSTANT)
     Q_PROPERTY(QString cpuModel READ cpuModel CONSTANT)
@@ -46,6 +47,7 @@ public:
     bool wineAvailable() const { return m_wineAvailable; }
     bool bottlesAvailable() const { return m_bottlesAvailable; }
     bool flatpakAvailable() const { return m_flatpakAvailable; }
+    bool externalPanel() const { return m_externalPanel; }
 
     QString distroName() const { return m_distroName; }
     QString kernelVersion() const { return m_kernelVersion; }
@@ -97,6 +99,7 @@ private:
     bool m_wineAvailable = false;
     bool m_bottlesAvailable = false;
     bool m_flatpakAvailable = false;
+    bool m_externalPanel = false;
     QString m_distroName = QStringLiteral("Linux");
     QString m_kernelVersion;
     QString m_cpuModel = QStringLiteral("CPU desconocida");
