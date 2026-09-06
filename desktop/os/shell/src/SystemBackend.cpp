@@ -28,6 +28,15 @@ QString unquote(QString value)
         value = value.mid(1, value.size() - 2);
     return value;
 }
+
+int statsIntervalForProfile(const QString &profile)
+{
+    if (profile == QStringLiteral("Ligero"))
+        return 3500;
+    if (profile == QStringLiteral("Rendimiento"))
+        return 900;
+    return 1600;
+}
 }
 
 SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
@@ -45,7 +54,7 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
         m_profile = recommendedProfile();
 
     connect(&m_timer, &QTimer::timeout, this, &SystemBackend::refreshStats);
-    m_timer.start(1500);
+    m_timer.start(statsIntervalForProfile(m_profile));
 }
 
 void SystemBackend::detectStaticSystemInfo()
@@ -192,6 +201,7 @@ void SystemBackend::setProfile(const QString &profile)
 
     m_profile = profile;
     QSettings().setValue(QStringLiteral("performance/profile"), profile);
+    m_timer.setInterval(statsIntervalForProfile(profile));
     emit profileChanged();
     updateStatus(QStringLiteral("Perfil cambiado a %1").arg(profile));
 }
