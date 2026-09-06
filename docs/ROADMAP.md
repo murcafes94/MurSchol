@@ -93,6 +93,24 @@
 - [ ] SMB/Samba, WebDAV y SFTP.
 - [ ] Integración futura con MurSchol Cloud / Nextcloud, Biblioteca y NotCan.
 
+### MurSchol Reader
+
+- [x] Definir la visión y arquitectura en `docs/MURSCHOL_READER.md`.
+- [x] Crear el esqueleto Qt 6/QML de `murschol-reader`.
+- [x] Crear biblioteca visual inicial con recientes, colecciones y progreso.
+- [x] Crear modo lector con panel de Contenido oculto por defecto.
+- [x] Crear panel Mis marcas oculto por defecto.
+- [x] Añadir modo concentración F11/Esc.
+- [x] Preparar controles de búsqueda, zoom e impresión sin ocupar permanentemente el área de lectura.
+- [ ] Integrar Poppler/Qt y renderizar PDF real.
+- [ ] Integrar un motor eBook rápido para EPUB/MOBI/AZW3/FB2/CBZ.
+- [ ] Crear base SQLite real de biblioteca, progreso, colecciones y metadatos.
+- [ ] Persistir marcadores, subrayados y anotaciones.
+- [ ] Implementar MurSchol Print Center con vista previa, escalado, varias páginas, folleto y dúplex.
+- [ ] Añadir Calibre como gestor avanzado opcional, fuera de la ruta normal de lectura.
+- [ ] Asociar formatos desde MurSchol Files.
+- [ ] Integrar MurSchol Reader en la Live ISO tras validar lectura real y tiempos de apertura.
+
 ### Iconografía
 
 - [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
