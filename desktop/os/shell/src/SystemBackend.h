@@ -64,9 +64,6 @@ public:
     Q_INVOKABLE void openFiles();
     Q_INVOKABLE void openBrowser();
     Q_INVOKABLE void openTerminal();
-    Q_INVOKABLE void openNetworkSettings();
-    Q_INVOKABLE void openAudioSettings();
-    Q_INVOKABLE void openBluetoothSettings();
     Q_INVOKABLE void openAndroid();
     Q_INVOKABLE void openWindowsManager();
     Q_INVOKABLE void powerOff();
