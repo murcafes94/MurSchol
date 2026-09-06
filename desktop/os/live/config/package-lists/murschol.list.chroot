@@ -14,8 +14,11 @@ xdg-utils
 dbus-user-session
 
 # Sesión gráfica mínima Wayland
+# LightDM usa un servidor X para su greeter. Como live-build se configura
+# con --apt-recommends false, xserver-xorg debe declararse explícitamente.
 lightdm
 lightdm-gtk-greeter
+xserver-xorg
 labwc
 xwayland
 qt6-wayland
