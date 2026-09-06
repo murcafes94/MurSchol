@@ -49,6 +49,29 @@ target_link_libraries(murschol-desktop PRIVATE
 
 install(TARGETS murschol-desktop RUNTIME DESTINATION bin)
 
+# Gestor de archivos propio de MurSchol. La primera fase prioriza navegación,
+# búsqueda local, vista lista/cuadrícula y un diseño coherente con el shell.
+qt_add_executable(murschol-files
+    src/files_main.cpp
+    src/FileListModel.cpp
+    src/FileListModel.h
+    src/ThemeIconProvider.cpp
+    src/ThemeIconProvider.h
+)
+
+qt_add_resources(murschol-files "files_resources"
+    PREFIX "/"
+    FILES
+        qml/Files.qml
+)
+
+target_include_directories(murschol-files PRIVATE src)
+target_link_libraries(murschol-files PRIVATE
+    Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2
+)
+
+install(TARGETS murschol-files RUNTIME DESTINATION bin)
+
 # En Debian 13 la sesión Live incorpora LayerShellQt 6. Cuando está disponible
 # construimos el dock como un proceso independiente wlr-layer-shell para que
 # aparezca sobre aplicaciones maximizadas y pueda reducirse a una franja de 8 px.
