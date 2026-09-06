@@ -1,6 +1,7 @@
 #include "FileListModel.h"
 
 #include <algorithm>
+#include <utility>
 
 #include <QDateTime>
 #include <QDesktopServices>
