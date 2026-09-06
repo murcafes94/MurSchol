@@ -64,6 +64,7 @@ if(LayerShellQt_FOUND)
             qml/Panel.qml
             qml/components/Dock.qml
             qml/components/StartMenu.qml
+            qml/components/SystemCenter.qml
             qml/components/AppManagerPanel.qml
     )
 
