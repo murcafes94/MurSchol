@@ -3,14 +3,27 @@
 # Propaga el entorno de la sesión a servicios iniciados por systemd/dbus.
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
 
-# El shell es el escritorio principal. Guardamos el log para que una alpha
-# que falle no se quede en una pantalla negra imposible de diagnosticar.
-LOG="$HOME/murschol-desktop.log"
-/usr/local/bin/murschol-desktop >> "$LOG" 2>&1 &
+# En la Live ISO el dock se ejecuta como una superficie wlr-layer-shell
+# independiente para permanecer accesible sobre aplicaciones maximizadas.
+export MURSCHOL_EXTERNAL_PANEL=1
+
+DESKTOP_LOG="$HOME/murschol-desktop.log"
+PANEL_LOG="$HOME/murschol-panel.log"
+
+/usr/local/bin/murschol-desktop >> "$DESKTOP_LOG" 2>&1 &
 MURSCHOL_PID=$!
 
-# Si el shell muere al iniciar, muestra automáticamente el error en una terminal.
+if command -v /usr/local/bin/murschol-panel >/dev/null 2>&1; then
+  /usr/local/bin/murschol-panel >> "$PANEL_LOG" 2>&1 &
+  PANEL_PID=$!
+else
+  PANEL_PID=""
+fi
+
+# Si una pieza crítica muere al iniciar, muestra automáticamente el error.
 sleep 4
 if ! kill -0 "$MURSCHOL_PID" 2>/dev/null; then
   foot -T "MurSchol OS - diagnóstico" sh -c 'echo "MurSchol Desktop no pudo iniciar."; echo; cat "$HOME/murschol-desktop.log" 2>/dev/null || true; echo; echo "Pulsa Enter para abrir una consola."; read _; exec sh' &
+elif [ -n "$PANEL_PID" ] && ! kill -0 "$PANEL_PID" 2>/dev/null; then
+  foot -T "MurSchol Panel - diagnóstico" sh -c 'echo "El dock global de MurSchol no pudo iniciar."; echo; cat "$HOME/murschol-panel.log" 2>/dev/null || true; echo; echo "El escritorio seguirá disponible con Alt+Tab y Super+D."; echo; echo "Pulsa Enter para abrir una consola."; read _; exec sh' &
 fi
