@@ -41,6 +41,7 @@ int statsIntervalForProfile(const QString &profile)
 
 SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
 {
+    m_externalPanel = qEnvironmentVariableIsSet("MURSCHOL_EXTERNAL_PANEL");
     detectStaticSystemInfo();
     detectCapabilities();
 
