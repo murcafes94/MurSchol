@@ -38,24 +38,19 @@ Rectangle {
 
         Repeater {
             model: [
-                {label:"Inicio", icon:"start-here", action:"start"},
-                {label:"Archivos", icon:"system-file-manager", action:"files"},
-                {label:"Navegador", icon:"web-browser", action:"browser"},
-                {label:"Terminal", icon:"utilities-terminal", action:"terminal"},
-                {label:"Instalar", icon:"system-software-install", action:"install"},
-                {label:"Sistema", icon:"preferences-system", action:"system"}
+                {label:"Inicio", icon:"start-here", fallback:"⌂", action:"start"},
+                {label:"Archivos", icon:"system-file-manager", fallback:"▰", action:"files"},
+                {label:"Navegador", icon:"firefox-esr", fallback:"◎", action:"browser"},
+                {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal"},
+                {label:"Instalar", icon:"system-software-install", fallback:"+", action:"install"},
+                {label:"Sistema", icon:"preferences-system", fallback:"⚙", action:"system"}
             ]
 
             delegate: Button {
+                id: dockButton
                 required property var modelData
                 width: 72
                 height: 62
-                text: modelData.label
-                icon.name: modelData.icon
-                icon.width: 27
-                icon.height: 27
-                display: AbstractButton.TextUnderIcon
-                spacing: 2
 
                 ToolTip.visible: hovered
                 ToolTip.text: modelData.label
@@ -63,10 +58,9 @@ Rectangle {
 
                 background: Rectangle {
                     radius: 18
-                    color: parent.hovered ? "#284b60" : (parent.down ? "#315e73" : "transparent")
-                    border.width: parent.hovered ? 1 : 0
+                    color: dockButton.hovered ? "#284b60" : (dockButton.down ? "#315e73" : "transparent")
+                    border.width: dockButton.hovered ? 1 : 0
                     border.color: "#4d8093"
-
                     Behavior on color { ColorAnimation { duration: 120 } }
                 }
 
@@ -74,22 +68,27 @@ Rectangle {
                     spacing: 1
                     Item {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: 30
-                        Layout.preferredHeight: 30
+                        Layout.preferredWidth: 34
+                        Layout.preferredHeight: 34
+
+                        Image {
+                            id: themeIcon
+                            anchors.centerIn: parent
+                            width: 29
+                            height: 29
+                            source: "image://theme/" + modelData.icon
+                            sourceSize.width: 32
+                            sourceSize.height: 32
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                        }
+
                         Label {
                             anchors.centerIn: parent
-                            text: {
-                                switch (modelData.action) {
-                                case "start": return "⌂"
-                                case "files": return "▰"
-                                case "browser": return "◎"
-                                case "terminal": return ">_"
-                                case "install": return "+"
-                                default: return "⚙"
-                                }
-                            }
-                            color: parent.parent.parent.hovered ? "#7bf0e8" : "#e9f4f7"
-                            font.pixelSize: modelData.action === "terminal" ? 15 : 21
+                            visible: themeIcon.status === Image.Error
+                            text: modelData.fallback
+                            color: dockButton.hovered ? "#7bf0e8" : "#e9f4f7"
+                            font.pixelSize: modelData.action === "terminal" ? 14 : 20
                             font.bold: true
                         }
                     }
