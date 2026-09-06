@@ -27,11 +27,15 @@ ApplicationWindow {
     AppManagerBackend { id: appManagerBackend }
 
     function showDock() {
+        if (systemBackend.externalPanel)
+            return
         dockRaised = true
         dockHideTimer.stop()
     }
 
     function scheduleDockHide() {
+        if (systemBackend.externalPanel)
+            return
         if (!startOpen && !appManagerOpen && !dock.pointerInside)
             dockHideTimer.restart()
     }
@@ -48,12 +52,19 @@ ApplicationWindow {
 
     Timer {
         interval: 2200
-        running: true
+        running: !systemBackend.externalPanel
         repeat: false
         onTriggered: root.scheduleDockHide()
     }
 
-    Shortcut { sequence: "Meta+Space"; onActivated: { root.startOpen = !root.startOpen; root.showDock() } }
+    Shortcut {
+        enabled: !systemBackend.externalPanel
+        sequence: "Meta+Space"
+        onActivated: {
+            root.startOpen = !root.startOpen
+            root.showDock()
+        }
+    }
     Shortcut { sequence: "Meta+1"; onActivated: systemBackend.setWorkspace("Estudio") }
     Shortcut { sequence: "Meta+2"; onActivated: systemBackend.setWorkspace("Trabajos") }
     Shortcut { sequence: "Meta+3"; onActivated: systemBackend.setWorkspace("Personal") }
@@ -167,8 +178,8 @@ ApplicationWindow {
 
     Rectangle {
         visible: root.width >= 1180 && !root.startOpen && !root.systemOpen && !root.appManagerOpen
-        width: 290
-        height: 74
+        width: 300
+        height: 78
         radius: 20
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -191,13 +202,14 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 spacing: 1
                 Label { text: "Multitarea"; color: "white"; font.bold: true; font.pixelSize: 12 }
-                Label { text: "Alt+Tab cambia de app · Super+←/→ divide"; color: "#839da8"; font.pixelSize: 8 }
+                Label { text: "Alt+Tab · Super+←/→ · Super+D escritorio"; color: "#839da8"; font.pixelSize: 8 }
             }
         }
     }
 
     Rectangle {
         id: dockRevealHandle
+        visible: !systemBackend.externalPanel
         z: 79
         width: 76
         height: 7
@@ -210,6 +222,7 @@ ApplicationWindow {
     }
 
     MouseArea {
+        visible: !systemBackend.externalPanel
         z: 90
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
@@ -222,13 +235,21 @@ ApplicationWindow {
 
     Dock {
         id: dock
+        visible: !systemBackend.externalPanel
         z: 80
         x: (root.width - width) / 2
         y: root.dockRaised ? root.height - height - 14 : root.height - 5
         opacity: root.dockRaised ? 1 : 0.15
 
-        Behavior on y { NumberAnimation { duration: 210; easing.type: Easing.OutCubic } }
-        Behavior on opacity { NumberAnimation { duration: 160 } }
+        Behavior on y {
+            NumberAnimation {
+                duration: systemBackend.profile === "Ligero" ? 0 : 210
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on opacity {
+            NumberAnimation { duration: systemBackend.profile === "Ligero" ? 0 : 160 }
+        }
 
         onPointerInsideChanged: {
             if (pointerInside)
@@ -263,7 +284,7 @@ ApplicationWindow {
     StartMenu {
         id: startMenu
         z: 60
-        visible: root.startOpen
+        visible: !systemBackend.externalPanel && root.startOpen
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: dock.height + 28
@@ -289,7 +310,7 @@ ApplicationWindow {
 
     Rectangle {
         z: 40
-        visible: root.appManagerOpen
+        visible: !systemBackend.externalPanel && root.appManagerOpen
         anchors.fill: parent
         color: "#7a02070c"
         MouseArea {
@@ -303,7 +324,7 @@ ApplicationWindow {
 
     AppManagerPanel {
         z: 41
-        visible: root.appManagerOpen
+        visible: !systemBackend.externalPanel && root.appManagerOpen
         anchors.centerIn: parent
         backend: appManagerBackend
         onCloseRequested: {
