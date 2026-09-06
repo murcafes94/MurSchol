@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'desktop/os/shell/**'
+      - 'desktop/apps/reader/**'
       - '.github/workflows/build-desktop.yml'
   workflow_dispatch:
 
@@ -36,6 +37,33 @@ jobs:
           name: MurSchol-Desktop-0.3.0-linux-x86_64
           path: MurSchol-Desktop-0.3.0-linux-x86_64.tar.gz
           retention-days: 30
+
+  validate-reader:
+    name: Validar MurSchol Reader
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+
+      - name: Validar QML y compilar Reader
+        run: |
+          set -eu
+          for qml in \
+            desktop/apps/reader/qml/Main.qml \
+            desktop/apps/reader/qml/components/ReaderTopBar.qml \
+            desktop/apps/reader/qml/components/ContentsDrawer.qml \
+            desktop/apps/reader/qml/components/MarksDrawer.qml \
+            desktop/apps/reader/qml/components/LibraryHome.qml; do
+            /usr/lib/qt6/bin/qmlformat "$qml" >/dev/null
+          done
+
+          cmake -S desktop/apps/reader -B build/reader -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/reader --parallel
+          test -x build/reader/murschol-reader
 
   validate-debian-panel:
     name: Validar panel global en Debian 13
