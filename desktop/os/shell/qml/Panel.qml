@@ -115,11 +115,10 @@ Window {
 
     Dock {
         id: dock
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: root.dockRaised ? 10 : -70
+        x: Math.round((root.width - width) / 2)
+        y: root.dockRaised ? root.height - height - 10 : root.height - 8
 
-        Behavior on anchors.bottomMargin {
+        Behavior on y {
             NumberAnimation {
                 duration: backend.profile === "Ligero" ? 0 : 210
                 easing.type: Easing.OutCubic
