@@ -1,10 +1,25 @@
 <?xml version="1.0"?>
 <labwc_config>
+  <core>
+    <decoration>server</decoration>
+    <gap>6</gap>
+    <primarySelection>yes</primarySelection>
+  </core>
+
+  <placement>
+    <policy>cascade</policy>
+    <cascadeOffset x="34" y="28" />
+  </placement>
+
   <theme>
     <cornerRadius>10</cornerRadius>
+    <keepBorder>yes</keepBorder>
+    <maximizedDecoration>titlebar</maximizedDecoration>
+    <dropShadows>no</dropShadows>
     <font name="sans" size="10" />
     <titlebar>
-      <layout>iconify,max,close</layout>
+      <layout>icon:iconify,max,close</layout>
+      <showTitle>yes</showTitle>
     </titlebar>
   </theme>
 
@@ -16,10 +31,18 @@
     <default />
   </mouse>
 
-  <!-- Alt+Tab muestra una vista previa real de las ventanas abiertas. -->
-  <windowSwitcher show="yes" preview="yes" outlines="yes" allWorkspaces="no">
+  <!-- Garantiza controles estándar en aplicaciones Wayland y XWayland. -->
+  <windowRules>
+    <windowRule identifier="*" serverDecoration="yes" />
+  </windowRules>
+
+  <!-- Alt+Tab muestra icono, nombre y vista previa de la ventana activa. -->
+  <windowSwitcher preview="yes" outlines="yes" unshade="yes">
+    <osd show="yes" style="classic" output="all" thumbnailLabelFormat="%T" />
     <fields>
-      <field content="title" width="100%" />
+      <field content="icon" width="8%" />
+      <field content="desktop_entry_name" width="32%" />
+      <field content="title" width="60%" />
     </fields>
   </windowSwitcher>
 </labwc_config>
