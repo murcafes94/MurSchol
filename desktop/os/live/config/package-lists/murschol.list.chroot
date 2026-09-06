@@ -22,6 +22,8 @@ xserver-xorg
 labwc
 xwayland
 qt6-wayland
+layer-shell-qt
+liblayershellqtinterface-dev
 qml6-module-qtquick
 qml6-module-qtquick-controls
 qml6-module-qtquick-layouts
