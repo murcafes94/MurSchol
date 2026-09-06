@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<labwc_config>
+  <theme>
+    <cornerRadius>10</cornerRadius>
+    <font name="sans" size="10" />
+    <titlebar>
+      <layout>iconify,max,close</layout>
+    </titlebar>
+  </theme>
+
+  <keyboard>
+    <default />
+  </keyboard>
+
+  <mouse>
+    <default />
+  </mouse>
+
+  <!-- Alt+Tab muestra una vista previa real de las ventanas abiertas. -->
+  <windowSwitcher show="yes" preview="yes" outlines="yes" allWorkspaces="no">
+    <fields>
+      <field content="title" width="100%" />
+    </fields>
+  </windowSwitcher>
+</labwc_config>
