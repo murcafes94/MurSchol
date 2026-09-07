@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QGuiApplication::setApplicationName(QStringLiteral("MurSchol Photos"));
     QGuiApplication::setOrganizationName(QStringLiteral("MurSchol"));
+    QGuiApplication::setDesktopFileName(QStringLiteral("murschol-photos"));
     QQuickStyle::setStyle(QStringLiteral("Basic"));
 
     qmlRegisterType<PhotoBackend>("MurScholPhotos", 1, 0, "PhotoBackend");
@@ -36,7 +37,11 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("initialSource"), initialSource);
     engine.rootContext()->setContextProperty(QStringLiteral("initialAnnotationMode"), initialAnnotationMode);
-    engine.load(QUrl(QStringLiteral("qrc:/qt/qml/MurScholPhotos/qml/Main.qml")));
+
+    // MurSchol Desktop y la Live Debian cargan los módulos Qt 6.4 desde el
+    // prefijo de recurso antiguo (:/<URI>/...). Mantener la misma ruta aquí
+    // evita que Photos termine inmediatamente con "No such file or directory".
+    engine.load(QUrl(QStringLiteral("qrc:/MurScholPhotos/qml/Main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 
