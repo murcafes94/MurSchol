@@ -6,6 +6,10 @@ Rectangle {
     id: root
 
     property bool pointerInside: dockHover.hovered
+    property int preferredSize: 66
+    property bool magnifyOnHover: true
+    property color accentColor: "#56d8d2"
+    readonly property real sizeFactor: Math.max(0.82, Math.min(1.28, preferredSize / 66.0))
     signal startClicked()
     signal filesClicked()
     signal browserClicked()
@@ -13,9 +17,9 @@ Rectangle {
     signal appManagerClicked()
     signal systemClicked()
 
-    width: 432
-    height: 66
-    radius: 21
+    width: Math.round(432 * sizeFactor)
+    height: Math.round(66 * sizeFactor)
+    radius: Math.round(21 * sizeFactor)
     color: "#ee0b1824"
     border.width: 1
     border.color: "#486a7a"
@@ -34,7 +38,7 @@ Rectangle {
 
     RowLayout {
         anchors.centerIn: parent
-        spacing: 6
+        spacing: Math.max(4, Math.round(6 * root.sizeFactor))
 
         Repeater {
             model: [
@@ -43,15 +47,15 @@ Rectangle {
                 {label:"Navegador", icon:"firefox-esr", fallback:"◎", action:"browser"},
                 {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal"},
                 {label:"Instalar aplicaciones", icon:"system-software-install", fallback:"+", action:"install"},
-                {label:"Sistema", icon:"preferences-system", fallback:"⚙", action:"system"}
+                {label:"Configuración", icon:"preferences-system", fallback:"⚙", action:"system"}
             ]
 
             delegate: Button {
                 id: dockButton
                 required property var modelData
-                width: 58
-                height: 54
-                scale: hovered ? 1.06 : 1.0
+                width: Math.round(58 * root.sizeFactor)
+                height: Math.round(54 * root.sizeFactor)
+                scale: root.magnifyOnHover && hovered ? 1.06 : 1.0
 
                 ToolTip.visible: hovered
                 ToolTip.text: modelData.label
@@ -62,7 +66,7 @@ Rectangle {
                 }
 
                 background: Rectangle {
-                    radius: 15
+                    radius: Math.round(15 * root.sizeFactor)
                     color: dockButton.down
                            ? "#31596c"
                            : (dockButton.hovered ? "#253f4e" : "transparent")
@@ -77,19 +81,19 @@ Rectangle {
                     Rectangle {
                         visible: modelData.action === "start"
                         anchors.centerIn: parent
-                        width: 34
-                        height: 34
-                        radius: 11
+                        width: Math.round(34 * root.sizeFactor)
+                        height: Math.round(34 * root.sizeFactor)
+                        radius: Math.round(11 * root.sizeFactor)
                         color: dockButton.hovered ? "#1d6270" : "#164653"
                         border.width: 1
-                        border.color: dockButton.hovered ? "#59ddd6" : "#2e7380"
+                        border.color: dockButton.hovered ? root.accentColor : "#2e7380"
 
                         Label {
                             anchors.centerIn: parent
                             text: "MS"
                             color: "#ddfffc"
                             font.bold: true
-                            font.pixelSize: 11
+                            font.pixelSize: Math.round(11 * root.sizeFactor)
                         }
                     }
 
@@ -97,11 +101,11 @@ Rectangle {
                         id: themeIcon
                         visible: modelData.action !== "start"
                         anchors.centerIn: parent
-                        width: 29
-                        height: 29
+                        width: Math.round(29 * root.sizeFactor)
+                        height: Math.round(29 * root.sizeFactor)
                         source: modelData.icon.length > 0 ? "image://theme/" + modelData.icon : ""
-                        sourceSize.width: 34
-                        sourceSize.height: 34
+                        sourceSize.width: Math.round(34 * root.sizeFactor)
+                        sourceSize.height: Math.round(34 * root.sizeFactor)
                         fillMode: Image.PreserveAspectFit
                         smooth: true
                     }
@@ -110,8 +114,8 @@ Rectangle {
                         anchors.centerIn: parent
                         visible: modelData.action !== "start" && themeIcon.status === Image.Error
                         text: modelData.fallback
-                        color: dockButton.hovered ? "#78eee7" : "#e4eff3"
-                        font.pixelSize: modelData.action === "terminal" ? 13 : 19
+                        color: dockButton.hovered ? root.accentColor : "#e4eff3"
+                        font.pixelSize: Math.round((modelData.action === "terminal" ? 13 : 19) * root.sizeFactor)
                         font.bold: true
                     }
 
@@ -119,13 +123,13 @@ Rectangle {
                     // el punto se activará cuando el modelo de ventanas de labwc esté conectado.
                     Rectangle {
                         visible: false
-                        width: 5
-                        height: 5
-                        radius: 3
+                        width: Math.max(4, Math.round(5 * root.sizeFactor))
+                        height: width
+                        radius: width / 2
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 2
-                        color: "#63e4de"
+                        color: root.accentColor
                     }
                 }
 
@@ -144,13 +148,13 @@ Rectangle {
     }
 
     Rectangle {
-        width: 46
-        height: 3
+        width: Math.round(46 * root.sizeFactor)
+        height: Math.max(2, Math.round(3 * root.sizeFactor))
         radius: 2
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 3
-        color: "#56d8d2"
+        color: root.accentColor
         opacity: 0.58
     }
 }
