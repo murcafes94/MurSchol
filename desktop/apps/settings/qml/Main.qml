@@ -37,6 +37,7 @@ ApplicationWindow {
 
     SettingsBackend { id: backend }
     NetworkBackend { id: networkBackend }
+    SoundBackend { id: soundBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -61,7 +62,7 @@ ApplicationWindow {
         case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
         case "system": return "Información real detectada en este equipo."
         case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
-        case "sound": return "Audio administrado por PipeWire y WirePlumber."
+        case "sound": return "Salida, entrada y volumen controlados mediante PipeWire/WirePlumber."
         case "bluetooth": return "Dispositivos Bluetooth administrados por BlueZ."
         case "storage": return "Estado básico del almacenamiento local."
         case "about": return "Información de MurSchol OS y de esta configuración."
@@ -169,6 +170,7 @@ ApplicationWindow {
                                     root.currentPage = modelData.key
                                     searchField.text = ""
                                     if (modelData.key === "network") networkBackend.refresh()
+                                    if (modelData.key === "sound") soundBackend.refresh()
                                 }
                                 background: Rectangle {
                                     radius: 13
@@ -211,7 +213,8 @@ ApplicationWindow {
                         Label { text: "●"; color: root.accent; font.pixelSize: 10 }
                         Label {
                             Layout.fillWidth: true
-                            text: root.currentPage === "network" ? networkBackend.statusText : backend.statusText
+                            text: root.currentPage === "network" ? networkBackend.statusText
+                                  : (root.currentPage === "sound" ? soundBackend.statusText : backend.statusText)
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -268,15 +271,13 @@ ApplicationWindow {
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
-                    ExternalPage {
+                    SoundPage {
                         visible: root.currentPage === "sound"
                         Layout.fillWidth: true
+                        backend: soundBackend
+                        settingsBackend: backend
                         lightTheme: root.lightTheme
                         accent: root.accent
-                        description: "La interfaz nativa de PipeWire llegará en el siguiente bloque. Mientras tanto, este botón abre el mezclador real y no simula controles."
-                        buttonText: "Abrir controles de sonido"
-                        available: backend.audioSettingsAvailable
-                        onOpenRequested: backend.openAudioSettings()
                     }
                     ExternalPage {
                         visible: root.currentPage === "bluetooth"
