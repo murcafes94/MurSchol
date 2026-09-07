@@ -5,6 +5,7 @@ on:
     paths:
       - 'desktop/os/shell/**'
       - 'desktop/apps/reader/**'
+      - 'desktop/apps/photos/**'
       - '.github/workflows/build-desktop.yml'
   workflow_dispatch:
 
@@ -64,6 +65,25 @@ jobs:
           cmake -S desktop/apps/reader -B build/reader -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/reader --parallel
           test -x build/reader/murschol-reader
+
+  validate-photos:
+    name: Validar MurSchol Photos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+
+      - name: Validar QML y compilar Photos
+        run: |
+          set -eu
+          /usr/lib/qt6/bin/qmlformat desktop/apps/photos/qml/Main.qml >/dev/null
+          cmake -S desktop/apps/photos -B build/photos -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/photos --parallel
+          test -x build/photos/murschol-photos
 
   validate-debian-panel:
     name: Validar panel global en Debian 13
