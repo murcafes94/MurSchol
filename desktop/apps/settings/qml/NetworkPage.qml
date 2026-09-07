@@ -204,17 +204,18 @@ Rectangle {
                         }
 
                         Button {
+                            id: connectButton
                             visible: !modelData.active && modelData.saved
                             text: "Conectar"
                             onClicked: root.backend.connectSavedNetwork(modelData.ssid)
                             background: Rectangle {
                                 radius: 11
-                                color: parent.hovered ? root.accent : (root.lightTheme ? "#dcebec" : "#153744")
+                                color: connectButton.hovered ? root.accent : (root.lightTheme ? "#dcebec" : "#153744")
                                 border.color: root.accent
                             }
                             contentItem: Label {
-                                text: parent.text
-                                color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#24434c" : "#d7eeee")
+                                text: connectButton.text
+                                color: connectButton.hovered ? "#07131d" : (root.lightTheme ? "#24434c" : "#d7eeee")
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 font.pixelSize: 8
