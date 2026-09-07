@@ -168,6 +168,24 @@
 - [ ] Añadir proveedores online únicamente cuando sean técnicamente y jurídicamente apropiados.
 - [ ] Integrar MurSchol Music en la Live ISO tras validar rendimiento y reproducción.
 
+### MurSchol Calendar
+
+- [x] Definir arquitectura local-first en `docs/MURSCHOL_CALENDAR.md`.
+- [x] Crear el primer ejecutable Qt 6/C++20 `murschol-calendar`.
+- [x] Crear vista mensual navegable y agenda diaria.
+- [x] Persistir eventos locales en SQLite.
+- [x] Crear y eliminar eventos con hora, todo el día, calendario, notas y minutos de aviso.
+- [x] Preparar calendarios Personal, Estudio y Trabajo.
+- [ ] Editar eventos existentes.
+- [ ] Recurrencias diarias, semanales, mensuales y anuales.
+- [ ] Vistas Semana y Agenda global.
+- [ ] Implementar `murschol-reminder-service` para avisos sin mantener la interfaz abierta.
+- [ ] Importar y exportar iCalendar `.ics`.
+- [ ] Sincronización CalDAV y Nextcloud opcional.
+- [ ] Soporte completo de zonas horarias.
+- [ ] Drag & drop para mover eventos.
+- [ ] Integrar en la Live ISO tras validar persistencia, recordatorios y sincronización.
+
 ### Iconografía
 
 - [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
