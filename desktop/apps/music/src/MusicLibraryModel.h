@@ -5,7 +5,7 @@
 #include <QString>
 #include <QVector>
 
-class MusicLibraryModel final : public QAbstractListModel
+class MusicLibraryModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged)
