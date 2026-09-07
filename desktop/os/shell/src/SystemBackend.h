@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QFileSystemWatcher>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -16,6 +17,12 @@ class SystemBackend : public QObject
     Q_PROPERTY(QString recommendedProfile READ recommendedProfile NOTIFY statsChanged)
     Q_PROPERTY(QString workspace READ workspace WRITE setWorkspace NOTIFY workspaceChanged)
     Q_PROPERTY(QString studyLayout READ studyLayout WRITE setStudyLayout NOTIFY studyLayoutChanged)
+    Q_PROPERTY(QString theme READ theme NOTIFY appearanceChanged)
+    Q_PROPERTY(QString accentColor READ accentColor NOTIFY appearanceChanged)
+    Q_PROPERTY(QString animationMode READ animationMode NOTIFY appearanceChanged)
+    Q_PROPERTY(bool dockAutoHide READ dockAutoHide NOTIFY dockSettingsChanged)
+    Q_PROPERTY(int dockSize READ dockSize NOTIFY dockSettingsChanged)
+    Q_PROPERTY(bool dockMagnify READ dockMagnify NOTIFY dockSettingsChanged)
     Q_PROPERTY(bool waydroidAvailable READ waydroidAvailable CONSTANT)
     Q_PROPERTY(bool wineAvailable READ wineAvailable CONSTANT)
     Q_PROPERTY(bool bottlesAvailable READ bottlesAvailable CONSTANT)
@@ -41,6 +48,12 @@ public:
     QString recommendedProfile() const;
     QString workspace() const { return m_workspace; }
     QString studyLayout() const { return m_studyLayout; }
+    QString theme() const { return m_theme; }
+    QString accentColor() const { return m_accentColor; }
+    QString animationMode() const { return m_animationMode; }
+    bool dockAutoHide() const { return m_dockAutoHide; }
+    int dockSize() const { return m_dockSize; }
+    bool dockMagnify() const { return m_dockMagnify; }
     QString statusText() const { return m_statusText; }
 
     bool waydroidAvailable() const { return m_waydroidAvailable; }
@@ -64,6 +77,7 @@ public:
     Q_INVOKABLE void openFiles();
     Q_INVOKABLE void openBrowser();
     Q_INVOKABLE void openTerminal();
+    Q_INVOKABLE void openSettings(const QString &page = QString());
     Q_INVOKABLE void openAndroid();
     Q_INVOKABLE void openWindowsManager();
     Q_INVOKABLE void powerOff();
@@ -74,10 +88,13 @@ signals:
     void profileChanged();
     void workspaceChanged();
     void studyLayoutChanged();
+    void appearanceChanged();
+    void dockSettingsChanged();
     void statusChanged();
 
 private slots:
     void refreshStats();
+    void reloadSharedSettings();
 
 private:
     void detectCapabilities();
@@ -87,6 +104,8 @@ private:
     static bool startFirstAvailable(const QStringList &commands, const QStringList &arguments = {});
 
     QTimer m_timer;
+    QFileSystemWatcher m_settingsWatcher;
+    QString m_settingsPath;
     int m_cpuUsage = 0;
     int m_memoryUsage = 0;
     double m_totalMemoryGb = 0.0;
@@ -94,6 +113,12 @@ private:
     QString m_profile;
     QString m_workspace = QStringLiteral("Estudio");
     QString m_studyLayout = QStringLiteral("PDF + NotCan");
+    QString m_theme = QStringLiteral("Automático");
+    QString m_accentColor = QStringLiteral("#22d6cf");
+    QString m_animationMode = QStringLiteral("Normal");
+    bool m_dockAutoHide = true;
+    int m_dockSize = 66;
+    bool m_dockMagnify = true;
     QString m_statusText = QStringLiteral("MurSchol listo");
     bool m_waydroidAvailable = false;
     bool m_wineAvailable = false;
