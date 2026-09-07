@@ -1,7 +1,7 @@
 #include "CalculatorBackend.h"
 
-#include <Calculator.h>
-#include <includes.h>
+#include <libqalculate/Calculator.h>
+#include <libqalculate/includes.h>
 
 #include <QClipboard>
 #include <QGuiApplication>
