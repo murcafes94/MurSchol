@@ -146,7 +146,27 @@
 - [ ] Integrar MPRIS y teclas multimedia.
 - [ ] Picture-in-Picture compatible con Wayland.
 - [ ] Asociar formatos desde MurSchol Files y la Live ISO.
-- [ ] Biblioteca musical local opcional; estudiar servicio musical tipo Spotify en una fase posterior.
+- [ ] Compartir formalmente el núcleo de reproducción con MurSchol Music.
+
+### MurSchol Music
+
+- [x] Definir la arquitectura modular en `docs/MURSCHOL_MUSIC.md`.
+- [x] Crear el primer ejecutable Qt 6/C++20 `murschol-music`.
+- [x] Crear biblioteca local con escaneo asíncrono de la carpeta Música.
+- [x] Buscar por título, artista y álbum.
+- [x] Reconocer MP3, FLAC, WAV, OGG/OGA, Opus, M4A, AAC y WMA.
+- [x] Delegar la reproducción local a MurSchol Media/libmpv.
+- [x] Preparar fuentes separadas: Este dispositivo, Mi servidor, Radio y Servicios.
+- [ ] Leer tags reales y portadas sin bloquear el arranque.
+- [ ] Vistas reales de Álbumes, Artistas, Géneros, Listas y Favoritos.
+- [ ] Cola, listas persistentes, gapless playback y ReplayGain.
+- [ ] Letras locales LRC y proveedor de letras opcional.
+- [ ] Integrar MPRIS y controles multimedia del panel.
+- [ ] Implementar cliente OpenSubsonic para Navidrome y servidores compatibles.
+- [ ] Implementar proveedor de radio por Internet.
+- [ ] Definir SDK/contrato estable para proveedores y plugins externos.
+- [ ] Añadir proveedores online únicamente cuando sean técnicamente y jurídicamente apropiados.
+- [ ] Integrar MurSchol Music en la Live ISO tras validar rendimiento y reproducción.
 
 ### Iconografía
 
