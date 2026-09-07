@@ -16,6 +16,8 @@ qt_add_executable(murschol-settings
     src/NetworkBackend.h
     src/SoundBackend.cpp
     src/SoundBackend.h
+    src/BluetoothBackend.cpp
+    src/BluetoothBackend.h
 )
 
 qt_add_qml_module(murschol-settings
@@ -29,6 +31,7 @@ qt_add_qml_module(murschol-settings
         qml/SystemPage.qml
         qml/NetworkPage.qml
         qml/SoundPage.qml
+        qml/BluetoothPage.qml
         qml/ExternalPage.qml
         qml/PlaceholderPage.qml
 )
