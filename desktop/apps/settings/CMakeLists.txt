@@ -18,6 +18,10 @@ qt_add_executable(murschol-settings
     src/SoundBackend.h
     src/BluetoothBackend.cpp
     src/BluetoothBackend.h
+    src/PowerBackend.cpp
+    src/PowerBackend.h
+    src/DisplayBackend.cpp
+    src/DisplayBackend.h
 )
 
 qt_add_qml_module(murschol-settings
@@ -32,6 +36,8 @@ qt_add_qml_module(murschol-settings
         qml/NetworkPage.qml
         qml/SoundPage.qml
         qml/BluetoothPage.qml
+        qml/PowerPage.qml
+        qml/DisplayPage.qml
         qml/ExternalPage.qml
         qml/PlaceholderPage.qml
 )
