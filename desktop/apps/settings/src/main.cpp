@@ -1,3 +1,4 @@
+#include "NetworkBackend.h"
 #include "SettingsBackend.h"
 
 #include <QGuiApplication>
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
     }
 
     qmlRegisterType<SettingsBackend>("MurScholSettings", 1, 0, "SettingsBackend");
+    qmlRegisterType<NetworkBackend>("MurScholSettings", 1, 0, "NetworkBackend");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("initialPage"), initialPage);
