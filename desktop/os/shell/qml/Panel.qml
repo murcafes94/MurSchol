@@ -8,7 +8,7 @@ import "components"
 Window {
     id: root
     width: 980
-    height: (startOpen || systemOpen) ? 720 : (appManagerOpen ? 610 : (dockRaised ? 98 : 8))
+    height: (startOpen || systemOpen) ? 720 : (appManagerOpen ? 610 : (dockRaised ? 110 : 8))
     visible: false
     color: "transparent"
     flags: Qt.FramelessWindowHint
@@ -24,14 +24,37 @@ Window {
     UniversalSearchModel { id: searchModel }
     AppManagerBackend { id: appManagerBackend }
 
+    function animationDuration(normalValue, reducedValue) {
+        if (backend.profile === "Ligero" || backend.animationMode === "Desactivadas")
+            return 0
+        if (backend.animationMode === "Reducidas")
+            return reducedValue
+        return normalValue
+    }
+
     function showDock() {
         dockRaised = true
         hideTimer.stop()
     }
 
     function scheduleHide() {
+        if (!backend.dockAutoHide) {
+            dockRaised = true
+            hideTimer.stop()
+            return
+        }
         if (!startOpen && !systemOpen && !appManagerOpen && !dock.pointerInside)
             hideTimer.restart()
+    }
+
+    Connections {
+        target: backend
+        function onDockSettingsChanged() {
+            if (!backend.dockAutoHide)
+                root.dockRaised = true
+            else
+                root.scheduleHide()
+        }
     }
 
     Timer {
@@ -39,14 +62,14 @@ Window {
         interval: 850
         repeat: false
         onTriggered: {
-            if (!root.startOpen && !root.systemOpen && !root.appManagerOpen && !dock.pointerInside)
+            if (backend.dockAutoHide && !root.startOpen && !root.systemOpen && !root.appManagerOpen && !dock.pointerInside)
                 root.dockRaised = false
         }
     }
 
     Timer {
         interval: 2200
-        running: true
+        running: backend.dockAutoHide
         repeat: false
         onTriggered: root.scheduleHide()
     }
@@ -57,6 +80,7 @@ Window {
     }
 
     MouseArea {
+        visible: backend.dockAutoHide
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -81,6 +105,7 @@ Window {
         }
     }
 
+    // Se conserva durante la migración; el acceso visible abre MurSchol Settings.
     SystemCenter {
         visible: root.systemOpen
         anchors.right: parent.right
@@ -115,12 +140,15 @@ Window {
 
     Dock {
         id: dock
+        preferredSize: backend.dockSize
+        magnifyOnHover: backend.dockMagnify && backend.animationMode !== "Desactivadas"
+        accentColor: backend.accentColor
         x: Math.round((root.width - width) / 2)
         y: root.dockRaised ? root.height - height - 10 : root.height - 8
 
         Behavior on y {
             NumberAnimation {
-                duration: backend.profile === "Ligero" ? 0 : 210
+                duration: root.animationDuration(210, 90)
                 easing.type: Easing.OutCubic
             }
         }
@@ -148,20 +176,22 @@ Window {
             root.showDock()
         }
         onSystemClicked: {
-            root.systemOpen = !root.systemOpen
+            backend.openSettings("appearance")
             root.startOpen = false
+            root.systemOpen = false
             root.appManagerOpen = false
-            root.showDock()
+            root.scheduleHide()
         }
     }
 
     Rectangle {
+        visible: backend.dockAutoHide
         width: 76
         height: 5
         radius: 3
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        color: root.dockRaised ? "#61dcd6" : "#547080"
+        color: root.dockRaised ? backend.accentColor : "#547080"
         opacity: root.dockRaised ? 0.72 : 0.46
     }
 }
