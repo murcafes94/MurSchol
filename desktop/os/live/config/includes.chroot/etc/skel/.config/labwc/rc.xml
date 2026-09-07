@@ -25,6 +25,14 @@
 
   <keyboard>
     <default />
+
+    <!-- Captura estilo Windows: región con Super+Shift+S y pantalla completa con Print. -->
+    <keybind key="W-S-s">
+      <action name="Execute" command="murschol-capture --region" />
+    </keybind>
+    <keybind key="Print">
+      <action name="Execute" command="murschol-capture --screen" />
+    </keybind>
   </keyboard>
 
   <mouse>
