@@ -8,6 +8,7 @@ on:
       - 'desktop/apps/photos/**'
       - 'desktop/apps/media/**'
       - 'desktop/apps/music/**'
+      - 'desktop/apps/calendar/**'
       - '.github/workflows/build-desktop.yml'
   workflow_dispatch:
 
@@ -127,6 +128,25 @@ jobs:
           cmake -S desktop/apps/music -B build/music -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/music --parallel
           test -x build/music/murschol-music
+
+  validate-calendar:
+    name: Validar MurSchol Calendar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6 y SQLite
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev libqt6sql6-sqlite
+
+      - name: Validar QML y compilar Calendar
+        run: |
+          set -eu
+          /usr/lib/qt6/bin/qmlformat desktop/apps/calendar/qml/Main.qml >/dev/null
+          cmake -S desktop/apps/calendar -B build/calendar -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/calendar --parallel
+          test -x build/calendar/murschol-calendar
 
   validate-debian-panel:
     name: Validar panel global en Debian 13
