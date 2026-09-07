@@ -29,6 +29,15 @@ cmake -S /usr/src/murschol-capture \
 cmake --build /tmp/murschol-capture-build --parallel "$(nproc)"
 cmake --install /tmp/murschol-capture-build
 
+echo "[MurSchol] Compilando MurSchol Settings..."
+cmake -S /usr/src/murschol-settings \
+      -B /tmp/murschol-settings-build \
+      -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build /tmp/murschol-settings-build --parallel "$(nproc)"
+cmake --install /tmp/murschol-settings-build
+
 cat > /usr/share/applications/murschol-desktop.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
@@ -80,6 +89,19 @@ Categories=Graphics;Utility;
 Keywords=captura;pantalla;screenshot;screen;
 EOF
 
+cat > /usr/share/applications/murschol-settings.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Settings
+GenericName=Configuración
+Comment=Configura MurSchol OS
+Exec=/usr/local/bin/murschol-settings
+Icon=preferences-system
+Terminal=false
+Categories=Settings;System;
+Keywords=configuracion;ajustes;settings;sistema;apariencia;dock;rendimiento;
+EOF
+
 cat > /usr/share/applications/murschol-edge.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
@@ -98,6 +120,7 @@ chmod 0755 /usr/local/bin/murschol-desktop
 chmod 0755 /usr/local/bin/murschol-files
 chmod 0755 /usr/local/bin/murschol-photos
 chmod 0755 /usr/local/bin/murschol-capture
+chmod 0755 /usr/local/bin/murschol-settings
 chmod 0755 /usr/local/bin/murschol-edge
 chmod 0755 /usr/local/lib/murschol/install-edge-root
 
@@ -115,12 +138,15 @@ rm -rf \
   /tmp/murschol-build \
   /tmp/murschol-photos-build \
   /tmp/murschol-capture-build \
+  /tmp/murschol-settings-build \
   /usr/src/murschol-shell \
   /usr/src/murschol-photos \
-  /usr/src/murschol-capture
+  /usr/src/murschol-capture \
+  /usr/src/murschol-settings
 
 echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
 echo "[MurSchol] MurSchol Files instalado en /usr/local/bin/murschol-files"
 echo "[MurSchol] MurSchol Photos instalado en /usr/local/bin/murschol-photos"
 echo "[MurSchol] MurSchol Capture instalado en /usr/local/bin/murschol-capture"
+echo "[MurSchol] MurSchol Settings instalado en /usr/local/bin/murschol-settings"
 echo "[MurSchol] Microsoft Edge disponible como instalación bajo demanda."
