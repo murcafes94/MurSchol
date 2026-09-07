@@ -61,6 +61,7 @@ private slots:
 private:
     static bool isSupportedMedia(const QString &path);
     static bool isAudioFile(const QString &path);
+    bool loadPath(const QString &path, bool rebuildPlaylist);
     void rebuildFolderPlaylist();
     void openPlaylistIndex(int index);
     void saveResumePosition();
