@@ -43,17 +43,18 @@ Rectangle {
                 }
             }
             Button {
+                id: outputMuteButton
                 text: root.backend.outputMuted ? "Activar" : "Silenciar"
                 enabled: root.backend.available
                 onClicked: root.backend.setOutputMuted(!root.backend.outputMuted)
                 background: Rectangle {
                     radius: 12
-                    color: parent.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
+                    color: outputMuteButton.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
                     border.color: root.accent
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                    text: outputMuteButton.text
+                    color: outputMuteButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -72,7 +73,6 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
             }
             Slider {
-                id: outputSlider
                 Layout.fillWidth: true
                 from: 0
                 to: 100
@@ -131,17 +131,18 @@ Rectangle {
                         elide: Text.ElideRight
                     }
                     Button {
+                        id: outputUseButton
                         visible: !modelData.active
                         text: "Usar"
                         onClicked: root.backend.setDefaultOutput(modelData.id)
                         background: Rectangle {
                             radius: 10
-                            color: parent.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
+                            color: outputUseButton.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
                             border.color: root.accent
                         }
                         contentItem: Label {
-                            text: parent.text
-                            color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                            text: outputUseButton.text
+                            color: outputUseButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: 8
@@ -174,17 +175,18 @@ Rectangle {
                 }
             }
             Button {
+                id: inputMuteButton
                 text: root.backend.inputMuted ? "Activar" : "Silenciar"
                 enabled: root.backend.available
                 onClicked: root.backend.setInputMuted(!root.backend.inputMuted)
                 background: Rectangle {
                     radius: 12
-                    color: parent.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
+                    color: inputMuteButton.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
                     border.color: root.accent
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                    text: inputMuteButton.text
+                    color: inputMuteButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -260,17 +262,18 @@ Rectangle {
                         elide: Text.ElideRight
                     }
                     Button {
+                        id: inputUseButton
                         visible: !modelData.active
                         text: "Usar"
                         onClicked: root.backend.setDefaultInput(modelData.id)
                         background: Rectangle {
                             radius: 10
-                            color: parent.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
+                            color: inputUseButton.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
                             border.color: root.accent
                         }
                         contentItem: Label {
-                            text: parent.text
-                            color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                            text: inputUseButton.text
+                            color: inputUseButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: 8
@@ -312,19 +315,20 @@ Rectangle {
                 }
             }
             Button {
+                id: advancedButton
                 text: "Abrir avanzado"
                 enabled: root.settingsBackend.audioSettingsAvailable
                 onClicked: root.settingsBackend.openAudioSettings()
                 background: Rectangle {
                     radius: 11
-                    color: parent.enabled ? (parent.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744"))
-                                          : (root.lightTheme ? "#e0e5e7" : "#263942")
-                    border.color: parent.enabled ? root.accent : "transparent"
+                    color: advancedButton.enabled ? (advancedButton.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744"))
+                                                  : (root.lightTheme ? "#e0e5e7" : "#263942")
+                    border.color: advancedButton.enabled ? root.accent : "transparent"
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: parent.enabled ? (parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0"))
-                                          : (root.lightTheme ? "#8b989d" : "#71858d")
+                    text: advancedButton.text
+                    color: advancedButton.enabled ? (advancedButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0"))
+                                                  : (root.lightTheme ? "#8b989d" : "#71858d")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 8
