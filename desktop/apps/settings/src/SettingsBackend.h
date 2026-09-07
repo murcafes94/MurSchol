@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
+#include <QVariant>
 
 class SettingsBackend : public QObject
 {
