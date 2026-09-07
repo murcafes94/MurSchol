@@ -9,6 +9,7 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OS_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_DIR="$(cd "${OS_DIR}/../.." && pwd)"
 WORK_DIR="${SCRIPT_DIR}/work"
 OUTPUT_ISO="${SCRIPT_DIR}/MurSchol-OS-0.1-Live-amd64.iso"
 OUTPUT_SHA="${OUTPUT_ISO}.sha256"
@@ -18,10 +19,16 @@ rm -f "${OUTPUT_ISO}" "${OUTPUT_SHA}"
 mkdir -p "${WORK_DIR}"
 cp -a "${SCRIPT_DIR}/config" "${WORK_DIR}/config"
 
-# El shell se compila dentro del chroot Debian para evitar incompatibilidades
-# de glibc/Qt entre el runner y la ISO final.
+# El shell y las apps integradas se compilan dentro del chroot Debian para
+# evitar incompatibilidades de glibc/Qt entre el runner y la ISO final.
 mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-shell"
 cp -a "${OS_DIR}/shell/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-shell/"
+
+mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-photos"
+cp -a "${REPO_DIR}/desktop/apps/photos/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-photos/"
+
+mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-capture"
+cp -a "${REPO_DIR}/desktop/apps/capture/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-capture/"
 
 cd "${WORK_DIR}"
 
