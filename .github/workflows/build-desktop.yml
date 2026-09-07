@@ -9,6 +9,7 @@ on:
       - 'desktop/apps/media/**'
       - 'desktop/apps/music/**'
       - 'desktop/apps/calendar/**'
+      - 'desktop/apps/capture/**'
       - '.github/workflows/build-desktop.yml'
   workflow_dispatch:
 
@@ -147,6 +148,25 @@ jobs:
           cmake -S desktop/apps/calendar -B build/calendar -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/calendar --parallel
           test -x build/calendar/murschol-calendar
+
+  validate-capture:
+    name: Validar MurSchol Capture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+
+      - name: Validar QML y compilar Capture
+        run: |
+          set -eu
+          /usr/lib/qt6/bin/qmlformat desktop/apps/capture/qml/Main.qml >/dev/null
+          cmake -S desktop/apps/capture -B build/capture -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/capture --parallel
+          test -x build/capture/murschol-capture
 
   validate-debian-panel:
     name: Validar panel global en Debian 13
