@@ -26,6 +26,18 @@
   <keyboard>
     <default />
 
+    <!-- Atajos críticos declarados también de forma explícita para que la
+         alpha siga siendo operable aunque cambien defaults entre versiones. -->
+    <keybind key="A-F4">
+      <action name="Close" />
+    </keybind>
+    <keybind key="A-Tab">
+      <action name="NextWindow" />
+    </keybind>
+    <keybind key="A-S-Tab">
+      <action name="PreviousWindow" />
+    </keybind>
+
     <!-- Captura estilo Windows: región con Super+Shift+S y pantalla completa con Print. -->
     <keybind key="W-S-s">
       <action name="Execute" command="murschol-capture --region" />
