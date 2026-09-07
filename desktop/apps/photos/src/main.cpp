@@ -17,14 +17,25 @@ int main(int argc, char *argv[])
     qmlRegisterType<PhotoBackend>("MurScholPhotos", 1, 0, "PhotoBackend");
 
     QString initialSource;
+    bool initialAnnotationMode = false;
     const QStringList arguments = QGuiApplication::arguments();
-    if (arguments.size() > 1) {
-        const QUrl url = QUrl::fromUserInput(arguments.at(1), QDir::currentPath(), QUrl::AssumeLocalFile);
-        initialSource = url.toString();
+    for (int i = 1; i < arguments.size(); ++i) {
+        const QString argument = arguments.at(i);
+        if (argument == QStringLiteral("--annotate")) {
+            initialAnnotationMode = true;
+            continue;
+        }
+
+        if (initialSource.isEmpty()) {
+            const QUrl url = QUrl::fromUserInput(argument, QDir::currentPath(), QUrl::AssumeLocalFile);
+            if (url.isValid())
+                initialSource = url.toString();
+        }
     }
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("initialSource"), initialSource);
+    engine.rootContext()->setContextProperty(QStringLiteral("initialAnnotationMode"), initialAnnotationMode);
     engine.load(QUrl(QStringLiteral("qrc:/qt/qml/MurScholPhotos/qml/Main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
