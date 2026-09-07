@@ -1,10 +1,12 @@
 #include "MusicLibraryModel.h"
 
 #include <QDesktopServices>
+#include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QProcess>
 #include <QStandardPaths>
+#include <QUrl>
 #include <QtConcurrent>
 
 #include <algorithm>
