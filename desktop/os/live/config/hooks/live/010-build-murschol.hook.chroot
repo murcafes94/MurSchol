@@ -122,6 +122,7 @@ chmod 0755 /usr/local/bin/murschol-photos
 chmod 0755 /usr/local/bin/murschol-capture
 chmod 0755 /usr/local/bin/murschol-settings
 chmod 0755 /usr/local/bin/murschol-edge
+chmod 0755 /usr/local/bin/murschol-launch
 chmod 0755 /usr/local/lib/murschol/install-edge-root
 
 if [ -x /usr/local/bin/murschol-panel ]; then
@@ -149,4 +150,5 @@ echo "[MurSchol] MurSchol Files instalado en /usr/local/bin/murschol-files"
 echo "[MurSchol] MurSchol Photos instalado en /usr/local/bin/murschol-photos"
 echo "[MurSchol] MurSchol Capture instalado en /usr/local/bin/murschol-capture"
 echo "[MurSchol] MurSchol Settings instalado en /usr/local/bin/murschol-settings"
+echo "[MurSchol] Lanzador de diagnóstico instalado en /usr/local/bin/murschol-launch"
 echo "[MurSchol] Microsoft Edge disponible como instalación bajo demanda."
