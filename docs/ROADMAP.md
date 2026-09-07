@@ -127,6 +127,27 @@
 - [ ] Asociar formatos de imagen desde MurSchol Files y la Live ISO.
 - [ ] Medir apertura con imágenes grandes y carpetas extensas.
 
+### MurSchol Media
+
+- [x] Definir la arquitectura en `docs/MURSCHOL_MEDIA.md`.
+- [x] Crear el primer ejecutable Qt 6/C++20 `murschol-media`.
+- [x] Integrar libmpv como motor inicial de reproducción.
+- [x] Preparar reproducción de vídeo y audio en una sola aplicación.
+- [x] Apertura directa por ruta y arrastrar/soltar.
+- [x] Controles de reproducción, salto, volumen, velocidad y pantalla completa.
+- [x] Auto-ocultar controles durante vídeo.
+- [x] Navegar anterior/siguiente entre medios de la misma carpeta.
+- [x] Recordar localmente la posición para continuar después.
+- [x] Preparar cambio de pista de audio y subtítulos.
+- [ ] Validar renderizado y aceleración por hardware en VirtualBox y hardware real.
+- [ ] Selector completo de pistas y subtítulos externos SRT/ASS/VTT.
+- [ ] Extraer portada y metadatos embebidos de audio.
+- [ ] Añadir cola, listas M3U/M3U8 y capítulos.
+- [ ] Integrar MPRIS y teclas multimedia.
+- [ ] Picture-in-Picture compatible con Wayland.
+- [ ] Asociar formatos desde MurSchol Files y la Live ISO.
+- [ ] Biblioteca musical local opcional; estudiar servicio musical tipo Spotify en una fase posterior.
+
 ### Iconografía
 
 - [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
