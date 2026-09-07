@@ -37,6 +37,17 @@ int statsIntervalForProfile(const QString &profile)
         return 900;
     return 1600;
 }
+
+QString sharedSettingsDirectory()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
+           + QStringLiteral("/murschol");
+}
+
+QString sharedSettingsPath()
+{
+    return sharedSettingsDirectory() + QStringLiteral("/settings.ini");
+}
 }
 
 SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
@@ -45,17 +56,48 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
     detectStaticSystemInfo();
     detectCapabilities();
 
-    QSettings settings;
-    m_profile = settings.value(QStringLiteral("performance/profile")).toString();
-    m_workspace = settings.value(QStringLiteral("workspace/active"), QStringLiteral("Estudio")).toString();
-    m_studyLayout = settings.value(QStringLiteral("study/layout"), QStringLiteral("PDF + NotCan")).toString();
+    QDir().mkpath(sharedSettingsDirectory());
+    m_settingsPath = sharedSettingsPath();
+
+    // Migración silenciosa desde la configuración anterior de MurSchol Desktop.
+    // Así Settings puede centralizar preferencias sin perder el perfil o el espacio
+    // que el usuario ya tenía guardados.
+    QSettings shared(m_settingsPath, QSettings::IniFormat);
+    QSettings legacy;
+    const QStringList migratableKeys = {
+        QStringLiteral("performance/profile"),
+        QStringLiteral("workspace/active"),
+        QStringLiteral("study/layout")
+    };
+    for (const QString &key : migratableKeys) {
+        if (!shared.contains(key) && legacy.contains(key))
+            shared.setValue(key, legacy.value(key));
+    }
+    shared.sync();
+
+    m_profile = shared.value(QStringLiteral("performance/profile")).toString();
+    m_workspace = shared.value(QStringLiteral("workspace/active"), QStringLiteral("Estudio")).toString();
+    m_studyLayout = shared.value(QStringLiteral("study/layout"), QStringLiteral("PDF + NotCan")).toString();
+    m_theme = shared.value(QStringLiteral("appearance/theme"), m_theme).toString();
+    m_accentColor = shared.value(QStringLiteral("appearance/accent"), m_accentColor).toString();
+    m_animationMode = shared.value(QStringLiteral("appearance/animations"), m_animationMode).toString();
+    m_dockAutoHide = shared.value(QStringLiteral("dock/autoHide"), m_dockAutoHide).toBool();
+    m_dockSize = qBound(54, shared.value(QStringLiteral("dock/size"), m_dockSize).toInt(), 84);
+    m_dockMagnify = shared.value(QStringLiteral("dock/magnify"), m_dockMagnify).toBool();
 
     refreshStats();
-    if (m_profile.isEmpty())
+    if (m_profile.isEmpty()) {
         m_profile = recommendedProfile();
+        shared.setValue(QStringLiteral("performance/profile"), m_profile);
+        shared.sync();
+    }
 
     connect(&m_timer, &QTimer::timeout, this, &SystemBackend::refreshStats);
     m_timer.start(statsIntervalForProfile(m_profile));
+
+    m_settingsWatcher.addPath(sharedSettingsDirectory());
+    connect(&m_settingsWatcher, &QFileSystemWatcher::directoryChanged,
+            this, &SystemBackend::reloadSharedSettings);
 }
 
 void SystemBackend::detectStaticSystemInfo()
@@ -191,6 +233,53 @@ void SystemBackend::refreshBattery()
     }
 }
 
+void SystemBackend::reloadSharedSettings()
+{
+    QSettings settings(m_settingsPath, QSettings::IniFormat);
+
+    const QString newProfile = settings.value(QStringLiteral("performance/profile"), m_profile).toString();
+    if ((newProfile == QStringLiteral("Ligero")
+         || newProfile == QStringLiteral("Normal")
+         || newProfile == QStringLiteral("Rendimiento"))
+        && newProfile != m_profile) {
+        m_profile = newProfile;
+        m_timer.setInterval(statsIntervalForProfile(m_profile));
+        emit profileChanged();
+    }
+
+    const QString newWorkspace = settings.value(QStringLiteral("workspace/active"), m_workspace).toString();
+    if (newWorkspace != m_workspace) {
+        m_workspace = newWorkspace;
+        emit workspaceChanged();
+    }
+
+    const QString newStudyLayout = settings.value(QStringLiteral("study/layout"), m_studyLayout).toString();
+    if (newStudyLayout != m_studyLayout) {
+        m_studyLayout = newStudyLayout;
+        emit studyLayoutChanged();
+    }
+
+    const QString newTheme = settings.value(QStringLiteral("appearance/theme"), m_theme).toString();
+    const QString newAccent = settings.value(QStringLiteral("appearance/accent"), m_accentColor).toString();
+    const QString newAnimations = settings.value(QStringLiteral("appearance/animations"), m_animationMode).toString();
+    if (newTheme != m_theme || newAccent != m_accentColor || newAnimations != m_animationMode) {
+        m_theme = newTheme;
+        m_accentColor = newAccent;
+        m_animationMode = newAnimations;
+        emit appearanceChanged();
+    }
+
+    const bool newAutoHide = settings.value(QStringLiteral("dock/autoHide"), m_dockAutoHide).toBool();
+    const int newDockSize = qBound(54, settings.value(QStringLiteral("dock/size"), m_dockSize).toInt(), 84);
+    const bool newMagnify = settings.value(QStringLiteral("dock/magnify"), m_dockMagnify).toBool();
+    if (newAutoHide != m_dockAutoHide || newDockSize != m_dockSize || newMagnify != m_dockMagnify) {
+        m_dockAutoHide = newAutoHide;
+        m_dockSize = newDockSize;
+        m_dockMagnify = newMagnify;
+        emit dockSettingsChanged();
+    }
+}
+
 void SystemBackend::setProfile(const QString &profile)
 {
     if (profile != QStringLiteral("Ligero")
@@ -201,7 +290,9 @@ void SystemBackend::setProfile(const QString &profile)
         return;
 
     m_profile = profile;
-    QSettings().setValue(QStringLiteral("performance/profile"), profile);
+    QSettings settings(m_settingsPath, QSettings::IniFormat);
+    settings.setValue(QStringLiteral("performance/profile"), profile);
+    settings.sync();
     m_timer.setInterval(statsIntervalForProfile(profile));
     emit profileChanged();
     updateStatus(QStringLiteral("Perfil cambiado a %1").arg(profile));
@@ -222,7 +313,9 @@ void SystemBackend::setWorkspace(const QString &workspace)
         return;
 
     m_workspace = workspace;
-    QSettings().setValue(QStringLiteral("workspace/active"), workspace);
+    QSettings settings(m_settingsPath, QSettings::IniFormat);
+    settings.setValue(QStringLiteral("workspace/active"), workspace);
+    settings.sync();
     emit workspaceChanged();
     updateStatus(QStringLiteral("Espacio activo: %1").arg(workspace));
 }
@@ -237,7 +330,9 @@ void SystemBackend::setStudyLayout(const QString &layout)
         return;
 
     m_studyLayout = layout;
-    QSettings().setValue(QStringLiteral("study/layout"), layout);
+    QSettings settings(m_settingsPath, QSettings::IniFormat);
+    settings.setValue(QStringLiteral("study/layout"), layout);
+    settings.sync();
     emit studyLayoutChanged();
     updateStatus(QStringLiteral("Modo estudio: %1").arg(layout));
 }
@@ -282,6 +377,24 @@ void SystemBackend::openTerminal()
 {
     if (!startFirstAvailable({QStringLiteral("foot"), QStringLiteral("kgx"), QStringLiteral("konsole"), QStringLiteral("gnome-terminal"), QStringLiteral("xfce4-terminal"), QStringLiteral("xterm")}))
         updateStatus(QStringLiteral("No se encontró una terminal"));
+}
+
+void SystemBackend::openSettings(const QString &page)
+{
+    const QString executable = QStandardPaths::findExecutable(QStringLiteral("murschol-settings"));
+    if (executable.isEmpty()) {
+        updateStatus(QStringLiteral("MurSchol Settings todavía no está instalado"));
+        return;
+    }
+
+    QStringList arguments;
+    if (!page.trimmed().isEmpty())
+        arguments << QStringLiteral("--page") << page.trimmed();
+
+    if (QProcess::startDetached(executable, arguments))
+        updateStatus(QStringLiteral("Abriendo Configuración"));
+    else
+        updateStatus(QStringLiteral("No se pudo abrir Configuración"));
 }
 
 void SystemBackend::openAndroid()
