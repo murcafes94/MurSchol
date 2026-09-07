@@ -1,5 +1,15 @@
 [Default Applications]
 inode/directory=murschol-files.desktop;
+image/jpeg=murschol-photos.desktop;
+image/png=murschol-photos.desktop;
+image/gif=murschol-photos.desktop;
+image/svg+xml=murschol-photos.desktop;
+image/webp=murschol-photos.desktop;
 
 [Added Associations]
 inode/directory=murschol-files.desktop;thunar.desktop;
+image/jpeg=murschol-photos.desktop;
+image/png=murschol-photos.desktop;
+image/gif=murschol-photos.desktop;
+image/svg+xml=murschol-photos.desktop;
+image/webp=murschol-photos.desktop;
