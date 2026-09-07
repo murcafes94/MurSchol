@@ -8,6 +8,32 @@ export QT_QPA_PLATFORM=wayland
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 
+# La alpha actual usa interfaz en español. Inicializamos las carpetas XDG
+# antes de arrancar Qt para que MurSchol Files, Capture y el resto de apps
+# compartan exactamente las mismas rutas y no aparezcan accesos a carpetas
+# inexistentes como ~/Documents.
+mkdir -p "$HOME/.config"
+if [ ! -f "$HOME/.config/user-dirs.dirs" ]; then
+  cat > "$HOME/.config/user-dirs.dirs" <<'EOF'
+XDG_DESKTOP_DIR="$HOME/Escritorio"
+XDG_DOWNLOAD_DIR="$HOME/Descargas"
+XDG_TEMPLATES_DIR="$HOME/Plantillas"
+XDG_PUBLICSHARE_DIR="$HOME/Público"
+XDG_DOCUMENTS_DIR="$HOME/Documentos"
+XDG_MUSIC_DIR="$HOME/Música"
+XDG_PICTURES_DIR="$HOME/Imágenes"
+XDG_VIDEOS_DIR="$HOME/Vídeos"
+EOF
+fi
+
+mkdir -p \
+  "$HOME/Escritorio" \
+  "$HOME/Descargas" \
+  "$HOME/Documentos" \
+  "$HOME/Imágenes" \
+  "$HOME/Música" \
+  "$HOME/Vídeos"
+
 # VirtualBox suele arrancar Wayland sin aceleración 3D en esta alpha.
 # En ese caso forzamos renderizado por software para evitar pantalla negra.
 PRODUCT_NAME="$(cat /sys/class/dmi/id/product_name 2>/dev/null || true)"
