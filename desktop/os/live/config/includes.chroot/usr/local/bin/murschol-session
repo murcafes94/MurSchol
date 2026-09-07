@@ -5,13 +5,21 @@ export XDG_SESSION_TYPE=wayland
 export XDG_CURRENT_DESKTOP=MurSchol
 export XDG_SESSION_DESKTOP=MurSchol
 export QT_QPA_PLATFORM=wayland
-export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
 export WLR_RENDERER_ALLOW_SOFTWARE=1
+
+# Las aplicaciones normales deben conservar las decoraciones de labwc para
+# minimizar, maximizar y cerrar. El shell y el panel declaran por sí mismos
+# cuándo necesitan una superficie sin marco, así que no desactivamos las
+# decoraciones de Qt de forma global.
+unset QT_WAYLAND_DISABLE_WINDOWDECORATION 2>/dev/null || true
+
+# Firefox ESR se ejecuta directamente sobre Wayland para no depender de
+# XWayland como ruta principal del navegador dentro de la sesión MurSchol.
+export MOZ_ENABLE_WAYLAND=1
 
 # La alpha actual usa interfaz en español. Inicializamos las carpetas XDG
 # antes de arrancar Qt para que MurSchol Files, Capture y el resto de apps
-# compartan exactamente las mismas rutas y no aparezcan accesos a carpetas
-# inexistentes como ~/Documents.
+# compartan exactamente las mismas rutas.
 mkdir -p "$HOME/.config"
 if [ ! -f "$HOME/.config/user-dirs.dirs" ]; then
   cat > "$HOME/.config/user-dirs.dirs" <<'EOF'
