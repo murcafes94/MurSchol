@@ -38,6 +38,7 @@ ApplicationWindow {
     SettingsBackend { id: backend }
     NetworkBackend { id: networkBackend }
     SoundBackend { id: soundBackend }
+    BluetoothBackend { id: bluetoothBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -63,7 +64,7 @@ ApplicationWindow {
         case "system": return "Información real detectada en este equipo."
         case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
         case "sound": return "Salida, entrada y volumen controlados mediante PipeWire/WirePlumber."
-        case "bluetooth": return "Dispositivos Bluetooth administrados por BlueZ."
+        case "bluetooth": return "Adaptador y dispositivos controlados directamente mediante BlueZ."
         case "storage": return "Estado básico del almacenamiento local."
         case "about": return "Información de MurSchol OS y de esta configuración."
         default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
@@ -171,6 +172,7 @@ ApplicationWindow {
                                     searchField.text = ""
                                     if (modelData.key === "network") networkBackend.refresh()
                                     if (modelData.key === "sound") soundBackend.refresh()
+                                    if (modelData.key === "bluetooth") bluetoothBackend.refresh()
                                 }
                                 background: Rectangle {
                                     radius: 13
@@ -214,7 +216,8 @@ ApplicationWindow {
                         Label {
                             Layout.fillWidth: true
                             text: root.currentPage === "network" ? networkBackend.statusText
-                                  : (root.currentPage === "sound" ? soundBackend.statusText : backend.statusText)
+                                  : (root.currentPage === "sound" ? soundBackend.statusText
+                                     : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText : backend.statusText))
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -279,15 +282,13 @@ ApplicationWindow {
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
-                    ExternalPage {
+                    BluetoothPage {
                         visible: root.currentPage === "bluetooth"
                         Layout.fillWidth: true
+                        backend: bluetoothBackend
+                        settingsBackend: backend
                         lightTheme: root.lightTheme
                         accent: root.accent
-                        description: "La interfaz nativa de BlueZ llegará después de sonido. Mientras tanto, este botón abre el administrador real de Bluetooth."
-                        buttonText: "Abrir Bluetooth"
-                        available: backend.bluetoothSettingsAvailable
-                        onOpenRequested: backend.openBluetoothSettings()
                     }
                     PlaceholderPage {
                         visible: !root.pageImplemented(root.currentPage)
