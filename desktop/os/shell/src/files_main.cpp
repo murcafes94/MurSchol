@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     app.setApplicationName("MurSchol Files");
     app.setOrganizationName("MurSchol");
+    app.setDesktopFileName("murschol-files");
     QQuickStyle::setStyle("Basic");
 
     qmlRegisterType<FileListModel>("MurScholFiles", 1, 0, "FileListModel");
