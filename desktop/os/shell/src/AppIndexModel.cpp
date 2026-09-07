@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSet>
+#include <QStandardPaths>
 
 AppIndexModel::AppIndexModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -195,10 +196,22 @@ bool AppIndexModel::launch(int row) const
 {
     if (row < 0 || row >= m_visible.size())
         return false;
-    const QStringList parts = QProcess::splitCommand(m_visible.at(row).exec);
+
+    const auto &entry = m_visible.at(row);
+    const QStringList parts = QProcess::splitCommand(entry.exec);
     if (parts.isEmpty())
         return false;
+
     QStringList args = parts;
     const QString program = args.takeFirst();
+
+    const QString diagnosticLauncher = QStandardPaths::findExecutable(QStringLiteral("murschol-launch"));
+    if (!diagnosticLauncher.isEmpty()) {
+        QStringList launchArgs;
+        launchArgs << entry.name << QStringLiteral("--") << program;
+        launchArgs.append(args);
+        return QProcess::startDetached(diagnosticLauncher, launchArgs);
+    }
+
     return QProcess::startDetached(program, args);
 }
