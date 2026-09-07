@@ -17,11 +17,11 @@ ApplicationWindow {
     property bool lightTheme: backend.theme === "Claro"
     property color accent: backend.accentColor
     property var pages: [
-        { key: "display", title: "Pantalla", group: "Sistema", symbol: "▣", keywords: "monitor resolución escala brillo orientación" },
+        { key: "display", title: "Pantalla", group: "Sistema", symbol: "▣", keywords: "monitor resolución escala brillo orientación luz nocturna filtro azul" },
         { key: "sound", title: "Sonido", group: "Sistema", symbol: "◕", keywords: "audio volumen micrófono altavoz pipewire" },
         { key: "network", title: "Red e Internet", group: "Sistema", symbol: "◎", keywords: "wifi ethernet red internet network" },
         { key: "bluetooth", title: "Bluetooth", group: "Sistema", symbol: "ᛒ", keywords: "bluetooth dispositivos auriculares" },
-        { key: "power", title: "Energía", group: "Sistema", symbol: "ϟ", keywords: "batería energía suspensión brillo" },
+        { key: "power", title: "Energía", group: "Sistema", symbol: "ϟ", keywords: "batería energía suspensión brillo corriente" },
         { key: "storage", title: "Almacenamiento", group: "Sistema", symbol: "▤", keywords: "disco almacenamiento espacio archivos" },
         { key: "appearance", title: "Apariencia", group: "Personalización", symbol: "◈", keywords: "tema claro oscuro color animaciones apariencia" },
         { key: "dock", title: "Dock y panel", group: "Personalización", symbol: "▰", keywords: "dock panel ocultar tamaño iconos ampliar" },
@@ -39,6 +39,8 @@ ApplicationWindow {
     NetworkBackend { id: networkBackend }
     SoundBackend { id: soundBackend }
     BluetoothBackend { id: bluetoothBackend }
+    PowerBackend { id: powerBackend }
+    DisplayBackend { id: displayBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -58,6 +60,7 @@ ApplicationWindow {
 
     function pageDescription(key) {
         switch (key) {
+        case "display": return "Pantallas, brillo y Luz nocturna con información real de Wayland."
         case "appearance": return "Tema, color y movimiento del entorno MurSchol."
         case "dock": return "Comportamiento del dock global y del panel."
         case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
@@ -65,6 +68,7 @@ ApplicationWindow {
         case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
         case "sound": return "Salida, entrada y volumen controlados mediante PipeWire/WirePlumber."
         case "bluetooth": return "Adaptador y dispositivos controlados directamente mediante BlueZ."
+        case "power": return "Batería, brillo y suspensión conectados a UPower, brightnessctl y logind."
         case "storage": return "Estado básico del almacenamiento local."
         case "about": return "Información de MurSchol OS y de esta configuración."
         default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
@@ -84,6 +88,7 @@ ApplicationWindow {
         return key === "appearance" || key === "dock" || key === "performance"
                 || key === "system" || key === "storage" || key === "about"
                 || key === "network" || key === "sound" || key === "bluetooth"
+                || key === "power" || key === "display"
     }
 
     Component.onCompleted: {
@@ -173,6 +178,11 @@ ApplicationWindow {
                                     if (modelData.key === "network") networkBackend.refresh()
                                     if (modelData.key === "sound") soundBackend.refresh()
                                     if (modelData.key === "bluetooth") bluetoothBackend.refresh()
+                                    if (modelData.key === "power") powerBackend.refresh()
+                                    if (modelData.key === "display") {
+                                        displayBackend.refresh()
+                                        powerBackend.refresh()
+                                    }
                                 }
                                 background: Rectangle {
                                     radius: 13
@@ -217,7 +227,9 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             text: root.currentPage === "network" ? networkBackend.statusText
                                   : (root.currentPage === "sound" ? soundBackend.statusText
-                                     : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText : backend.statusText))
+                                     : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText
+                                        : (root.currentPage === "power" ? powerBackend.statusText
+                                           : (root.currentPage === "display" ? displayBackend.statusText : backend.statusText))))
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -255,6 +267,14 @@ ApplicationWindow {
                         }
                     }
 
+                    DisplayPage {
+                        visible: root.currentPage === "display"
+                        Layout.fillWidth: true
+                        backend: displayBackend
+                        powerBackend: powerBackend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
                     AppearancePage { visible: root.currentPage === "appearance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
                     DockPage { visible: root.currentPage === "dock"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
                     PerformancePage { visible: root.currentPage === "performance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
@@ -286,6 +306,14 @@ ApplicationWindow {
                         visible: root.currentPage === "bluetooth"
                         Layout.fillWidth: true
                         backend: bluetoothBackend
+                        settingsBackend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    PowerPage {
+                        visible: root.currentPage === "power"
+                        Layout.fillWidth: true
+                        backend: powerBackend
                         settingsBackend: backend
                         lightTheme: root.lightTheme
                         accent: root.accent
