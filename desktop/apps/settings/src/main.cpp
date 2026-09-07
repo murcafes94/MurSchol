@@ -1,3 +1,4 @@
+#include "AppsBackend.h"
 #include "BluetoothBackend.h"
 #include "DisplayBackend.h"
 #include "NetworkBackend.h"
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<BluetoothBackend>("MurScholSettings", 1, 0, "BluetoothBackend");
     qmlRegisterType<PowerBackend>("MurScholSettings", 1, 0, "PowerBackend");
     qmlRegisterType<DisplayBackend>("MurScholSettings", 1, 0, "DisplayBackend");
+    qmlRegisterType<AppsBackend>("MurScholSettings", 1, 0, "AppsBackend");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("initialPage"), initialPage);
