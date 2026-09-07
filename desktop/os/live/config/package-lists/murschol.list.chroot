@@ -33,7 +33,7 @@ adwaita-icon-theme
 fonts-noto-core
 fonts-noto-color-emoji
 
-# Red, audio, energía y Bluetooth
+# Red, audio, energía, pantalla y Bluetooth
 network-manager
 network-manager-gnome
 pipewire
@@ -43,6 +43,7 @@ pavucontrol
 alsa-utils
 upower
 brightnessctl
+gammastep
 bluez
 blueman
 polkitd
