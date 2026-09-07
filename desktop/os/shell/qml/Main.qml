@@ -26,6 +26,14 @@ ApplicationWindow {
     UniversalSearchModel { id: universalSearch }
     AppManagerBackend { id: appManagerBackend }
 
+    function animationDuration(normalValue, reducedValue) {
+        if (systemBackend.profile === "Ligero" || systemBackend.animationMode === "Desactivadas")
+            return 0
+        if (systemBackend.animationMode === "Reducidas")
+            return reducedValue
+        return normalValue
+    }
+
     function showDock() {
         if (systemBackend.externalPanel)
             return
@@ -36,8 +44,23 @@ ApplicationWindow {
     function scheduleDockHide() {
         if (systemBackend.externalPanel)
             return
+        if (!systemBackend.dockAutoHide) {
+            dockRaised = true
+            dockHideTimer.stop()
+            return
+        }
         if (!startOpen && !appManagerOpen && !dock.pointerInside)
             dockHideTimer.restart()
+    }
+
+    Connections {
+        target: systemBackend
+        function onDockSettingsChanged() {
+            if (!systemBackend.dockAutoHide)
+                root.dockRaised = true
+            else
+                root.scheduleDockHide()
+        }
     }
 
     Timer {
@@ -45,14 +68,14 @@ ApplicationWindow {
         interval: 850
         repeat: false
         onTriggered: {
-            if (!root.startOpen && !root.appManagerOpen && !dock.pointerInside)
+            if (systemBackend.dockAutoHide && !root.startOpen && !root.appManagerOpen && !dock.pointerInside)
                 root.dockRaised = false
         }
     }
 
     Timer {
         interval: 2200
-        running: !systemBackend.externalPanel
+        running: !systemBackend.externalPanel && systemBackend.dockAutoHide
         repeat: false
         onTriggered: root.scheduleDockHide()
     }
@@ -106,10 +129,11 @@ ApplicationWindow {
         anchors.right: parent.right
         backend: systemBackend
         onSystemClicked: {
-            root.systemOpen = !root.systemOpen
+            systemBackend.openSettings("system")
             root.startOpen = false
+            root.systemOpen = false
             root.appManagerOpen = false
-            root.showDock()
+            root.scheduleDockHide()
         }
     }
 
@@ -122,7 +146,7 @@ ApplicationWindow {
 
         Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 32; font.bold: true }
         Label { text: "Aprender. Crear. Sin límites."; color: "#a9bdc6"; font.pixelSize: 15 }
-        Rectangle { width: 66; height: 3; radius: 2; color: "#22d6cf" }
+        Rectangle { width: 66; height: 3; radius: 2; color: systemBackend.accentColor }
         Label {
             width: 420
             wrapMode: Text.WordWrap
@@ -145,7 +169,7 @@ ApplicationWindow {
                     id: activeSpace
                     anchors.centerIn: parent
                     text: "Espacio: " + systemBackend.workspace
-                    color: "#7edfd9"
+                    color: systemBackend.accentColor
                     font.pixelSize: 9
                     font.bold: true
                 }
@@ -196,7 +220,7 @@ ApplicationWindow {
                 height: 42
                 radius: 13
                 color: "#173e4e"
-                Label { anchors.centerIn: parent; text: "⇄"; color: "#6ce5df"; font.pixelSize: 20; font.bold: true }
+                Label { anchors.centerIn: parent; text: "⇄"; color: systemBackend.accentColor; font.pixelSize: 20; font.bold: true }
             }
             ColumnLayout {
                 Layout.fillWidth: true
@@ -209,7 +233,7 @@ ApplicationWindow {
 
     Rectangle {
         id: dockRevealHandle
-        visible: !systemBackend.externalPanel
+        visible: !systemBackend.externalPanel && systemBackend.dockAutoHide
         z: 79
         width: 76
         height: 7
@@ -217,12 +241,12 @@ ApplicationWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 2
-        color: root.dockRaised ? "#55dcd7" : "#456b7c"
+        color: root.dockRaised ? systemBackend.accentColor : "#456b7c"
         opacity: root.dockRaised ? 0.75 : 0.48
     }
 
     MouseArea {
-        visible: !systemBackend.externalPanel
+        visible: !systemBackend.externalPanel && systemBackend.dockAutoHide
         z: 90
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
@@ -237,18 +261,21 @@ ApplicationWindow {
         id: dock
         visible: !systemBackend.externalPanel
         z: 80
+        preferredSize: systemBackend.dockSize
+        magnifyOnHover: systemBackend.dockMagnify && systemBackend.animationMode !== "Desactivadas"
+        accentColor: systemBackend.accentColor
         x: (root.width - width) / 2
         y: root.dockRaised ? root.height - height - 14 : root.height - 5
         opacity: root.dockRaised ? 1 : 0.15
 
         Behavior on y {
             NumberAnimation {
-                duration: systemBackend.profile === "Ligero" ? 0 : 210
+                duration: root.animationDuration(210, 90)
                 easing.type: Easing.OutCubic
             }
         }
         Behavior on opacity {
-            NumberAnimation { duration: systemBackend.profile === "Ligero" ? 0 : 160 }
+            NumberAnimation { duration: root.animationDuration(160, 70) }
         }
 
         onPointerInsideChanged: {
@@ -274,10 +301,11 @@ ApplicationWindow {
             root.showDock()
         }
         onSystemClicked: {
-            root.systemOpen = !root.systemOpen
+            systemBackend.openSettings("appearance")
             root.startOpen = false
+            root.systemOpen = false
             root.appManagerOpen = false
-            root.showDock()
+            root.scheduleDockHide()
         }
     }
 
@@ -297,6 +325,8 @@ ApplicationWindow {
         }
     }
 
+    // Conservamos el componente durante la migración por compatibilidad interna,
+    // pero el acceso visible de configuración abre MurSchol Settings.
     SystemCenter {
         id: systemCenter
         z: 55
