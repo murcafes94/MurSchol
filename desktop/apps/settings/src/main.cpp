@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QGuiApplication::setApplicationName(QStringLiteral("MurSchol Settings"));
     QGuiApplication::setOrganizationName(QStringLiteral("MurSchol"));
+    QGuiApplication::setDesktopFileName(QStringLiteral("murschol-settings"));
     QQuickStyle::setStyle(QStringLiteral("Basic"));
 
     QString initialPage = QStringLiteral("appearance");
