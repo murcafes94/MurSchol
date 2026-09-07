@@ -1,12 +1,8 @@
 # MurSchol Settings — Energía
 
-La página **Energía** seguirá el criterio visual de MurSchol Settings: presentación inspirada en Windows 11, claridad operativa cercana a Windows 10 y sin controles ficticios.
+La página **Energía** sigue el criterio visual de MurSchol Settings: presentación inspirada en Windows 11, claridad operativa cercana a Windows 10 y controles visibles solo cuando tienen un backend real.
 
-## Objetivo
-
-Centralizar batería, brillo, suspensión y comportamiento energético sin duplicar la fuente de verdad del sistema.
-
-Arquitectura prevista:
+## Arquitectura 0.1
 
 ```text
 MurSchol Settings
@@ -16,78 +12,56 @@ MurSchol Settings
  +----+----------------+----------------+
  |                     |                |
 UPower             brightnessctl      logind
-batería/AC          brillo             suspensión/tapa
+batería/AC          brillo             suspensión
 ```
 
-## Primera fase
+## Implementado
 
 ### Batería
 
-- Detectar presencia de batería mediante UPower.
-- Mostrar porcentaje, cargando/descargando, conectado a corriente y tiempo estimado cuando UPower lo exponga.
-- No inventar tiempo restante si el sistema no lo proporciona de forma fiable.
+- Detectar UPower en el bus del sistema.
+- Detectar batería real o DisplayDevice de UPower.
+- Mostrar porcentaje.
+- Mostrar cargando, descargando, carga completa y estados pendientes.
+- Mostrar tiempo restante o tiempo para completar únicamente cuando UPower lo informa.
+- Diferenciar la ausencia de batería de un error; esto es importante en VirtualBox y PCs de escritorio.
 
 ### Brillo
 
-- Leer brillo actual.
+- Detectar `brightnessctl` y un dispositivo de brillo compatible.
+- Leer porcentaje actual.
 - Ajustar brillo desde Settings.
-- Mantener el control compatible con portátiles y monitores cuando el hardware exponga backlight.
-- Si no existe control de brillo, la UI no mostrará un deslizador falso.
+- Ocultar el control si el hardware no ofrece un backlight utilizable.
+- Informar si el sistema rechaza el cambio por permisos o soporte.
 
-### Suspensión y pantalla
+El mismo `PowerBackend` se comparte con la página **Pantalla** para no crear dos fuentes de verdad.
 
-Opciones previstas:
+### Suspensión
 
-- apagar pantalla tras un intervalo;
-- suspender tras un intervalo;
-- comportamiento con batería y conectado a corriente;
-- al cerrar la tapa: suspender / no hacer nada, únicamente cuando systemd-logind lo permita y el hardware lo exponga.
+- Botón **Suspender ahora** conectado a `org.freedesktop.login1.Manager.Suspend` mediante D-Bus.
+- No se ejecutan comandos de shell privilegiados arbitrarios.
+- systemd-logind conserva el control de permisos e inhibidores.
 
-## Perfiles MurSchol
+### Perfiles MurSchol
 
-La página Energía mostrará el perfil compartido **Ligero / Normal / Rendimiento**, pero no lo confundirá con un gobernador de CPU.
+La página muestra el perfil compartido **Ligero / Normal / Rendimiento** usando el almacenamiento común de MurSchol.
 
-En la primera fase:
+Estos perfiles todavía no fuerzan frecuencias de CPU o GPU. Actualmente coordinan preferencias del shell y de las aplicaciones que ya consultan el perfil común.
 
-- Ligero: menos animaciones, miniaturas bajo demanda y menor actividad secundaria;
-- Normal: equilibrio;
-- Rendimiento: efectos completos y mayor precarga cuando corresponda.
+## Pendiente
 
-Cualquier política de CPU, GPU o platform_profile se añadirá solo tras detectar soporte real y probarla en hardware.
+- Apagar pantalla automáticamente tras un intervalo.
+- Suspender automáticamente tras un intervalo.
+- Políticas distintas con batería y corriente.
+- Acción al cerrar la tapa.
+- Servicio de sesión pequeño que aplique esas políticas aun cuando Settings esté cerrado.
+- Evaluar `power-profiles-daemon` o `platform_profile` únicamente si aporta valor en hardware compatible.
 
-## UX objetivo
+No se mostrarán selectores de temporización o tapa hasta que exista el servicio que realmente los aplique.
 
-```text
-Energía y batería
+## Validación pendiente
 
-Batería
-82 % · 3 h 24 min restantes
-
-Modo de energía
-[ Ligero ] [ Normal ] [ Rendimiento ]
-
-Pantalla
-Brillo ─────────●──── 72 %
-
-Apagar pantalla después de
-[ 10 minutos ]
-
-Suspender después de
-[ 30 minutos ]
-
-Al cerrar la tapa
-[ Suspender ]
-```
-
-## Seguridad
-
-- Settings nunca ejecutará comandos arbitrarios como root.
-- Los cambios privilegiados usarán mecanismos limitados y, cuando sea necesario, Polkit.
-- Los cambios de suspensión/tapa deberán respetar inhibidores de systemd-logind.
-
-## Pendiente de validación
-
-1. VirtualBox: comprobar qué expone UPower sin batería física.
-2. Hardware real: batería, brillo, tapa y suspensión.
-3. Verificar permisos de `brightnessctl` en Debian 13.
-4. Evaluar integración futura con `power-profiles-daemon` o `platform_profile` solo si aporta valor sin aumentar consumo ni complejidad.
+1. VirtualBox: confirmar que la ausencia de batería se representa correctamente y que `Suspend` no rompe la sesión de prueba.
+2. Portátil real: batería, tiempo estimado, brillo y suspensión.
+3. Verificar permisos de `brightnessctl` en Debian 13 sobre hardware físico.
+4. Comprobar comportamiento con varios controladores de backlight.
