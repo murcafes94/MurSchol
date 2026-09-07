@@ -48,11 +48,12 @@
 - [x] Modo estudio — primera fase de perfiles y preferencias.
 - [x] Guía visible de multitarea: Alt+Tab y división con Super+flechas.
 - [x] Primera implementación del dock global `wlr-layer-shell` mediante LayerShellQt.
+- [x] Compartir perfil, apariencia y preferencias del dock mediante `~/.config/murschol/settings.ini`.
 - [ ] Validar el dock global sobre aplicaciones maximizadas en VirtualBox y hardware real.
 - [ ] Visor gráfico de aplicaciones abiertas integrado en MurSchol.
 - [ ] Centro de control real conectado a red/audio/energía.
 - [ ] Búsqueda de contenido dentro de documentos, opcional y de bajo consumo.
-- [ ] Modo claro/oscuro.
+- [ ] Aplicar tema claro/oscuro de forma completa a todos los componentes.
 - [ ] Aplicar físicamente el perfil Ligero a todos los efectos del compositor.
 - [ ] Espacios de trabajo gestionados por el compositor y sincronizados con el shell.
 - [ ] Modo estudio con composición real de ventanas.
@@ -207,6 +208,44 @@
 - [ ] Pixelado real para ocultar información.
 - [ ] Captura con desplazamiento.
 - [ ] Grabación de pantalla ligera compatible con wlroots.
+
+### MurSchol Calculator
+
+- [x] Definir la arquitectura en `docs/MURSCHOL_CALCULATOR.md`.
+- [x] Crear el ejecutable Qt 6/C++20 `murschol-calculator`.
+- [x] Integrar `libqalculate` como motor matemático.
+- [x] Crear modos Estándar, Científica, Convertir y Programador.
+- [x] Añadir DEG/RAD, historial local, teclado y copia de resultados.
+- [x] Validar la compilación de Calculator en CI.
+- [ ] Validar resultados científicos, conversiones y bases en ejecución real.
+- [ ] Añadir memoria MC/MR/M+/M-.
+- [ ] Añadir ecuaciones, matrices, derivadas e integrales de forma progresiva.
+- [ ] Gráficos opcionales cargados solo bajo demanda.
+- [ ] Integrar Calculator en la Live ISO después de la prueba funcional.
+
+### MurSchol Settings
+
+- [x] Definir la arquitectura en `docs/MURSCHOL_SETTINGS.md`.
+- [x] Crear el ejecutable Qt 6/C++20 `murschol-settings`.
+- [x] Crear navegación y búsqueda interna de ajustes.
+- [x] Crear configuración real de tema, color de énfasis y nivel de animaciones.
+- [x] Crear configuración real de auto-ocultado, tamaño y ampliación del dock.
+- [x] Centralizar el perfil Ligero / Normal / Rendimiento.
+- [x] Crear página de sistema con distribución, kernel, CPU, hilos, RAM y almacenamiento.
+- [x] Centralizar preferencias propias en `~/.config/murschol/settings.ini`.
+- [x] Migrar perfil, espacio activo y modo estudio desde la configuración anterior del shell.
+- [x] Hacer que Desktop y el panel global reaccionen a cambios del dock/perfil mediante la configuración compartida.
+- [x] Abrir Settings desde los accesos de configuración del shell y panel.
+- [x] Mantener Red, Sonido y Bluetooth conectados temporalmente a sus herramientas reales, sin interruptores ficticios.
+- [x] Integrar Settings en la receta de la Live ISO.
+- [x] Validar la compilación independiente de Settings en CI.
+- [ ] Validar Settings y actualización en vivo del dock dentro de VirtualBox.
+- [ ] Aplicar tema claro/oscuro completamente a shell y apps MurSchol.
+- [ ] Conectar NetworkManager por D-Bus dentro de la UI propia.
+- [ ] Conectar PipeWire/WirePlumber dentro de la UI propia.
+- [ ] Conectar BlueZ por D-Bus dentro de la UI propia.
+- [ ] Implementar pantalla, energía, aplicaciones predeterminadas y actualizaciones con backends reales.
+- [ ] Retirar visualmente el System Center antiguo cuando Settings esté validado en ejecución.
 
 ### Iconografía
 
