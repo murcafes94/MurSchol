@@ -121,10 +121,12 @@
 - [x] Mostrar formato, dimensiones, tamaño, fecha y ubicación bajo demanda.
 - [x] Panel de información oculto por defecto.
 - [x] Preparar zoom, giro, enderezado visual, marco de recorte y dibujo.
-- [ ] Guardar recorte, enderezado y dibujo en una copia sin destruir el original por defecto.
-- [ ] Deshacer/rehacer operaciones de edición.
+- [x] Añadir modo de anotación para capturas con lápiz, resaltador, flecha, cuadro, texto y ocultación.
+- [x] Preparar deshacer/rehacer para anotaciones.
+- [x] Asociar JPG/PNG/GIF/SVG/WebP con MurSchol Photos en la Live ISO.
+- [ ] Guardar recorte, enderezado y anotaciones en una copia a resolución original.
+- [ ] Deshacer/rehacer también las transformaciones de imagen.
 - [ ] Leer EXIF/GPS de forma diferida.
-- [ ] Asociar formatos de imagen desde MurSchol Files y la Live ISO.
 - [ ] Medir apertura con imágenes grandes y carpetas extensas.
 
 ### MurSchol Media
@@ -185,6 +187,26 @@
 - [ ] Soporte completo de zonas horarias.
 - [ ] Drag & drop para mover eventos.
 - [ ] Integrar en la Live ISO tras validar persistencia, recordatorios y sincronización.
+
+### MurSchol Capture
+
+- [x] Definir arquitectura ligera en `docs/MURSCHOL_CAPTURE.md`.
+- [x] Crear el ejecutable Qt 6/C++20 `murschol-capture`.
+- [x] Captura de región mediante `grim + slurp`.
+- [x] Captura de pantalla completa mediante `grim`.
+- [x] Temporizador de 0, 3, 5 y 10 segundos.
+- [x] Guardar PNG en `Imágenes/Capturas de pantalla/`.
+- [x] Copiar la captura al portapapeles con `wl-copy` cuando esté disponible.
+- [x] Notificar el guardado mediante `notify-send` cuando esté disponible.
+- [x] Abrir la captura directamente en el modo de anotación de MurSchol Photos.
+- [x] Atajos globales `Super + Shift + S` y `Print Screen` preparados en labwc.
+- [x] Integrar Capture, Photos y sus dependencias en la receta de la Live ISO.
+- [ ] Validar captura de región/pantalla en VirtualBox y hardware real.
+- [ ] Captura de ventana concreta.
+- [ ] Guardar anotaciones a resolución original desde Photos.
+- [ ] Pixelado real para ocultar información.
+- [ ] Captura con desplazamiento.
+- [ ] Grabación de pantalla ligera compatible con wlroots.
 
 ### Iconografía
 
