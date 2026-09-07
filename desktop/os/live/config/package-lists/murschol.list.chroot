@@ -47,6 +47,14 @@ bluez
 blueman
 polkitd
 
+# Capturas Wayland ligeras
+# MurSchol Capture usa estas herramientas como backend y no mantiene un
+# servicio pesado residente.
+grim
+slurp
+wl-clipboard
+libnotify-bin
+
 # Aplicaciones esenciales para la primera prueba
 thunar
 gvfs
