@@ -1,0 +1,55 @@
+#!/bin/sh
+set -u
+
+LABEL="${1:-Aplicación}"
+shift || true
+if [ "${1:-}" = "--" ]; then
+  shift
+fi
+
+if [ "$#" -lt 1 ]; then
+  exit 2
+fi
+
+STATE_DIR="$HOME/.local/state/murschol"
+mkdir -p "$STATE_DIR"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+SAFE_LABEL="$(printf '%s' "$LABEL" | tr ' /:' '___' | tr -cd '[:alnum:]_.-')"
+[ -n "$SAFE_LABEL" ] || SAFE_LABEL="app"
+LOG="$STATE_DIR/${STAMP}-${SAFE_LABEL}.log"
+LATEST="$STATE_DIR/last-launch.log"
+
+{
+  echo "MurSchol launch diagnostics"
+  echo "Aplicación: $LABEL"
+  echo "Fecha: $(date -Is)"
+  echo "Comando: $*"
+  echo "WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-}"
+  echo "XDG_SESSION_TYPE=${XDG_SESSION_TYPE:-}"
+  echo "QT_QPA_PLATFORM=${QT_QPA_PLATFORM:-}"
+  echo
+} > "$LOG"
+cp "$LOG" "$LATEST" 2>/dev/null || true
+
+"$@" >> "$LOG" 2>&1 &
+PID=$!
+sleep 2
+
+if kill -0 "$PID" 2>/dev/null; then
+  exit 0
+fi
+
+wait "$PID"
+RC=$?
+cp "$LOG" "$LATEST" 2>/dev/null || true
+
+if [ "$RC" -ne 0 ]; then
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "MurSchol" "No se pudo abrir $LABEL. Se mostrará el diagnóstico." 2>/dev/null || true
+  fi
+  if command -v foot >/dev/null 2>&1; then
+    foot -T "MurSchol - diagnóstico de $LABEL" sh -c 'echo "No se pudo abrir: $1"; echo; cat "$2"; echo; echo "Pulsa Enter para cerrar."; read _' _ "$LABEL" "$LOG" >/dev/null 2>&1 &
+  fi
+fi
+
+exit "$RC"
