@@ -11,6 +11,24 @@ cmake -S /usr/src/murschol-shell \
 cmake --build /tmp/murschol-build --parallel "$(nproc)"
 cmake --install /tmp/murschol-build
 
+echo "[MurSchol] Compilando MurSchol Photos..."
+cmake -S /usr/src/murschol-photos \
+      -B /tmp/murschol-photos-build \
+      -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build /tmp/murschol-photos-build --parallel "$(nproc)"
+cmake --install /tmp/murschol-photos-build
+
+echo "[MurSchol] Compilando MurSchol Capture..."
+cmake -S /usr/src/murschol-capture \
+      -B /tmp/murschol-capture-build \
+      -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build /tmp/murschol-capture-build --parallel "$(nproc)"
+cmake --install /tmp/murschol-capture-build
+
 cat > /usr/share/applications/murschol-desktop.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
@@ -35,6 +53,33 @@ Categories=System;FileTools;Utility;
 Keywords=archivos;carpetas;documentos;files;folders;
 EOF
 
+cat > /usr/share/applications/murschol-photos.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Photos
+GenericName=Visor de imágenes
+Comment=Abre y anota imágenes en MurSchol OS
+Exec=/usr/local/bin/murschol-photos %f
+Icon=image-viewer
+Terminal=false
+MimeType=image/jpeg;image/png;image/gif;image/svg+xml;image/webp;
+Categories=Graphics;Viewer;
+Keywords=fotos;imagenes;capturas;photos;images;
+EOF
+
+cat > /usr/share/applications/murschol-capture.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Capture
+GenericName=Capturas de pantalla
+Comment=Captura una región o la pantalla completa
+Exec=/usr/local/bin/murschol-capture
+Icon=applets-screenshooter
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=captura;pantalla;screenshot;screen;
+EOF
+
 cat > /usr/share/applications/murschol-edge.desktop <<'EOF'
 [Desktop Entry]
 Type=Application
@@ -51,6 +96,8 @@ EOF
 
 chmod 0755 /usr/local/bin/murschol-desktop
 chmod 0755 /usr/local/bin/murschol-files
+chmod 0755 /usr/local/bin/murschol-photos
+chmod 0755 /usr/local/bin/murschol-capture
 chmod 0755 /usr/local/bin/murschol-edge
 chmod 0755 /usr/local/lib/murschol/install-edge-root
 
@@ -64,8 +111,16 @@ fi
 # MurSchol Files será el gestor predeterminado para carpetas nuevas y existentes.
 update-desktop-database /usr/share/applications 2>/dev/null || true
 
-rm -rf /tmp/murschol-build /usr/src/murschol-shell
+rm -rf \
+  /tmp/murschol-build \
+  /tmp/murschol-photos-build \
+  /tmp/murschol-capture-build \
+  /usr/src/murschol-shell \
+  /usr/src/murschol-photos \
+  /usr/src/murschol-capture
 
 echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
 echo "[MurSchol] MurSchol Files instalado en /usr/local/bin/murschol-files"
+echo "[MurSchol] MurSchol Photos instalado en /usr/local/bin/murschol-photos"
+echo "[MurSchol] MurSchol Capture instalado en /usr/local/bin/murschol-capture"
 echo "[MurSchol] Microsoft Edge disponible como instalación bajo demanda."
