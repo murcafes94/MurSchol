@@ -36,6 +36,7 @@ ApplicationWindow {
     ]
 
     SettingsBackend { id: backend }
+    NetworkBackend { id: networkBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -53,6 +54,21 @@ ApplicationWindow {
         return "Configuración"
     }
 
+    function pageDescription(key) {
+        switch (key) {
+        case "appearance": return "Tema, color y movimiento del entorno MurSchol."
+        case "dock": return "Comportamiento del dock global y del panel."
+        case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
+        case "system": return "Información real detectada en este equipo."
+        case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
+        case "sound": return "Audio administrado por PipeWire y WirePlumber."
+        case "bluetooth": return "Dispositivos Bluetooth administrados por BlueZ."
+        case "storage": return "Estado básico del almacenamiento local."
+        case "about": return "Información de MurSchol OS y de esta configuración."
+        default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
+        }
+    }
+
     function matchesPage(page) {
         const query = searchField.text.trim().toLowerCase()
         if (query.length === 0)
@@ -60,6 +76,12 @@ ApplicationWindow {
         return page.title.toLowerCase().includes(query)
                 || page.group.toLowerCase().includes(query)
                 || page.keywords.toLowerCase().includes(query)
+    }
+
+    function pageImplemented(key) {
+        return key === "appearance" || key === "dock" || key === "performance"
+                || key === "system" || key === "storage" || key === "about"
+                || key === "network" || key === "sound" || key === "bluetooth"
     }
 
     Component.onCompleted: {
@@ -85,28 +107,13 @@ ApplicationWindow {
                 height: 34
                 radius: 11
                 color: root.accent
-                Label {
-                    anchors.centerIn: parent
-                    text: "MS"
-                    color: "#07131d"
-                    font.bold: true
-                    font.pixelSize: 11
-                }
+                Label { anchors.centerIn: parent; text: "MS"; color: "#07131d"; font.bold: true; font.pixelSize: 11 }
             }
 
             ColumnLayout {
                 spacing: 0
-                Label {
-                    text: "MurSchol Settings"
-                    color: lightTheme ? "#132833" : "#f3f8fa"
-                    font.pixelSize: 16
-                    font.bold: true
-                }
-                Label {
-                    text: "Configuración del sistema"
-                    color: lightTheme ? "#6a7d86" : "#7897a5"
-                    font.pixelSize: 9
-                }
+                Label { text: "MurSchol Settings"; color: lightTheme ? "#132833" : "#f3f8fa"; font.pixelSize: 16; font.bold: true }
+                Label { text: "Configuración del sistema"; color: lightTheme ? "#6a7d86" : "#7897a5"; font.pixelSize: 9 }
             }
 
             Item { Layout.fillWidth: true }
@@ -146,11 +153,9 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     clip: true
-
                     Column {
                         width: parent.width
                         spacing: 5
-
                         Repeater {
                             model: root.pages
                             delegate: Button {
@@ -163,8 +168,8 @@ ApplicationWindow {
                                 onClicked: {
                                     root.currentPage = modelData.key
                                     searchField.text = ""
+                                    if (modelData.key === "network") networkBackend.refresh()
                                 }
-
                                 background: Rectangle {
                                     radius: 13
                                     color: root.currentPage === navButton.modelData.key
@@ -173,7 +178,6 @@ ApplicationWindow {
                                     border.width: root.currentPage === navButton.modelData.key ? 1 : 0
                                     border.color: root.accent
                                 }
-
                                 contentItem: RowLayout {
                                     spacing: 9
                                     Label {
@@ -187,17 +191,8 @@ ApplicationWindow {
                                     ColumnLayout {
                                         spacing: 0
                                         Layout.fillWidth: true
-                                        Label {
-                                            text: navButton.modelData.title
-                                            color: lightTheme ? "#17303a" : "#eef5f7"
-                                            font.pixelSize: 11
-                                            font.bold: root.currentPage === navButton.modelData.key
-                                        }
-                                        Label {
-                                            text: navButton.modelData.group
-                                            color: lightTheme ? "#7b8d95" : "#607f8c"
-                                            font.pixelSize: 7
-                                        }
+                                        Label { text: navButton.modelData.title; color: lightTheme ? "#17303a" : "#eef5f7"; font.pixelSize: 11; font.bold: root.currentPage === navButton.modelData.key }
+                                        Label { text: navButton.modelData.group; color: lightTheme ? "#7b8d95" : "#607f8c"; font.pixelSize: 7 }
                                     }
                                 }
                             }
@@ -216,7 +211,7 @@ ApplicationWindow {
                         Label { text: "●"; color: root.accent; font.pixelSize: 10 }
                         Label {
                             Layout.fillWidth: true
-                            text: backend.statusText
+                            text: root.currentPage === "network" ? networkBackend.statusText : backend.statusText
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -234,7 +229,6 @@ ApplicationWindow {
             ScrollView {
                 anchors.fill: parent
                 clip: true
-
                 ColumnLayout {
                     width: Math.max(620, parent.width - 64)
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -245,27 +239,9 @@ ApplicationWindow {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 3
+                        Label { text: root.pageTitle(root.currentPage); color: lightTheme ? "#122933" : "#f1f7f9"; font.pixelSize: 28; font.bold: true }
                         Label {
-                            text: root.pageTitle(root.currentPage)
-                            color: lightTheme ? "#122933" : "#f1f7f9"
-                            font.pixelSize: 28
-                            font.bold: true
-                        }
-                        Label {
-                            text: {
-                                switch (root.currentPage) {
-                                case "appearance": return "Tema, color y movimiento del entorno MurSchol."
-                                case "dock": return "Comportamiento del dock global y del panel."
-                                case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
-                                case "system": return "Información real detectada en este equipo."
-                                case "network": return "Conexiones administradas por NetworkManager."
-                                case "sound": return "Audio administrado por PipeWire y WirePlumber."
-                                case "bluetooth": return "Dispositivos Bluetooth administrados por BlueZ."
-                                case "storage": return "Estado básico del almacenamiento local."
-                                case "about": return "Información de MurSchol OS y de esta configuración."
-                                default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
-                                }
-                            }
+                            text: root.pageDescription(root.currentPage)
                             color: lightTheme ? "#647984" : "#7895a2"
                             font.pixelSize: 11
                             wrapMode: Text.WordWrap
@@ -273,418 +249,49 @@ ApplicationWindow {
                         }
                     }
 
-                    Rectangle {
-                        visible: root.currentPage === "appearance"
-                        Layout.fillWidth: true
-                        height: appearanceColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: appearanceColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 14
-
-                            Label { text: "Tema"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-                                Repeater {
-                                    model: ["Automático", "Claro", "Oscuro"]
-                                    delegate: Button {
-                                        required property string modelData
-                                        Layout.fillWidth: true
-                                        height: 48
-                                        checkable: true
-                                        checked: backend.theme === modelData
-                                        text: modelData
-                                        onClicked: backend.setTheme(modelData)
-                                        background: Rectangle {
-                                            radius: 14
-                                            color: parent.checked ? (lightTheme ? "#d9eeee" : "#153c45") : (lightTheme ? "#edf2f4" : "#122832")
-                                            border.width: parent.checked ? 2 : 1
-                                            border.color: parent.checked ? root.accent : (lightTheme ? "#d2dde1" : "#294653")
-                                        }
-                                        contentItem: Label {
-                                            text: parent.text
-                                            color: lightTheme ? "#17303a" : "#eef6f8"
-                                            horizontalAlignment: Text.AlignHCenter
-                                            verticalAlignment: Text.AlignVCenter
-                                            font.pixelSize: 10
-                                            font.bold: parent.checked
-                                        }
-                                    }
-                                }
-                            }
-
-                            Label { text: "Color de énfasis"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
-                            RowLayout {
-                                spacing: 10
-                                Repeater {
-                                    model: ["#22d6cf", "#38bdf8", "#6d8cff", "#9a71f5", "#55d58a", "#e6a85c"]
-                                    delegate: Button {
-                                        required property string modelData
-                                        width: 42
-                                        height: 42
-                                        onClicked: backend.setAccentColor(modelData)
-                                        background: Rectangle {
-                                            radius: 21
-                                            color: modelData
-                                            border.width: backend.accentColor === modelData ? 4 : 1
-                                            border.color: backend.accentColor === modelData ? (lightTheme ? "#17303a" : "white") : "#60808d"
-                                        }
-                                        contentItem: Item {}
-                                    }
-                                }
-                            }
-
-                            Label { text: "Animaciones"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-                                Repeater {
-                                    model: ["Normal", "Reducidas", "Desactivadas"]
-                                    delegate: Button {
-                                        required property string modelData
-                                        Layout.fillWidth: true
-                                        height: 44
-                                        checkable: true
-                                        checked: backend.animationMode === modelData
-                                        text: modelData
-                                        onClicked: backend.setAnimationMode(modelData)
-                                        background: Rectangle {
-                                            radius: 13
-                                            color: parent.checked ? (lightTheme ? "#d9eeee" : "#153c45") : (lightTheme ? "#edf2f4" : "#122832")
-                                            border.color: parent.checked ? root.accent : (lightTheme ? "#d2dde1" : "#294653")
-                                        }
-                                        contentItem: Label {
-                                            text: parent.text
-                                            color: lightTheme ? "#17303a" : "#eef6f8"
-                                            horizontalAlignment: Text.AlignHCenter
-                                            verticalAlignment: Text.AlignVCenter
-                                            font.pixelSize: 9
-                                        }
-                                    }
-                                }
-                            }
-
-                            Label {
-                                Layout.fillWidth: true
-                                text: "El tema y el color quedan guardados en la configuración común. La adopción visual completa por todas las aplicaciones MurSchol se hará de forma progresiva."
-                                color: lightTheme ? "#71838b" : "#668694"
-                                font.pixelSize: 9
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        visible: root.currentPage === "dock"
-                        Layout.fillWidth: true
-                        height: dockColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: dockColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 14
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 2
-                                    Label { text: "Ocultar automáticamente"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 12 }
-                                    Label { text: "El dock aparece al llevar el puntero al borde inferior."; color: lightTheme ? "#74868e" : "#708e9a"; font.pixelSize: 9 }
-                                }
-                                Switch { checked: backend.dockAutoHide; onToggled: backend.setDockAutoHide(checked) }
-                            }
-
-                            Rectangle { Layout.fillWidth: true; height: 1; color: lightTheme ? "#dce5e8" : "#23414e" }
-
-                            Label { text: "Tamaño del dock"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 12 }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Label { text: "Pequeño"; color: lightTheme ? "#6c7f87" : "#7895a1"; font.pixelSize: 9 }
-                                Slider {
-                                    id: dockSizeSlider
-                                    Layout.fillWidth: true
-                                    from: 54
-                                    to: 84
-                                    stepSize: 2
-                                    value: backend.dockSize
-                                    onMoved: backend.setDockSize(Math.round(value))
-                                }
-                                Label {
-                                    text: backend.dockSize + " px"
-                                    color: lightTheme ? "#334b55" : "#c7d9df"
-                                    font.pixelSize: 9
-                                    Layout.preferredWidth: 48
-                                }
-                            }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 2
-                                    Label { text: "Ampliar iconos al pasar el puntero"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 12 }
-                                    Label { text: "Efecto discreto; se desactiva con animaciones desactivadas."; color: lightTheme ? "#74868e" : "#708e9a"; font.pixelSize: 9 }
-                                }
-                                Switch { checked: backend.dockMagnify; onToggled: backend.setDockMagnify(checked) }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        visible: root.currentPage === "performance"
-                        Layout.fillWidth: true
-                        height: performanceColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: performanceColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 12
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Label { text: "Perfil activo"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13; Layout.fillWidth: true }
-                                Rectangle {
-                                    width: recommendation.implicitWidth + 22
-                                    height: 28
-                                    radius: 14
-                                    color: lightTheme ? "#dcefee" : "#153943"
-                                    Label {
-                                        id: recommendation
-                                        anchors.centerIn: parent
-                                        text: "Recomendado: " + backend.recommendedProfile
-                                        color: root.accent
-                                        font.pixelSize: 9
-                                        font.bold: true
-                                    }
-                                }
-                            }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-                                Repeater {
-                                    model: [
-                                        { name: "Ligero", detail: "Menos efectos y menos actividad secundaria", symbol: "◆" },
-                                        { name: "Normal", detail: "Equilibrio para el uso diario", symbol: "▣" },
-                                        { name: "Rendimiento", detail: "Más respuesta y precarga cuando sea útil", symbol: "▲" }
-                                    ]
-                                    delegate: Button {
-                                        id: profileButton
-                                        required property var modelData
-                                        Layout.fillWidth: true
-                                        height: 118
-                                        checkable: true
-                                        checked: backend.profile === modelData.name
-                                        onClicked: backend.setProfile(modelData.name)
-                                        background: Rectangle {
-                                            radius: 16
-                                            color: profileButton.checked ? (lightTheme ? "#dcefee" : "#143943") : (lightTheme ? "#edf2f4" : "#112630")
-                                            border.width: profileButton.checked ? 2 : 1
-                                            border.color: profileButton.checked ? root.accent : (lightTheme ? "#d1dde1" : "#294754")
-                                        }
-                                        contentItem: ColumnLayout {
-                                            spacing: 4
-                                            Label { Layout.alignment: Qt.AlignHCenter; text: profileButton.modelData.symbol; color: root.accent; font.pixelSize: 19; font.bold: true }
-                                            Label { Layout.alignment: Qt.AlignHCenter; text: profileButton.modelData.name; color: lightTheme ? "#18313b" : "white"; font.pixelSize: 11; font.bold: true }
-                                            Label {
-                                                Layout.fillWidth: true
-                                                text: profileButton.modelData.detail
-                                                color: lightTheme ? "#6c7f87" : "#7895a1"
-                                                font.pixelSize: 8
-                                                wrapMode: Text.WordWrap
-                                                horizontalAlignment: Text.AlignHCenter
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Label {
-                                Layout.fillWidth: true
-                                text: "En la alpha el perfil ya controla la frecuencia de estadísticas y parte de las animaciones del shell. CPU, compositor, cachés y precarga se irán conectando sin prometer optimizaciones que aún no estén implementadas."
-                                color: lightTheme ? "#71838b" : "#668694"
-                                font.pixelSize: 9
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-                    }
-
-                    Rectangle {
+                    AppearancePage { visible: root.currentPage === "appearance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
+                    DockPage { visible: root.currentPage === "dock"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
+                    PerformancePage { visible: root.currentPage === "performance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
+                    SystemPage {
                         visible: root.currentPage === "system" || root.currentPage === "storage" || root.currentPage === "about"
                         Layout.fillWidth: true
-                        height: systemColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: systemColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 10
-
-                            Repeater {
-                                model: [
-                                    { label: "Sistema", value: backend.distroName },
-                                    { label: "Kernel", value: backend.kernelVersion },
-                                    { label: "Procesador", value: backend.cpuModel },
-                                    { label: "Hilos", value: backend.cpuThreads.toString() },
-                                    { label: "Memoria", value: backend.totalMemoryGb.toFixed(1) + " GB" },
-                                    { label: "Almacenamiento", value: backend.storageSummary }
-                                ]
-                                delegate: Rectangle {
-                                    required property var modelData
-                                    Layout.fillWidth: true
-                                    height: 52
-                                    radius: 13
-                                    color: lightTheme ? "#edf2f4" : "#112630"
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 13
-                                        anchors.rightMargin: 13
-                                        Label {
-                                            text: parent.parent.modelData.label
-                                            color: lightTheme ? "#667b84" : "#7896a2"
-                                            font.pixelSize: 9
-                                            Layout.preferredWidth: 120
-                                        }
-                                        Label {
-                                            Layout.fillWidth: true
-                                            text: parent.parent.modelData.value
-                                            color: lightTheme ? "#18313b" : "#e7f0f3"
-                                            font.pixelSize: 10
-                                            elide: Text.ElideMiddle
-                                            horizontalAlignment: Text.AlignRight
-                                        }
-                                    }
-                                }
-                            }
-
-                            Label {
-                                visible: root.currentPage === "about"
-                                Layout.fillWidth: true
-                                text: "MurSchol Settings 0.1 · configuración local-first de MurSchol OS. Las preferencias propias se guardan en " + backend.settingsFilePath()
-                                color: lightTheme ? "#6d8088" : "#688793"
-                                font.pixelSize: 9
-                                wrapMode: Text.WordWrap
-                            }
-                        }
+                        backend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                        showAbout: root.currentPage === "about"
                     }
-
-                    Rectangle {
-                        visible: root.currentPage === "network" || root.currentPage === "sound" || root.currentPage === "bluetooth"
+                    NetworkPage {
+                        visible: root.currentPage === "network"
                         Layout.fillWidth: true
-                        height: externalColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: externalColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 12
-
-                            Label {
-                                Layout.fillWidth: true
-                                text: root.currentPage === "network"
-                                      ? "MurSchol todavía no duplica el estado de NetworkManager. Puedes abrir su editor real desde aquí."
-                                      : (root.currentPage === "sound"
-                                         ? "MurSchol todavía no duplica controles de PipeWire. Puedes abrir el mezclador real desde aquí."
-                                         : "MurSchol todavía no duplica BlueZ. Puedes abrir el administrador real desde aquí.")
-                                color: lightTheme ? "#4f6670" : "#8ca6b0"
-                                font.pixelSize: 10
-                                wrapMode: Text.WordWrap
-                            }
-
-                            Button {
-                                text: root.currentPage === "network" ? "Abrir conexiones de red"
-                                      : (root.currentPage === "sound" ? "Abrir controles de sonido" : "Abrir Bluetooth")
-                                enabled: root.currentPage === "network" ? backend.networkSettingsAvailable
-                                         : (root.currentPage === "sound" ? backend.audioSettingsAvailable : backend.bluetoothSettingsAvailable)
-                                onClicked: {
-                                    if (root.currentPage === "network") backend.openNetworkSettings()
-                                    else if (root.currentPage === "sound") backend.openAudioSettings()
-                                    else backend.openBluetoothSettings()
-                                }
-                                background: Rectangle {
-                                    radius: 13
-                                    color: parent.enabled ? root.accent : (lightTheme ? "#dbe2e5" : "#263942")
-                                }
-                                contentItem: Label {
-                                    text: parent.text
-                                    color: parent.enabled ? "#07131d" : (lightTheme ? "#89969b" : "#71858d")
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    font.pixelSize: 10
-                                    font.bold: parent.enabled
-                                }
-                            }
-                        }
+                        backend: networkBackend
+                        settingsBackend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
                     }
-
-                    Rectangle {
-                        visible: root.currentPage !== "appearance"
-                                 && root.currentPage !== "dock"
-                                 && root.currentPage !== "performance"
-                                 && root.currentPage !== "system"
-                                 && root.currentPage !== "storage"
-                                 && root.currentPage !== "about"
-                                 && root.currentPage !== "network"
-                                 && root.currentPage !== "sound"
-                                 && root.currentPage !== "bluetooth"
+                    ExternalPage {
+                        visible: root.currentPage === "sound"
                         Layout.fillWidth: true
-                        height: placeholderColumn.implicitHeight + 36
-                        radius: 20
-                        color: lightTheme ? "#f9fbfc" : "#0d202a"
-                        border.color: lightTheme ? "#d5e0e4" : "#284653"
-
-                        ColumnLayout {
-                            id: placeholderColumn
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: 18
-                            spacing: 7
-                            Label {
-                                text: "Preparado, todavía sin controles ficticios"
-                                color: lightTheme ? "#1b323c" : "white"
-                                font.bold: true
-                                font.pixelSize: 13
-                            }
-                            Label {
-                                Layout.fillWidth: true
-                                text: "La sección forma parte de la navegación definitiva, pero sus controles aparecerán únicamente cuando estén conectados al backend real del sistema."
-                                color: lightTheme ? "#667a83" : "#77939f"
-                                font.pixelSize: 10
-                                wrapMode: Text.WordWrap
-                            }
-                        }
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                        description: "La interfaz nativa de PipeWire llegará en el siguiente bloque. Mientras tanto, este botón abre el mezclador real y no simula controles."
+                        buttonText: "Abrir controles de sonido"
+                        available: backend.audioSettingsAvailable
+                        onOpenRequested: backend.openAudioSettings()
+                    }
+                    ExternalPage {
+                        visible: root.currentPage === "bluetooth"
+                        Layout.fillWidth: true
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                        description: "La interfaz nativa de BlueZ llegará después de sonido. Mientras tanto, este botón abre el administrador real de Bluetooth."
+                        buttonText: "Abrir Bluetooth"
+                        available: backend.bluetoothSettingsAvailable
+                        onOpenRequested: backend.openBluetoothSettings()
+                    }
+                    PlaceholderPage {
+                        visible: !root.pageImplemented(root.currentPage)
+                        Layout.fillWidth: true
+                        lightTheme: root.lightTheme
                     }
                 }
             }
