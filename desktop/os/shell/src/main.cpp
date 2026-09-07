@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     app.setApplicationName("MurSchol Desktop");
     app.setOrganizationName("MurSchol");
+    app.setDesktopFileName("murschol-desktop");
     QQuickStyle::setStyle("Basic");
 
     qmlRegisterType<SystemBackend>("MurScholShell", 1, 0, "SystemBackend");
