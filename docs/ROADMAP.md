@@ -111,6 +111,22 @@
 - [ ] Asociar formatos desde MurSchol Files.
 - [ ] Integrar MurSchol Reader en la Live ISO tras validar lectura real y tiempos de apertura.
 
+### MurSchol Photos
+
+- [x] Definir la visión funcional en `docs/MURSCHOL_PHOTOS.md`.
+- [x] Crear el primer ejecutable Qt 6/C++20 `murschol-photos`.
+- [x] Reconocer JPG/JPEG, PNG, GIF, SVG y WebP.
+- [x] Abrir una imagen directamente desde una ruta sin cargar una biblioteca previa.
+- [x] Navegar anterior/siguiente entre imágenes de la misma carpeta.
+- [x] Mostrar formato, dimensiones, tamaño, fecha y ubicación bajo demanda.
+- [x] Panel de información oculto por defecto.
+- [x] Preparar zoom, giro, enderezado visual, marco de recorte y dibujo.
+- [ ] Guardar recorte, enderezado y dibujo en una copia sin destruir el original por defecto.
+- [ ] Deshacer/rehacer operaciones de edición.
+- [ ] Leer EXIF/GPS de forma diferida.
+- [ ] Asociar formatos de imagen desde MurSchol Files y la Live ISO.
+- [ ] Medir apertura con imágenes grandes y carpetas extensas.
+
 ### Iconografía
 
 - [x] Definir política de iconos común en `docs/ICON_POLICY.md`.
