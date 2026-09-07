@@ -11,6 +11,7 @@ locales
 ca-certificates
 curl
 xdg-utils
+xdg-user-dirs
 dbus-user-session
 
 # Sesión gráfica mínima Wayland
