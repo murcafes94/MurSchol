@@ -22,6 +22,8 @@ qt_add_executable(murschol-settings
     src/PowerBackend.h
     src/DisplayBackend.cpp
     src/DisplayBackend.h
+    src/AppsBackend.cpp
+    src/AppsBackend.h
 )
 
 qt_add_qml_module(murschol-settings
@@ -38,6 +40,8 @@ qt_add_qml_module(murschol-settings
         qml/BluetoothPage.qml
         qml/PowerPage.qml
         qml/DisplayPage.qml
+        qml/AppsPage.qml
+        qml/CompatibilityPage.qml
         qml/ExternalPage.qml
         qml/PlaceholderPage.qml
 )
