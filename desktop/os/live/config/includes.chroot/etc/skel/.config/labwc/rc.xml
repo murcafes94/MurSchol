@@ -39,9 +39,12 @@
     <default />
   </mouse>
 
-  <!-- Garantiza controles estándar en aplicaciones Wayland y XWayland. -->
+  <!-- Las aplicaciones normales reciben minimizar, maximizar y cerrar.
+       MurSchol Desktop es el fondo/shell y conserva únicamente su interfaz propia. -->
   <windowRules>
     <windowRule identifier="*" serverDecoration="yes" />
+    <windowRule identifier="murschol-desktop" serverDecoration="no" />
+    <windowRule identifier="murschol-panel" serverDecoration="no" />
   </windowRules>
 
   <!-- Alt+Tab muestra icono, nombre y vista previa de la ventana activa. -->
