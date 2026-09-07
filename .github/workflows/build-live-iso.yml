@@ -6,6 +6,8 @@ on:
     paths:
       - 'desktop/os/live/**'
       - 'desktop/os/shell/**'
+      - 'desktop/apps/photos/**'
+      - 'desktop/apps/capture/**'
       - '.github/workflows/build-live-iso.yml'
 
 permissions:
