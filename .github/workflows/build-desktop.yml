@@ -11,6 +11,7 @@ on:
       - 'desktop/apps/calendar/**'
       - 'desktop/apps/capture/**'
       - 'desktop/apps/calculator/**'
+      - 'desktop/apps/settings/**'
       - '.github/workflows/build-desktop.yml'
   workflow_dispatch:
 
@@ -190,6 +191,25 @@ jobs:
           cmake -S desktop/apps/calculator -B build/calculator -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/calculator --parallel
           test -x build/calculator/murschol-calculator
+
+  validate-settings:
+    name: Validar MurSchol Settings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+
+      - name: Validar QML y compilar Settings
+        run: |
+          set -eu
+          /usr/lib/qt6/bin/qmlformat desktop/apps/settings/qml/Main.qml >/dev/null
+          cmake -S desktop/apps/settings -B build/settings -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/settings --parallel
+          test -x build/settings/murschol-settings
 
   validate-debian-panel:
     name: Validar panel global en Debian 13
