@@ -1,5 +1,7 @@
 #include "BluetoothBackend.h"
 
+#include <algorithm>
+
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
