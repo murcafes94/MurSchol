@@ -26,7 +26,7 @@ ApplicationWindow {
         { key: "appearance", title: "Apariencia", group: "Personalización", symbol: "◈", keywords: "tema claro oscuro color animaciones apariencia" },
         { key: "dock", title: "Dock y panel", group: "Personalización", symbol: "▰", keywords: "dock panel ocultar tamaño iconos ampliar" },
         { key: "workspaces", title: "Espacios", group: "Personalización", symbol: "▦", keywords: "espacios estudio trabajos personal escritorios" },
-        { key: "apps", title: "Aplicaciones", group: "Aplicaciones", symbol: "▥", keywords: "apps instaladas inicio predeterminadas mime" },
+        { key: "apps", title: "Aplicaciones", group: "Aplicaciones", symbol: "▥", keywords: "apps instaladas predeterminadas navegador fotos archivos pdf mime" },
         { key: "compatibility", title: "Compatibilidad", group: "Aplicaciones", symbol: "⇄", keywords: "linux android windows waydroid wine bottles flatpak" },
         { key: "performance", title: "Rendimiento", group: "Dispositivo", symbol: "▲", keywords: "ligero normal rendimiento memoria cpu perfil" },
         { key: "system", title: "Sistema y hardware", group: "Dispositivo", symbol: "◉", keywords: "cpu ram kernel hardware sistema información" },
@@ -41,6 +41,7 @@ ApplicationWindow {
     BluetoothBackend { id: bluetoothBackend }
     PowerBackend { id: powerBackend }
     DisplayBackend { id: displayBackend }
+    AppsBackend { id: appsBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -70,6 +71,8 @@ ApplicationWindow {
         case "bluetooth": return "Adaptador y dispositivos controlados directamente mediante BlueZ."
         case "power": return "Batería, brillo y suspensión conectados a UPower, brightnessctl y logind."
         case "storage": return "Estado básico del almacenamiento local."
+        case "apps": return "Aplicaciones instaladas y asociaciones predeterminadas mediante XDG."
+        case "compatibility": return "Estado real de las capas Linux, Flatpak, Android y Windows."
         case "about": return "Información de MurSchol OS y de esta configuración."
         default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
         }
@@ -88,7 +91,8 @@ ApplicationWindow {
         return key === "appearance" || key === "dock" || key === "performance"
                 || key === "system" || key === "storage" || key === "about"
                 || key === "network" || key === "sound" || key === "bluetooth"
-                || key === "power" || key === "display"
+                || key === "power" || key === "display" || key === "apps"
+                || key === "compatibility"
     }
 
     Component.onCompleted: {
@@ -183,6 +187,8 @@ ApplicationWindow {
                                         displayBackend.refresh()
                                         powerBackend.refresh()
                                     }
+                                    if (modelData.key === "apps" || modelData.key === "compatibility")
+                                        appsBackend.refresh()
                                 }
                                 background: Rectangle {
                                     radius: 13
@@ -229,7 +235,8 @@ ApplicationWindow {
                                   : (root.currentPage === "sound" ? soundBackend.statusText
                                      : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText
                                         : (root.currentPage === "power" ? powerBackend.statusText
-                                           : (root.currentPage === "display" ? displayBackend.statusText : backend.statusText))))
+                                           : (root.currentPage === "display" ? displayBackend.statusText
+                                              : ((root.currentPage === "apps" || root.currentPage === "compatibility") ? appsBackend.statusText : backend.statusText)))))
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -315,6 +322,20 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         backend: powerBackend
                         settingsBackend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    AppsPage {
+                        visible: root.currentPage === "apps"
+                        Layout.fillWidth: true
+                        backend: appsBackend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    CompatibilityPage {
+                        visible: root.currentPage === "compatibility"
+                        Layout.fillWidth: true
+                        backend: appsBackend
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
