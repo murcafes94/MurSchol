@@ -22,7 +22,7 @@ ApplicationWindow {
         { key: "network", title: "Red e Internet", group: "Sistema", symbol: "◎", keywords: "wifi ethernet red internet network" },
         { key: "bluetooth", title: "Bluetooth", group: "Sistema", symbol: "ᛒ", keywords: "bluetooth dispositivos auriculares" },
         { key: "power", title: "Energía", group: "Sistema", symbol: "ϟ", keywords: "batería energía suspensión brillo corriente" },
-        { key: "storage", title: "Almacenamiento", group: "Sistema", symbol: "▤", keywords: "disco almacenamiento espacio archivos" },
+        { key: "storage", title: "Almacenamiento", group: "Sistema", symbol: "▤", keywords: "disco almacenamiento espacio archivos usb papelera limpieza expulsar" },
         { key: "appearance", title: "Apariencia", group: "Personalización", symbol: "◈", keywords: "tema claro oscuro color animaciones apariencia" },
         { key: "dock", title: "Dock y panel", group: "Personalización", symbol: "▰", keywords: "dock panel ocultar tamaño iconos ampliar" },
         { key: "workspaces", title: "Espacios", group: "Personalización", symbol: "▦", keywords: "espacios estudio trabajos personal escritorios" },
@@ -42,6 +42,7 @@ ApplicationWindow {
     PowerBackend { id: powerBackend }
     DisplayBackend { id: displayBackend }
     AppsBackend { id: appsBackend }
+    StorageBackend { id: storageBackend }
 
     function pageKnown(key) {
         for (let i = 0; i < pages.length; ++i) {
@@ -70,7 +71,7 @@ ApplicationWindow {
         case "sound": return "Salida, entrada y volumen controlados mediante PipeWire/WirePlumber."
         case "bluetooth": return "Adaptador y dispositivos controlados directamente mediante BlueZ."
         case "power": return "Batería, brillo y suspensión conectados a UPower, brightnessctl y logind."
-        case "storage": return "Estado básico del almacenamiento local."
+        case "storage": return "Discos internos y USB, espacio disponible, papelera y limpieza segura."
         case "apps": return "Aplicaciones instaladas y asociaciones predeterminadas mediante XDG."
         case "compatibility": return "Estado real de las capas Linux, Flatpak, Android y Windows."
         case "about": return "Información de MurSchol OS y de esta configuración."
@@ -187,6 +188,7 @@ ApplicationWindow {
                                         displayBackend.refresh()
                                         powerBackend.refresh()
                                     }
+                                    if (modelData.key === "storage") storageBackend.refresh()
                                     if (modelData.key === "apps" || modelData.key === "compatibility")
                                         appsBackend.refresh()
                                 }
@@ -236,7 +238,8 @@ ApplicationWindow {
                                      : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText
                                         : (root.currentPage === "power" ? powerBackend.statusText
                                            : (root.currentPage === "display" ? displayBackend.statusText
-                                              : ((root.currentPage === "apps" || root.currentPage === "compatibility") ? appsBackend.statusText : backend.statusText)))))
+                                              : (root.currentPage === "storage" ? storageBackend.statusText
+                                                 : ((root.currentPage === "apps" || root.currentPage === "compatibility") ? appsBackend.statusText : backend.statusText))))))
                             color: lightTheme ? "#51666f" : "#7897a4"
                             font.pixelSize: 8
                             elide: Text.ElideRight
@@ -286,7 +289,7 @@ ApplicationWindow {
                     DockPage { visible: root.currentPage === "dock"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
                     PerformancePage { visible: root.currentPage === "performance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
                     SystemPage {
-                        visible: root.currentPage === "system" || root.currentPage === "storage" || root.currentPage === "about"
+                        visible: root.currentPage === "system" || root.currentPage === "about"
                         Layout.fillWidth: true
                         backend: backend
                         lightTheme: root.lightTheme
@@ -322,6 +325,13 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         backend: powerBackend
                         settingsBackend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    StoragePage {
+                        visible: root.currentPage === "storage"
+                        Layout.fillWidth: true
+                        backend: storageBackend
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
