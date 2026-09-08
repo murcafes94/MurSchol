@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QVariantList>
 
-class StorageBackend final : public QObject
+class StorageBackend : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList volumes READ volumes NOTIFY changed)
