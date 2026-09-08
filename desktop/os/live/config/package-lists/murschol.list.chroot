@@ -13,6 +13,7 @@ curl
 xdg-utils
 xdg-user-dirs
 dbus-user-session
+util-linux
 
 # Sesión gráfica mínima Wayland
 # LightDM usa un servidor X para su greeter. Como live-build se configura
@@ -34,7 +35,7 @@ adwaita-icon-theme
 fonts-noto-core
 fonts-noto-color-emoji
 
-# Red, audio, energía, pantalla y Bluetooth
+# Red, audio, energía, pantalla, almacenamiento y Bluetooth
 network-manager
 network-manager-gnome
 pipewire
@@ -48,6 +49,7 @@ gammastep
 bluez
 blueman
 polkitd
+udisks2
 
 # Capturas Wayland ligeras
 # MurSchol Capture usa estas herramientas como backend y no mantiene un
