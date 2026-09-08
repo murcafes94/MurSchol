@@ -5,6 +5,7 @@
 #include "PowerBackend.h"
 #include "SettingsBackend.h"
 #include "SoundBackend.h"
+#include "StorageBackend.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<PowerBackend>("MurScholSettings", 1, 0, "PowerBackend");
     qmlRegisterType<DisplayBackend>("MurScholSettings", 1, 0, "DisplayBackend");
     qmlRegisterType<AppsBackend>("MurScholSettings", 1, 0, "AppsBackend");
+    qmlRegisterType<StorageBackend>("MurScholSettings", 1, 0, "StorageBackend");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("initialPage"), initialPage);
