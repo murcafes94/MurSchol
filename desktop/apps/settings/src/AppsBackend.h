@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QStringList>
 
-class AppsBackend final : public QObject
+class AppsBackend : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int installedCount READ installedCount NOTIFY changed)
