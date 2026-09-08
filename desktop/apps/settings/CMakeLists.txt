@@ -24,6 +24,8 @@ qt_add_executable(murschol-settings
     src/DisplayBackend.h
     src/AppsBackend.cpp
     src/AppsBackend.h
+    src/StorageBackend.cpp
+    src/StorageBackend.h
 )
 
 qt_add_qml_module(murschol-settings
@@ -42,6 +44,7 @@ qt_add_qml_module(murschol-settings
         qml/DisplayPage.qml
         qml/AppsPage.qml
         qml/CompatibilityPage.qml
+        qml/StoragePage.qml
         qml/ExternalPage.qml
         qml/PlaceholderPage.qml
 )
