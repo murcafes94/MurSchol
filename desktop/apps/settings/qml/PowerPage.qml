@@ -7,34 +7,41 @@ Rectangle {
     property var backend
     property var settingsBackend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
     Layout.fillWidth: true
-    height: contentColumn.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    height: contentColumn.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
+
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color borderTone: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
 
     ColumnLayout {
         id: contentColumn
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
+        anchors.margins: 20
         spacing: 16
 
         Label {
             text: "Batería"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 13
             font.bold: true
         }
 
         Rectangle {
             Layout.fillWidth: true
-            height: root.backend.batteryAvailable ? 94 : 66
+            height: root.backend.batteryAvailable ? 96 : 68
             radius: 15
-            color: root.lightTheme ? "#edf2f4" : "#112630"
+            color: root.raised
+            border.width: 1
+            border.color: root.borderTone
 
             RowLayout {
                 anchors.fill: parent
@@ -47,7 +54,7 @@ Rectangle {
                     radius: 8
                     color: "transparent"
                     border.width: 2
-                    border.color: root.backend.batteryAvailable ? root.accent : (root.lightTheme ? "#8a9aa0" : "#607985")
+                    border.color: root.backend.batteryAvailable ? root.accent : root.textSecondary
                     Rectangle {
                         visible: root.backend.batteryAvailable
                         anchors.left: parent.left
@@ -65,7 +72,7 @@ Rectangle {
                         anchors.left: parent.right
                         anchors.leftMargin: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        color: root.backend.batteryAvailable ? root.accent : (root.lightTheme ? "#8a9aa0" : "#607985")
+                        color: root.backend.batteryAvailable ? root.accent : root.textSecondary
                     }
                 }
 
@@ -74,7 +81,7 @@ Rectangle {
                     spacing: 2
                     Label {
                         text: root.backend.batteryAvailable ? root.backend.batteryPercent + "%" : "Sin batería detectada"
-                        color: root.lightTheme ? "#18313b" : "#edf5f7"
+                        color: root.textPrimary
                         font.pixelSize: root.backend.batteryAvailable ? 22 : 12
                         font.bold: true
                     }
@@ -83,7 +90,7 @@ Rectangle {
                         text: root.backend.batteryAvailable
                               ? root.backend.batteryState + (root.backend.batteryTimeText.length > 0 ? " · " + root.backend.batteryTimeText : "")
                               : "Es normal en una máquina virtual o un PC de escritorio sin batería."
-                        color: root.lightTheme ? "#6b7f88" : "#75929e"
+                        color: root.textSecondary
                         font.pixelSize: 9
                         wrapMode: Text.WordWrap
                     }
@@ -91,11 +98,11 @@ Rectangle {
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         Label {
             text: "Modo de rendimiento"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 13
             font.bold: true
         }
@@ -115,14 +122,15 @@ Rectangle {
                     onClicked: root.settingsBackend.setProfile(modelData)
                     background: Rectangle {
                         radius: 13
-                        color: parent.checked ? (root.lightTheme ? "#dcefee" : "#143943")
-                                              : (root.lightTheme ? "#edf2f4" : "#112630")
+                        color: parent.checked
+                               ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
+                               : root.raised
                         border.width: parent.checked ? 2 : 1
-                        border.color: parent.checked ? root.accent : (root.lightTheme ? "#d1dde1" : "#294754")
+                        border.color: parent.checked ? root.accent : root.borderTone
                     }
                     contentItem: Label {
                         text: parent.text
-                        color: root.lightTheme ? "#18313b" : "#edf5f7"
+                        color: root.textPrimary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 9
@@ -135,7 +143,7 @@ Rectangle {
         Label {
             Layout.fillWidth: true
             text: "Estos perfiles coordinan la experiencia MurSchol; todavía no fuerzan frecuencias de CPU o GPU."
-            color: root.lightTheme ? "#71838b" : "#668694"
+            color: root.textSecondary
             font.pixelSize: 8
             wrapMode: Text.WordWrap
         }
@@ -145,21 +153,31 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 10
 
-            Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+            Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
             RowLayout {
                 Layout.fillWidth: true
                 Label {
                     text: "Brillo"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                     Layout.fillWidth: true
                 }
-                Label {
-                    text: root.backend.brightnessPercent + "%"
-                    color: root.lightTheme ? "#334b55" : "#c8d9df"
-                    font.pixelSize: 9
+                Rectangle {
+                    width: 52
+                    height: 30
+                    radius: 10
+                    color: root.raised
+                    border.width: 1
+                    border.color: root.borderTone
+                    Label {
+                        anchors.centerIn: parent
+                        text: root.backend.brightnessPercent + "%"
+                        color: root.textPrimary
+                        font.pixelSize: 9
+                        font.bold: true
+                    }
                 }
             }
 
@@ -179,12 +197,12 @@ Rectangle {
             Label {
                 text: root.backend.brightnessDevice.length > 0 ? "Control: " + root.backend.brightnessDevice : ""
                 visible: text.length > 0
-                color: root.lightTheme ? "#7a8b92" : "#678490"
+                color: root.textSecondary
                 font.pixelSize: 8
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -193,29 +211,31 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Suspensión"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                 }
                 Label {
                     Layout.fillWidth: true
-                    text: "Suspende el equipo mediante systemd-logind y respeta los permisos e inhibidores del sistema."
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    text: "Suspende el equipo mediante systemd-logind y respeta permisos e inhibidores del sistema."
+                    color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap
                 }
             }
             Button {
+                id: suspendButton
                 text: "Suspender ahora"
                 onClicked: root.backend.suspendNow()
                 background: Rectangle {
                     radius: 12
-                    color: parent.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744")
+                    color: suspendButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
                     border.color: root.accent
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                    text: suspendButton.text
+                    color: root.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -224,12 +244,24 @@ Rectangle {
             }
         }
 
-        Label {
+        Rectangle {
             Layout.fillWidth: true
-            text: "Los temporizadores automáticos de apagar pantalla, suspensión y cierre de tapa se añadirán cuando estén conectados a un servicio de sesión persistente; no se muestran controles que todavía no tengan efecto real."
-            color: root.lightTheme ? "#71838b" : "#668694"
-            font.pixelSize: 8
-            wrapMode: Text.WordWrap
+            implicitHeight: pendingNote.implicitHeight + 26
+            radius: 14
+            color: root.lightTheme ? "#F4F6F9" : "#0B0D12"
+            border.width: 1
+            border.color: root.borderTone
+            Label {
+                id: pendingNote
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 13
+                text: "Los temporizadores automáticos de apagar pantalla, suspensión y cierre de tapa se añadirán cuando estén conectados a un servicio de sesión persistente; no mostramos controles que todavía no tengan efecto real."
+                color: root.textSecondary
+                font.pixelSize: 8
+                wrapMode: Text.WordWrap
+            }
         }
     }
 }
