@@ -114,12 +114,90 @@ Rectangle {
             }
         }
 
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: resetColumn.implicitHeight + 28
+            radius: 16
+            color: root.lightTheme ? "#F7F8FA" : "#171C24"
+            border.color: root.lightTheme ? "#D8DEE9" : "#252B35"
+
+            RowLayout {
+                id: resetColumn
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 14
+                anchors.rightMargin: 14
+                spacing: 12
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 3
+                    Label {
+                        text: "Restablecer apariencia"
+                        color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
+                        font.bold: true
+                        font.pixelSize: 11
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: "Restaura tema, azul MurSchol, animaciones y dock. No modifica archivos, red, aplicaciones ni el perfil de rendimiento."
+                        color: root.lightTheme ? "#5B6573" : "#9AA4B2"
+                        font.pixelSize: 8
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                Button {
+                    text: "Restablecer"
+                    onClicked: resetDialog.open()
+                    background: Rectangle {
+                        radius: 12
+                        color: parent.hovered ? "#B91C2B" : "#E63946"
+                    }
+                    contentItem: Label {
+                        text: parent.text
+                        color: "#FFFFFF"
+                        font.bold: true
+                        font.pixelSize: 9
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+            }
+        }
+
         Label {
             Layout.fillWidth: true
             text: "Los cambios se guardan en la configuración común y el shell los detecta sin requerir una cuenta ni conexión a Internet."
             color: lightTheme ? "#5B6573" : "#9AA4B2"
             font.pixelSize: 9
             wrapMode: Text.WordWrap
+        }
+    }
+
+    Dialog {
+        id: resetDialog
+        anchors.centerIn: parent
+        modal: true
+        title: "Restablecer apariencia"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted: {
+            root.backend.setTheme("Automático")
+            root.backend.setAccentColor("#2563EB")
+            root.backend.setAnimationMode("Normal")
+            root.backend.setDockAutoHide(true)
+            root.backend.setDockSize(66)
+            root.backend.setDockMagnify(true)
+        }
+
+        contentItem: Label {
+            width: 360
+            text: "MurSchol volverá a su apariencia predeterminada. Tus archivos, aplicaciones, conexiones y perfil de rendimiento permanecerán intactos."
+            color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
+            wrapMode: Text.WordWrap
+            font.pixelSize: 10
         }
     }
 }
