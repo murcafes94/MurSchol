@@ -60,6 +60,15 @@ void SettingsBackend::loadPreferences()
     QSettings settings(settingsPath(), QSettings::IniFormat);
     m_theme = settings.value(QStringLiteral("appearance/theme"), m_theme).toString();
     m_accentColor = settings.value(QStringLiteral("appearance/accent"), m_accentColor).toString();
+
+    // La identidad anterior usaba teal como color por defecto. Si el usuario
+    // conserva exactamente ese valor heredado, migramos al azul oficial. Un
+    // color elegido manualmente por el usuario no se modifica.
+    if (m_accentColor.compare(QStringLiteral("#22d6cf"), Qt::CaseInsensitive) == 0) {
+        m_accentColor = QStringLiteral("#2563EB");
+        settings.setValue(QStringLiteral("appearance/accent"), m_accentColor);
+    }
+
     m_animationMode = settings.value(QStringLiteral("appearance/animations"), m_animationMode).toString();
     m_dockAutoHide = settings.value(QStringLiteral("dock/autoHide"), m_dockAutoHide).toBool();
     m_dockSize = qBound(54, settings.value(QStringLiteral("dock/size"), m_dockSize).toInt(), 84);
@@ -67,10 +76,9 @@ void SettingsBackend::loadPreferences()
 
     const QString savedProfile = settings.value(QStringLiteral("performance/profile")).toString();
     m_profile = savedProfile.isEmpty() ? m_recommendedProfile : savedProfile;
-    if (savedProfile.isEmpty()) {
+    if (savedProfile.isEmpty())
         settings.setValue(QStringLiteral("performance/profile"), m_profile);
-        settings.sync();
-    }
+    settings.sync();
 }
 
 void SettingsBackend::detectSystem()
