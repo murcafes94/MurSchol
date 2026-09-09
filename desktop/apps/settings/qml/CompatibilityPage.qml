@@ -6,15 +6,21 @@ ColumnLayout {
     id: root
     property var backend
     property bool lightTheme: false
-    property color accent: "#29d9d1"
+    property color accent: "#2563EB"
     spacing: 14
+
+    readonly property color surface: lightTheme ? "#FFFFFF" : "#11151C"
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color border: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 100
+        implicitHeight: 102
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         RowLayout {
             anchors.fill: parent
@@ -25,17 +31,17 @@ ColumnLayout {
                 width: 48
                 height: 48
                 radius: 15
-                color: lightTheme ? "#dcefed" : "#123d49"
+                color: root.lightTheme ? "#EAF1FF" : "#123A7A"
                 Label { anchors.centerIn: parent; text: "⇄"; color: root.accent; font.pixelSize: 22; font.bold: true }
             }
 
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                Label { text: "Una sola experiencia, varios tipos de aplicaciones"; color: lightTheme ? "#17303a" : "#f1f6f8"; font.pixelSize: 16; font.bold: true }
+                Label { text: "Una experiencia, varios formatos"; color: root.textPrimary; font.pixelSize: 16; font.bold: true }
                 Label {
-                    text: "MurSchol no oculta el estado real: cada capa aparece como disponible, no instalada o pendiente de configuración."
-                    color: lightTheme ? "#657983" : "#7f9aa6"
+                    text: "MurSchol muestra el estado real de cada capa sin exponer complejidad técnica en el flujo normal de uso."
+                    color: root.textSecondary
                     font.pixelSize: 9
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -69,7 +75,7 @@ ColumnLayout {
             },
             {
                 title: "Windows",
-                subtitle: "EXE/MSI mediante Wine; Bottles se usa como capa gráfica opcional.",
+                subtitle: "EXE/MSI mediante Wine; Bottles funciona como capa gráfica opcional.",
                 state: backend.wineAvailable ? (backend.bottlesAvailable ? "Wine + Bottles" : "Wine disponible") : (backend.bottlesAvailable ? "Bottles disponible" : "No instalado"),
                 available: backend.wineAvailable || backend.bottlesAvailable,
                 symbol: "W"
@@ -79,10 +85,11 @@ ColumnLayout {
         delegate: Rectangle {
             required property var modelData
             Layout.fillWidth: true
-            implicitHeight: 90
+            implicitHeight: 92
             radius: 17
-            color: lightTheme ? "#f8fbfc" : "#0d202b"
-            border.color: lightTheme ? "#d7e2e6" : "#234454"
+            color: root.surface
+            border.width: 1
+            border.color: root.border
 
             RowLayout {
                 anchors.fill: parent
@@ -94,12 +101,12 @@ ColumnLayout {
                     height: 44
                     radius: 14
                     color: modelData.available
-                           ? (lightTheme ? "#dcefed" : "#123d49")
-                           : (lightTheme ? "#eceff0" : "#202d34")
+                           ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
+                           : root.raised
                     Label {
                         anchors.centerIn: parent
                         text: modelData.symbol
-                        color: modelData.available ? root.accent : (lightTheme ? "#8b999f" : "#657983")
+                        color: modelData.available ? root.accent : root.textSecondary
                         font.pixelSize: 16
                         font.bold: true
                     }
@@ -108,10 +115,10 @@ ColumnLayout {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 2
-                    Label { text: modelData.title; color: lightTheme ? "#17303a" : "#f1f6f8"; font.pixelSize: 13; font.bold: true }
+                    Label { text: modelData.title; color: root.textPrimary; font.pixelSize: 13; font.bold: true }
                     Label {
                         text: modelData.subtitle
-                        color: lightTheme ? "#657983" : "#7f9aa6"
+                        color: root.textSecondary
                         font.pixelSize: 9
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
@@ -119,19 +126,19 @@ ColumnLayout {
                 }
 
                 Rectangle {
-                    width: stateLabel.implicitWidth + 20
+                    width: stateLabel.implicitWidth + 22
                     height: 30
                     radius: 15
                     color: modelData.available
-                           ? (lightTheme ? "#dcefe7" : "#14392f")
-                           : (lightTheme ? "#eceff0" : "#202d34")
+                           ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
+                           : root.raised
+                    border.width: 1
+                    border.color: modelData.available ? root.accent : root.border
                     Label {
                         id: stateLabel
                         anchors.centerIn: parent
                         text: modelData.state
-                        color: modelData.available
-                               ? (lightTheme ? "#2d6752" : "#8cddb9")
-                               : (lightTheme ? "#6f7f86" : "#82949c")
+                        color: modelData.available ? (root.lightTheme ? "#123A7A" : "#DCE8FF") : root.textSecondary
                         font.pixelSize: 9
                         font.bold: true
                     }
@@ -142,20 +149,24 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 86
+        implicitHeight: criterionColumn.implicitHeight + 30
         radius: 17
-        color: lightTheme ? "#f4f7f8" : "#0b1b25"
-        border.color: lightTheme ? "#d8e1e4" : "#203c49"
+        color: root.raised
+        border.width: 1
+        border.color: root.border
 
         ColumnLayout {
-            anchors.fill: parent
+            id: criterionColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
             anchors.margins: 15
-            spacing: 4
-            Label { text: "Criterio de compatibilidad"; color: lightTheme ? "#203942" : "#e8f1f4"; font.pixelSize: 12; font.bold: true }
+            spacing: 5
+            Label { text: "Criterio de compatibilidad"; color: root.textPrimary; font.pixelSize: 12; font.bold: true }
             Label {
                 Layout.fillWidth: true
-                text: "La tienda y el gestor de aplicaciones usarán etiquetas Nativa, Excelente, Compatible, Experimental o No compatible. La presencia de Wine o Waydroid no significa que cualquier aplicación vaya a funcionar perfectamente."
-                color: lightTheme ? "#697d86" : "#7d96a1"
+                text: "La tienda y el gestor de aplicaciones usarán Nativa, Excelente, Compatible, Experimental o No compatible. Tener Wine o Waydroid instalado no garantiza que cualquier aplicación vaya a funcionar correctamente."
+                color: root.textSecondary
                 font.pixelSize: 9
                 wrapMode: Text.WordWrap
             }
