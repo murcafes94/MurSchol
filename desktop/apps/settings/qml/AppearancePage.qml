@@ -6,12 +6,12 @@ Rectangle {
     id: root
     required property var backend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
     implicitHeight: content.implicitHeight + 36
     radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
 
     ColumnLayout {
         id: content
@@ -21,7 +21,7 @@ Rectangle {
         anchors.margins: 18
         spacing: 14
 
-        Label { text: "Tema"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
+        Label { text: "Tema"; color: lightTheme ? "#0B0D12" : "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -38,13 +38,13 @@ Rectangle {
                     onClicked: root.backend.setTheme(modelData)
                     background: Rectangle {
                         radius: 14
-                        color: themeButton.checked ? (root.lightTheme ? "#d9eeee" : "#153c45") : (root.lightTheme ? "#edf2f4" : "#122832")
+                        color: themeButton.checked ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : (root.lightTheme ? "#EEF1F5" : "#171C24")
                         border.width: themeButton.checked ? 2 : 1
-                        border.color: themeButton.checked ? root.accent : (root.lightTheme ? "#d2dde1" : "#294653")
+                        border.color: themeButton.checked ? root.accent : (root.lightTheme ? "#D8DEE9" : "#252B35")
                     }
                     contentItem: Label {
                         text: themeButton.text
-                        color: root.lightTheme ? "#17303a" : "#eef6f8"
+                        color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 10
@@ -54,11 +54,18 @@ Rectangle {
             }
         }
 
-        Label { text: "Color de énfasis"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
+        Label { text: "Color de énfasis"; color: lightTheme ? "#0B0D12" : "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
+        Label {
+            text: "Azul para interacción e identidad; rojo para un énfasis más fuerte. Blanco y negro estructuran el tema."
+            color: lightTheme ? "#5B6573" : "#9AA4B2"
+            font.pixelSize: 9
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
         RowLayout {
             spacing: 10
             Repeater {
-                model: ["#22d6cf", "#38bdf8", "#6d8cff", "#9a71f5", "#55d58a", "#e6a85c"]
+                model: ["#2563EB", "#3B82F6", "#123A7A", "#E63946"]
                 delegate: Button {
                     id: accentButton
                     required property string modelData
@@ -68,15 +75,15 @@ Rectangle {
                     background: Rectangle {
                         radius: 21
                         color: accentButton.modelData
-                        border.width: root.backend.accentColor === accentButton.modelData ? 4 : 1
-                        border.color: root.backend.accentColor === accentButton.modelData ? (root.lightTheme ? "#17303a" : "white") : "#60808d"
+                        border.width: root.backend.accentColor.toUpperCase() === accentButton.modelData.toUpperCase() ? 4 : 1
+                        border.color: root.backend.accentColor.toUpperCase() === accentButton.modelData.toUpperCase() ? (root.lightTheme ? "#0B0D12" : "#F8FAFC") : "#9AA4B2"
                     }
                     contentItem: Item {}
                 }
             }
         }
 
-        Label { text: "Animaciones"; color: lightTheme ? "#1b323c" : "white"; font.bold: true; font.pixelSize: 13 }
+        Label { text: "Animaciones"; color: lightTheme ? "#0B0D12" : "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -93,12 +100,12 @@ Rectangle {
                     onClicked: root.backend.setAnimationMode(modelData)
                     background: Rectangle {
                         radius: 13
-                        color: animationButton.checked ? (root.lightTheme ? "#d9eeee" : "#153c45") : (root.lightTheme ? "#edf2f4" : "#122832")
-                        border.color: animationButton.checked ? root.accent : (root.lightTheme ? "#d2dde1" : "#294653")
+                        color: animationButton.checked ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : (root.lightTheme ? "#EEF1F5" : "#171C24")
+                        border.color: animationButton.checked ? root.accent : (root.lightTheme ? "#D8DEE9" : "#252B35")
                     }
                     contentItem: Label {
                         text: animationButton.text
-                        color: root.lightTheme ? "#17303a" : "#eef6f8"
+                        color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 9
@@ -110,7 +117,7 @@ Rectangle {
         Label {
             Layout.fillWidth: true
             text: "Los cambios se guardan en la configuración común y el shell los detecta sin requerir una cuenta ni conexión a Internet."
-            color: lightTheme ? "#71838b" : "#668694"
+            color: lightTheme ? "#5B6573" : "#9AA4B2"
             font.pixelSize: 9
             wrapMode: Text.WordWrap
         }
