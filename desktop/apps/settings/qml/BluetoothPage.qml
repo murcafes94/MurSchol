@@ -7,20 +7,26 @@ Rectangle {
     property var backend
     property var settingsBackend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
     Layout.fillWidth: true
-    height: contentColumn.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    height: contentColumn.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
+
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color borderTone: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
 
     ColumnLayout {
         id: contentColumn
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
+        anchors.margins: 20
         spacing: 15
 
         RowLayout {
@@ -30,13 +36,13 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Bluetooth"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                 }
                 Label {
                     text: root.backend.available ? root.backend.adapterName : "BlueZ no disponible"
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 9
                 }
             }
@@ -61,16 +67,13 @@ Rectangle {
                 }
                 background: Rectangle {
                     radius: 12
-                    color: scanButton.enabled
-                           ? (scanButton.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744"))
-                           : (root.lightTheme ? "#e0e5e7" : "#263942")
-                    border.color: scanButton.enabled ? root.accent : "transparent"
+                    color: scanButton.enabled && scanButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: scanButton.enabled ? root.accent : root.borderTone
                 }
                 contentItem: Label {
                     text: scanButton.text
-                    color: scanButton.enabled
-                           ? (scanButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0"))
-                           : (root.lightTheme ? "#8b989d" : "#71858d")
+                    color: scanButton.enabled ? root.textPrimary : root.textSecondary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -95,12 +98,13 @@ Rectangle {
                 onClicked: root.backend.refresh()
                 background: Rectangle {
                     radius: 11
-                    color: refreshButton.hovered ? (root.lightTheme ? "#e4edef" : "#15313c") : "transparent"
-                    border.color: root.lightTheme ? "#cdd9dd" : "#294653"
+                    color: refreshButton.hovered ? root.raised : "transparent"
+                    border.width: 1
+                    border.color: root.borderTone
                 }
                 contentItem: Label {
                     text: refreshButton.text
-                    color: root.lightTheme ? "#425a64" : "#c7d8de"
+                    color: root.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 8
@@ -108,12 +112,12 @@ Rectangle {
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         Label {
             visible: root.backend.devices.length > 0
             text: "Dispositivos"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 11
             font.bold: true
         }
@@ -123,13 +127,11 @@ Rectangle {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                height: 70
+                height: 72
                 radius: 14
-                color: modelData.connected
-                       ? (root.lightTheme ? "#e2f0ef" : "#12343e")
-                       : (root.lightTheme ? "#edf2f4" : "#112630")
-                border.width: modelData.connected ? 1 : 0
-                border.color: root.accent
+                color: modelData.connected ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                border.width: modelData.connected ? 2 : 1
+                border.color: modelData.connected ? root.accent : root.borderTone
 
                 RowLayout {
                     anchors.fill: parent
@@ -138,16 +140,16 @@ Rectangle {
                     spacing: 10
 
                     Rectangle {
-                        width: 34
-                        height: 34
+                        width: 36
+                        height: 36
                         radius: 11
-                        color: modelData.connected
-                               ? root.accent
-                               : (root.lightTheme ? "#dce5e8" : "#17313c")
+                        color: modelData.connected ? root.accent : (root.lightTheme ? "#FFFFFF" : "#0B0D12")
+                        border.width: 1
+                        border.color: modelData.connected ? root.accent : root.borderTone
                         Label {
                             anchors.centerIn: parent
                             text: "ᛒ"
-                            color: modelData.connected ? "#07131d" : root.accent
+                            color: modelData.connected ? "#FFFFFF" : root.accent
                             font.pixelSize: 14
                             font.bold: true
                         }
@@ -159,7 +161,7 @@ Rectangle {
                         Label {
                             Layout.fillWidth: true
                             text: modelData.name
-                            color: root.lightTheme ? "#18313b" : "#edf5f7"
+                            color: root.textPrimary
                             font.pixelSize: 10
                             font.bold: modelData.connected
                             elide: Text.ElideRight
@@ -169,7 +171,7 @@ Rectangle {
                             text: modelData.address
                                   + (modelData.paired ? " · Emparejado" : " · No emparejado")
                                   + (modelData.trusted ? " · Confiable" : "")
-                            color: root.lightTheme ? "#6b7f88" : "#75929e"
+                            color: root.textSecondary
                             font.pixelSize: 8
                             elide: Text.ElideRight
                         }
@@ -196,12 +198,15 @@ Rectangle {
                         }
                         background: Rectangle {
                             radius: 10
-                            color: deviceActionButton.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
-                            border.color: root.accent
+                            color: deviceActionButton.hovered
+                                   ? (modelData.connected ? root.danger : (root.lightTheme ? "#EAF1FF" : "#123A7A"))
+                                   : root.raised
+                            border.width: 1
+                            border.color: modelData.connected && deviceActionButton.hovered ? root.danger : root.accent
                         }
                         contentItem: Label {
                             text: deviceActionButton.text
-                            color: deviceActionButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                            color: modelData.connected && deviceActionButton.hovered ? "#FFFFFF" : root.textPrimary
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: 8
@@ -218,7 +223,7 @@ Rectangle {
             text: root.backend.discovering
                   ? "Buscando dispositivos cercanos…"
                   : "No hay dispositivos conocidos. Pulsa Buscar dispositivos para actualizar."
-            color: root.lightTheme ? "#6a7d86" : "#77939f"
+            color: root.textSecondary
             font.pixelSize: 9
             wrapMode: Text.WordWrap
         }
@@ -227,12 +232,12 @@ Rectangle {
             visible: root.backend.available && !root.backend.powered
             Layout.fillWidth: true
             text: "Activa Bluetooth para ver dispositivos y buscar equipos cercanos."
-            color: root.lightTheme ? "#6a7d86" : "#77939f"
+            color: root.textSecondary
             font.pixelSize: 9
             wrapMode: Text.WordWrap
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -241,14 +246,14 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Emparejamiento avanzado"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 11
                     font.bold: true
                 }
                 Label {
                     Layout.fillWidth: true
                     text: "Los dispositivos nuevos que requieran PIN, confirmación o perfiles especiales se emparejan todavía con el agente de Blueman."
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap
                 }
@@ -260,16 +265,13 @@ Rectangle {
                 onClicked: root.settingsBackend.openBluetoothSettings()
                 background: Rectangle {
                     radius: 11
-                    color: advancedButton.enabled
-                           ? (advancedButton.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744"))
-                           : (root.lightTheme ? "#e0e5e7" : "#263942")
-                    border.color: advancedButton.enabled ? root.accent : "transparent"
+                    color: advancedButton.enabled && advancedButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: advancedButton.enabled ? root.accent : root.borderTone
                 }
                 contentItem: Label {
                     text: advancedButton.text
-                    color: advancedButton.enabled
-                           ? (advancedButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0"))
-                           : (root.lightTheme ? "#8b989d" : "#71858d")
+                    color: advancedButton.enabled ? root.textPrimary : root.textSecondary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 8
