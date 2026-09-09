@@ -6,23 +6,30 @@ ColumnLayout {
     id: root
     property var backend
     property bool lightTheme: false
-    property color accent: "#29d9d1"
+    property color accent: "#2563EB"
     spacing: 14
+
+    readonly property color surface: lightTheme ? "#FFFFFF" : "#11151C"
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color border: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: systemColumn.implicitHeight + 34
+        implicitHeight: systemColumn.implicitHeight + 36
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         ColumnLayout {
             id: systemColumn
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: 17
-            spacing: 10
+            anchors.margins: 18
+            spacing: 11
 
             RowLayout {
                 Layout.fillWidth: true
@@ -31,20 +38,38 @@ ColumnLayout {
                     width: 48
                     height: 48
                     radius: 15
-                    color: lightTheme ? "#dcefed" : "#123d49"
+                    color: root.lightTheme ? "#EAF1FF" : "#123A7A"
                     Label { anchors.centerIn: parent; text: "▤"; color: root.accent; font.pixelSize: 22; font.bold: true }
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 1
-                    Label { text: "Almacenamiento del sistema"; color: lightTheme ? "#17303a" : "#f1f6f8"; font.pixelSize: 17; font.bold: true }
+                    Label { text: "Almacenamiento del sistema"; color: root.textPrimary; font.pixelSize: 17; font.bold: true }
                     Label {
                         text: backend.rootUsedText + " usados de " + backend.rootTotalText + " · " + backend.rootFreeText + " libres"
-                        color: lightTheme ? "#657983" : "#7f9aa6"
+                        color: root.textSecondary
                         font.pixelSize: 9
                     }
                 }
-                Button { text: "Actualizar"; onClicked: backend.refresh() }
+                Button {
+                    id: refreshButton
+                    text: "Actualizar"
+                    onClicked: backend.refresh()
+                    background: Rectangle {
+                        radius: 12
+                        color: refreshButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                        border.width: 1
+                        border.color: refreshButton.hovered ? root.accent : root.border
+                    }
+                    contentItem: Label {
+                        text: refreshButton.text
+                        color: root.textPrimary
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 9
+                        font.bold: true
+                    }
+                }
             }
 
             ProgressBar {
@@ -52,7 +77,7 @@ ColumnLayout {
                 from: 0
                 to: 100
                 value: backend.rootUsedPercent
-                background: Rectangle { implicitHeight: 8; radius: 4; color: lightTheme ? "#dfe8eb" : "#17313c" }
+                background: Rectangle { implicitHeight: 8; radius: 4; color: root.raised }
                 contentItem: Item {
                     implicitHeight: 8
                     Rectangle {
@@ -68,23 +93,23 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: cleanupColumn.implicitHeight + 34
+        implicitHeight: cleanupColumn.implicitHeight + 36
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         ColumnLayout {
             id: cleanupColumn
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: 17
+            anchors.margins: 18
             spacing: 11
 
-            Label { text: "Limpieza segura"; color: lightTheme ? "#19323c" : "#f0f6f8"; font.pixelSize: 13; font.bold: true }
+            Label { text: "Limpieza segura"; color: root.textPrimary; font.pixelSize: 13; font.bold: true }
             Label {
                 text: "MurSchol solo limpia datos regenerables o elementos que tú ya enviaste a la papelera. No borra documentos personales ni cachés generales de otras aplicaciones."
-                color: lightTheme ? "#657983" : "#7d98a4"
+                color: root.textSecondary
                 font.pixelSize: 9
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -98,10 +123,10 @@ ColumnLayout {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 84
+                    implicitHeight: 86
                     radius: 15
-                    color: lightTheme ? "#f1f6f7" : "#102731"
-                    border.color: lightTheme ? "#d9e3e6" : "#244351"
+                    color: root.raised
+                    border.color: root.border
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 14
@@ -109,19 +134,37 @@ ColumnLayout {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 1
-                            Label { text: "Papelera"; color: lightTheme ? "#17303a" : "#eef5f7"; font.pixelSize: 11; font.bold: true }
-                            Label { text: backend.trashSizeText; color: lightTheme ? "#647984" : "#87a0aa"; font.pixelSize: 9 }
+                            Label { text: "Papelera"; color: root.textPrimary; font.pixelSize: 11; font.bold: true }
+                            Label { text: backend.trashSizeText; color: root.textSecondary; font.pixelSize: 9 }
                         }
-                        Button { text: "Vaciar"; onClicked: backend.emptyTrash() }
+                        Button {
+                            id: emptyTrashButton
+                            text: "Vaciar"
+                            onClicked: backend.emptyTrash()
+                            background: Rectangle {
+                                radius: 10
+                                color: emptyTrashButton.hovered ? root.danger : "transparent"
+                                border.width: 1
+                                border.color: emptyTrashButton.hovered ? root.danger : root.border
+                            }
+                            contentItem: Label {
+                                text: emptyTrashButton.text
+                                color: emptyTrashButton.hovered ? "#FFFFFF" : root.textPrimary
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: 8
+                                font.bold: true
+                            }
+                        }
                     }
                 }
 
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 84
+                    implicitHeight: 86
                     radius: 15
-                    color: lightTheme ? "#f1f6f7" : "#102731"
-                    border.color: lightTheme ? "#d9e3e6" : "#244351"
+                    color: root.raised
+                    border.color: root.border
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 14
@@ -129,10 +172,28 @@ ColumnLayout {
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: 1
-                            Label { text: "Miniaturas temporales"; color: lightTheme ? "#17303a" : "#eef5f7"; font.pixelSize: 11; font.bold: true }
-                            Label { text: backend.thumbnailsSizeText; color: lightTheme ? "#647984" : "#87a0aa"; font.pixelSize: 9 }
+                            Label { text: "Miniaturas temporales"; color: root.textPrimary; font.pixelSize: 11; font.bold: true }
+                            Label { text: backend.thumbnailsSizeText; color: root.textSecondary; font.pixelSize: 9 }
                         }
-                        Button { text: "Limpiar"; onClicked: backend.clearThumbnails() }
+                        Button {
+                            id: clearThumbsButton
+                            text: "Limpiar"
+                            onClicked: backend.clearThumbnails()
+                            background: Rectangle {
+                                radius: 10
+                                color: clearThumbsButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : "transparent"
+                                border.width: 1
+                                border.color: clearThumbsButton.hovered ? root.accent : root.border
+                            }
+                            contentItem: Label {
+                                text: clearThumbsButton.text
+                                color: root.textPrimary
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: 8
+                                font.bold: true
+                            }
+                        }
                     }
                 }
             }
@@ -141,27 +202,38 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: devicesColumn.implicitHeight + 34
+        implicitHeight: devicesColumn.implicitHeight + 36
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         ColumnLayout {
             id: devicesColumn
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: 17
+            anchors.margins: 18
             spacing: 10
 
             RowLayout {
                 Layout.fillWidth: true
-                Label { text: "Discos y dispositivos"; color: lightTheme ? "#19323c" : "#f0f6f8"; font.pixelSize: 13; font.bold: true }
+                Label { text: "Discos y dispositivos"; color: root.textPrimary; font.pixelSize: 13; font.bold: true }
                 Item { Layout.fillWidth: true }
-                Label {
-                    text: backend.udisksAvailable ? "Montaje seguro disponible" : "Solo lectura de estado"
-                    color: backend.udisksAvailable ? root.accent : (lightTheme ? "#8c7770" : "#c4a189")
-                    font.pixelSize: 8
+                Rectangle {
+                    width: udisksLabel.implicitWidth + 20
+                    height: 28
+                    radius: 14
+                    color: backend.udisksAvailable ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: backend.udisksAvailable ? root.accent : root.border
+                    Label {
+                        id: udisksLabel
+                        anchors.centerIn: parent
+                        text: backend.udisksAvailable ? "Montaje seguro disponible" : "Solo lectura de estado"
+                        color: backend.udisksAvailable ? (root.lightTheme ? "#123A7A" : "#DCE8FF") : root.textSecondary
+                        font.pixelSize: 8
+                        font.bold: true
+                    }
                 }
             }
 
@@ -170,17 +242,18 @@ ColumnLayout {
                 delegate: Rectangle {
                     required property var modelData
                     Layout.fillWidth: true
-                    implicitHeight: volumeColumn.implicitHeight + 26
+                    implicitHeight: volumeColumn.implicitHeight + 28
                     radius: 15
-                    color: lightTheme ? "#f2f6f7" : "#102630"
-                    border.color: modelData.external ? root.accent : (lightTheme ? "#d9e2e5" : "#274653")
+                    color: root.raised
+                    border.width: modelData.external ? 2 : 1
+                    border.color: modelData.external ? root.accent : root.border
 
                     ColumnLayout {
                         id: volumeColumn
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.top: parent.top
-                        anchors.margins: 13
+                        anchors.margins: 14
                         spacing: 8
 
                         RowLayout {
@@ -190,7 +263,9 @@ ColumnLayout {
                                 width: 38
                                 height: 38
                                 radius: 12
-                                color: lightTheme ? "#e1ecee" : "#163441"
+                                color: modelData.external ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : (root.lightTheme ? "#FFFFFF" : "#0B0D12")
+                                border.width: 1
+                                border.color: modelData.external ? root.accent : root.border
                                 Label {
                                     anchors.centerIn: parent
                                     text: modelData.external ? "USB" : (modelData.system ? "OS" : "◆")
@@ -202,16 +277,16 @@ ColumnLayout {
                             ColumnLayout {
                                 Layout.fillWidth: true
                                 spacing: 0
-                                Label { text: modelData.name; color: lightTheme ? "#17303a" : "#eef5f7"; font.pixelSize: 11; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                                Label { text: modelData.name; color: root.textPrimary; font.pixelSize: 11; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true }
                                 Label {
                                     text: modelData.kind + " · " + modelData.fileSystem + " · " + modelData.totalText
-                                    color: lightTheme ? "#657983" : "#7e98a4"
+                                    color: root.textSecondary
                                     font.pixelSize: 8
                                 }
                                 Label {
                                     visible: modelData.mounted
                                     text: modelData.mountPoint
-                                    color: lightTheme ? "#788b93" : "#678591"
+                                    color: root.textSecondary
                                     font.pixelSize: 8
                                     elide: Text.ElideMiddle
                                     Layout.fillWidth: true
@@ -241,7 +316,7 @@ ColumnLayout {
                             from: 0
                             to: 100
                             value: modelData.usedPercent
-                            background: Rectangle { implicitHeight: 6; radius: 3; color: lightTheme ? "#dde6e8" : "#18313b" }
+                            background: Rectangle { implicitHeight: 6; radius: 3; color: root.lightTheme ? "#FFFFFF" : "#0B0D12" }
                             contentItem: Item {
                                 implicitHeight: 6
                                 Rectangle {
@@ -256,7 +331,7 @@ ColumnLayout {
                         Label {
                             visible: modelData.mounted
                             text: modelData.usedText + " usados · " + modelData.freeText + " libres"
-                            color: lightTheme ? "#6d818a" : "#77929d"
+                            color: root.textSecondary
                             font.pixelSize: 8
                         }
                     }
@@ -266,7 +341,7 @@ ColumnLayout {
             Label {
                 visible: backend.volumes.length === 0
                 text: "No se detectaron volúmenes de bloque."
-                color: lightTheme ? "#72858d" : "#708d99"
+                color: root.textSecondary
                 font.pixelSize: 9
             }
         }
