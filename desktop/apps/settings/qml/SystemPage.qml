@@ -6,20 +6,20 @@ Rectangle {
     id: root
     required property var backend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
     property bool showAbout: false
 
-    implicitHeight: content.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    implicitHeight: content.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
 
     ColumnLayout {
         id: content
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
+        anchors.margins: 20
         spacing: 10
 
         Repeater {
@@ -34,24 +34,27 @@ Rectangle {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                height: 52
-                radius: 13
-                color: root.lightTheme ? "#edf2f4" : "#112630"
+                height: 56
+                radius: 14
+                color: root.lightTheme ? "#F4F6F9" : "#171C24"
+                border.width: 1
+                border.color: root.lightTheme ? "#D8DEE9" : "#252B35"
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 13
-                    anchors.rightMargin: 13
+                    anchors.leftMargin: 14
+                    anchors.rightMargin: 14
                     Label {
                         text: parent.parent.modelData.label
-                        color: root.lightTheme ? "#667b84" : "#7896a2"
+                        color: root.lightTheme ? "#5B6573" : "#9AA4B2"
                         font.pixelSize: 9
-                        Layout.preferredWidth: 120
+                        Layout.preferredWidth: 126
                     }
                     Label {
                         Layout.fillWidth: true
                         text: parent.parent.modelData.value
-                        color: root.lightTheme ? "#18313b" : "#e7f0f3"
+                        color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
                         font.pixelSize: 10
+                        font.bold: true
                         elide: Text.ElideMiddle
                         horizontalAlignment: Text.AlignRight
                     }
@@ -59,13 +62,25 @@ Rectangle {
             }
         }
 
-        Label {
+        Rectangle {
             visible: root.showAbout
             Layout.fillWidth: true
-            text: "MurSchol Settings 0.1 · configuración local-first. Las preferencias propias se guardan en " + root.backend.settingsFilePath()
-            color: root.lightTheme ? "#6d8088" : "#688793"
-            font.pixelSize: 9
-            wrapMode: Text.WordWrap
+            implicitHeight: aboutText.implicitHeight + 28
+            radius: 14
+            color: root.lightTheme ? "#EAF1FF" : "#123A7A"
+            border.width: 1
+            border.color: root.accent
+            Label {
+                id: aboutText
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 14
+                text: "MurSchol Settings 0.1 · configuración local-first. Las preferencias propias se guardan en " + root.backend.settingsFilePath()
+                color: root.lightTheme ? "#123A7A" : "#DCE8FF"
+                font.pixelSize: 9
+                wrapMode: Text.WordWrap
+            }
         }
     }
 }
