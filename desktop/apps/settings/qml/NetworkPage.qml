@@ -7,20 +7,26 @@ Rectangle {
     required property var backend
     required property var settingsBackend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
-    implicitHeight: content.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    implicitHeight: content.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
+
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color borderTone: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
 
     ColumnLayout {
         id: content
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
-        spacing: 12
+        anchors.margins: 20
+        spacing: 14
 
         RowLayout {
             Layout.fillWidth: true
@@ -29,7 +35,7 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Wi-Fi"
-                    color: root.lightTheme ? "#18313b" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 14
                     font.bold: true
                 }
@@ -39,26 +45,29 @@ Rectangle {
                           : (!root.backend.wifiHardwareAvailable
                              ? "No se detectó un adaptador Wi-Fi"
                              : root.backend.connectivityText)
-                    color: root.lightTheme ? "#6d8189" : "#7795a1"
+                    color: root.textSecondary
                     font.pixelSize: 9
                 }
             }
             Button {
+                id: scanButton
                 visible: root.backend.wifiHardwareAvailable && root.backend.wifiEnabled
                 text: root.backend.scanning ? "Buscando…" : "Buscar redes"
                 enabled: !root.backend.scanning
                 onClicked: root.backend.requestScan()
                 background: Rectangle {
                     radius: 12
-                    color: parent.hovered ? (root.lightTheme ? "#deebed" : "#163442") : (root.lightTheme ? "#edf3f4" : "#112a35")
-                    border.color: root.lightTheme ? "#cad8dd" : "#31515f"
+                    color: scanButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: scanButton.hovered ? root.accent : root.borderTone
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: root.lightTheme ? "#29434d" : "#dbe9ed"
+                    text: scanButton.text
+                    color: root.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
+                    font.bold: true
                 }
             }
             Switch {
@@ -72,9 +81,10 @@ Rectangle {
         Rectangle {
             visible: root.backend.activeSsid.length > 0
             Layout.fillWidth: true
-            height: 78
+            height: 80
             radius: 15
-            color: root.lightTheme ? "#e5f2f1" : "#12343e"
+            color: root.lightTheme ? "#EAF1FF" : "#123A7A"
+            border.width: 1
             border.color: root.accent
 
             RowLayout {
@@ -91,7 +101,7 @@ Rectangle {
                     Label {
                         anchors.centerIn: parent
                         text: "◎"
-                        color: "#07131d"
+                        color: "#FFFFFF"
                         font.pixelSize: 19
                         font.bold: true
                     }
@@ -102,7 +112,7 @@ Rectangle {
                     spacing: 2
                     Label {
                         text: root.backend.activeSsid
-                        color: root.lightTheme ? "#15303a" : "white"
+                        color: root.textPrimary
                         font.pixelSize: 12
                         font.bold: true
                     }
@@ -110,25 +120,28 @@ Rectangle {
                         text: "Conectada"
                               + (root.backend.activeInterface.length > 0 ? " · " + root.backend.activeInterface : "")
                               + (root.backend.ipv4Address.length > 0 ? " · " + root.backend.ipv4Address : "")
-                        color: root.lightTheme ? "#58717a" : "#8eb0ba"
+                        color: root.lightTheme ? "#3C4A5E" : "#DCE8FF"
                         font.pixelSize: 9
                     }
                 }
 
                 Button {
+                    id: disconnectButton
                     text: "Desconectar"
                     onClicked: root.backend.disconnectWifi()
                     background: Rectangle {
                         radius: 12
-                        color: parent.hovered ? (root.lightTheme ? "#d6e6e8" : "#244552") : "transparent"
-                        border.color: root.lightTheme ? "#bfcfd4" : "#486773"
+                        color: disconnectButton.hovered ? root.danger : "transparent"
+                        border.width: 1
+                        border.color: disconnectButton.hovered ? root.danger : root.accent
                     }
                     contentItem: Label {
-                        text: parent.text
-                        color: root.lightTheme ? "#344c56" : "#d6e5e9"
+                        text: disconnectButton.text
+                        color: disconnectButton.hovered ? "#FFFFFF" : root.textPrimary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 9
+                        font.bold: true
                     }
                 }
             }
@@ -137,7 +150,7 @@ Rectangle {
         Label {
             visible: root.backend.wifiHardwareAvailable && root.backend.wifiEnabled
             text: "Redes disponibles"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 12
             font.bold: true
         }
@@ -152,13 +165,13 @@ Rectangle {
                 delegate: Rectangle {
                     required property var modelData
                     Layout.fillWidth: true
-                    height: 64
+                    height: 66
                     radius: 14
                     color: modelData.active
-                           ? (root.lightTheme ? "#e5f2f1" : "#12343e")
-                           : (root.lightTheme ? "#edf2f4" : "#112630")
-                    border.width: modelData.active ? 1 : 0
-                    border.color: root.accent
+                           ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
+                           : root.raised
+                    border.width: modelData.active ? 2 : 1
+                    border.color: modelData.active ? root.accent : root.borderTone
 
                     RowLayout {
                         anchors.fill: parent
@@ -168,7 +181,7 @@ Rectangle {
 
                         Label {
                             text: modelData.strength >= 75 ? "▰" : (modelData.strength >= 45 ? "▱" : "·")
-                            color: root.accent
+                            color: modelData.active ? root.accent : root.textSecondary
                             font.pixelSize: 16
                             Layout.preferredWidth: 25
                             horizontalAlignment: Text.AlignHCenter
@@ -179,7 +192,7 @@ Rectangle {
                             spacing: 1
                             Label {
                                 text: modelData.ssid
-                                color: root.lightTheme ? "#18313b" : "#edf5f7"
+                                color: root.textPrimary
                                 font.pixelSize: 11
                                 font.bold: modelData.active
                                 elide: Text.ElideRight
@@ -190,7 +203,7 @@ Rectangle {
                                       + (modelData.saved ? " · Guardada" : "")
                                       + (modelData.band.length > 0 ? " · " + modelData.band : "")
                                       + " · " + modelData.strength + "%"
-                                color: root.lightTheme ? "#6b7f88" : "#75929e"
+                                color: root.textSecondary
                                 font.pixelSize: 8
                             }
                         }
@@ -210,12 +223,13 @@ Rectangle {
                             onClicked: root.backend.connectSavedNetwork(modelData.ssid)
                             background: Rectangle {
                                 radius: 11
-                                color: connectButton.hovered ? root.accent : (root.lightTheme ? "#dcebec" : "#153744")
+                                color: connectButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                                border.width: 1
                                 border.color: root.accent
                             }
                             contentItem: Label {
                                 text: connectButton.text
-                                color: connectButton.hovered ? "#07131d" : (root.lightTheme ? "#24434c" : "#d7eeee")
+                                color: root.textPrimary
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                                 font.pixelSize: 8
@@ -231,12 +245,12 @@ Rectangle {
             visible: root.backend.wifiHardwareAvailable && root.backend.wifiEnabled && root.backend.accessPoints.length === 0
             Layout.fillWidth: true
             text: root.backend.scanning ? "Buscando redes cercanas…" : "No hay redes visibles. Pulsa Buscar redes para actualizar."
-            color: root.lightTheme ? "#6a7d86" : "#77939f"
+            color: root.textSecondary
             font.pixelSize: 9
             wrapMode: Text.WordWrap
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -245,33 +259,36 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Configuración avanzada"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 11
                     font.bold: true
                 }
                 Label {
                     text: "Para redes nuevas con contraseña, VPN, DNS manual y perfiles avanzados seguimos usando el editor de NetworkManager durante esta fase."
-                    color: root.lightTheme ? "#6f828a" : "#718e9a"
+                    color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                 }
             }
             Button {
+                id: advancedButton
                 text: "Abrir avanzado"
                 enabled: root.settingsBackend.networkSettingsAvailable
                 onClicked: root.settingsBackend.openNetworkSettings()
                 background: Rectangle {
                     radius: 12
-                    color: parent.enabled ? (root.lightTheme ? "#e2ecee" : "#173440") : (root.lightTheme ? "#dde4e6" : "#263942")
-                    border.color: root.lightTheme ? "#c8d5d9" : "#3d5d69"
+                    color: advancedButton.enabled ? (advancedButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised) : root.raised
+                    border.width: 1
+                    border.color: advancedButton.enabled ? root.accent : root.borderTone
                 }
                 contentItem: Label {
-                    text: parent.text
-                    color: parent.enabled ? (root.lightTheme ? "#29434d" : "#dcebed") : (root.lightTheme ? "#89969b" : "#71858d")
+                    text: advancedButton.text
+                    color: advancedButton.enabled ? root.textPrimary : root.textSecondary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
+                    font.bold: true
                 }
             }
         }
@@ -279,7 +296,7 @@ Rectangle {
         Label {
             Layout.fillWidth: true
             text: root.backend.statusText
-            color: root.lightTheme ? "#6b8088" : "#6f909c"
+            color: root.textSecondary
             font.pixelSize: 8
             wrapMode: Text.WordWrap
         }
