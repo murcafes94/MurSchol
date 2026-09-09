@@ -90,6 +90,28 @@ Aplicación en MurSchol:
 - Menos controles simultáneos, mejor jerarquía visual.
 - Acciones sensibles claramente explicadas.
 
+### Haiku OS
+
+Haiku no es una distribución Linux; es un sistema operativo propio inspirado en BeOS. La referencia es valiosa precisamente porque resuelve varias tareas de escritorio con ideas distintas a Windows, macOS y los DE Linux tradicionales.
+
+Tomar:
+- **Deskbar**: un único punto claro para lanzar aplicaciones, ver programas en ejecución, acceder a recientes, bandeja y apagado. MurSchol puede mantener su Start + Dock separados visualmente, pero compartir una misma fuente de estado y recientes.
+- **Aplicación → ventanas**: Deskbar permite desplegar las ventanas que pertenecen a cada aplicación. Esto encaja con el siguiente paso del dock MurSchol: indicador real de app abierta y selector de sus ventanas mediante el protocolo foreign-toplevel de Wayland/labwc.
+- **Tracker como app normal**: el gestor de archivos y el escritorio son componentes reiniciables, no una razón para bloquear toda la sesión. MurSchol debe conservar procesos separados para Desktop, Panel, Files, Settings y apps nativas.
+- **Consultas guardadas**: Haiku puede guardar una búsqueda como objeto reutilizable. MurSchol Files debería considerar búsquedas guardadas/colecciones inteligentes cuando exista el indexador local opcional.
+- **Atributos de archivos**: Haiku trata metadatos enriquecidos como información navegable y buscable. MurSchol puede aproximar esta idea con SQLite/xattrs de manera opcional para etiquetas, materia, autor, tipo académico y estado de lectura, sin modificar el contenido del archivo.
+- **Espacios de trabajo**: navegación espacial clara y capacidad de llevar una ventana al siguiente espacio. MurSchol ya tiene Estudio/Trabajos/Personal y debe evolucionar de estado visual a espacios reales del compositor.
+- **Nightly vs estable**: Haiku distingue imágenes estables y nocturnas. MurSchol debería terminar adoptando canales `Stable`, `Preview` y `Nightly`, con el canal Preview como el natural durante la alpha.
+- **HaikuDepot**: tienda central con búsqueda, categorías y paquetes. Sirve como referencia de sencillez para MurSchol Store, aunque MurSchol tendrá además capas Linux/Flatpak/Android/Windows.
+
+Evitar:
+- Copiar la estética retro de BeOS/Haiku.
+- Intentar reproducir BFS o sus atributos nativos en Linux.
+- Aumentar el alcance de la alpha con un indexador pesado.
+- Copiar sus atajos si contradicen convenciones Windows/Linux que nuestros usuarios reconocerán más rápido.
+
+Estado actual relevante: Haiku R1/beta6 fue publicado en agosto de 2026. Sus builds oficiales estables siguen centrados en x86/x86_64; ARM/ARM64 aparecen todavía como variantes no soportadas para desarrollo. Esto refuerza nuestra decisión de separar MurSchol OS PC x86-64 de la futura línea MurSchol Mobile ARM64.
+
 ### Garuda Linux
 
 Tomar:
@@ -176,4 +198,6 @@ MurSchol debe sentirse familiar sin ser un clon de Windows, elegante sin depende
 - https://www.zdnet.com/article/most-windows-like-linux-distros/
 - https://www.youtube.com/watch?v=4629-IzQOIA&t=41
 - https://distrowatch.com/?language=ES
+- https://distrowatch.com/table.php?distribution=haiku
+- https://www.haiku-os.org/
 - https://labwc.github.io/
