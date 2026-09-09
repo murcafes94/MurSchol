@@ -60,21 +60,22 @@ Los grises permitidos se consideran derivados neutros de blanco/negro y se usan 
 
 MurSchol debe sentirse moderno y sobrio, no futurista recargado.
 
-- Radio pequeño: 10 px
-- Radio medio: 14 px
+- Radio pequeño: 8–10 px
+- Radio medio: 12–14 px
 - Radio de tarjetas: 18 px
 - Radio de panel grande: 24–30 px
 - Espaciado base: 4 px
-- Espaciados habituales: 8, 12, 16, 20, 24 y 32 px
+- Espaciados habituales: 8, 12, 16, 24 y 32 px
 - Controles táctiles/clicables: mínimo aproximado de 40–44 px cuando el espacio lo permita
 
 ## Movimiento
 
-- Duración rápida: 90–120 ms
-- Duración normal: 160–220 ms
+- Duración rápida: 100 ms
+- Duración normal: 160 ms
+- Duración lenta: 220 ms
 - Se prefieren cambios de opacidad, color y escala moderada.
 - El perfil **Ligero** reduce o elimina blur, sombras complejas y escalado de hover.
-- `Reducidas` y `Desactivadas` en Accesibilidad/Apariencia deben respetarse globalmente.
+- `Reducidas` usa transiciones aproximadas de 80 ms y `Desactivadas` elimina animación cosmética.
 
 ## Iconografía
 
@@ -95,6 +96,18 @@ Todos los componentes MurSchol deben derivarse de estos tokens:
 - indicador activo: azul;
 - error: rojo;
 - divisor: gris neutro.
+
+## Tokens canónicos
+
+La paleta base vive en `shared/design/palette.json` y los valores semánticos de tema, espaciado, radios, alturas de controles y movimiento viven en `shared/design/tokens.json`.
+
+Durante la fase alpha cada aplicación puede mantener un adaptador QML local, pero no debe inventar colores propios fuera de estos tokens. El objetivo es mover progresivamente Start, Dock, Settings, Files, Photos, Reader, Calendar, Calculator, Media y Music hacia una capa de componentes compartidos sin introducir un daemon ni una dependencia pesada.
+
+## Estado actual de adopción
+
+- **Start** ya usa negro/blanco como base, azul para selección/foco y rojo para borrar recientes o acciones destructivas.
+- **Settings** usa azul como acento predeterminado (`#2563EB`) y migra automáticamente el antiguo teal predeterminado cuando lo encuentra en configuraciones existentes.
+- El resto de aplicaciones se migrará de forma progresiva para no romper superficies funcionales antes de su validación visual.
 
 ## Alcance
 
