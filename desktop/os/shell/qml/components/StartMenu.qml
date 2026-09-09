@@ -17,10 +17,26 @@ Rectangle {
     border.width: 1
     border.color: "#3d6577"
 
+    function categoryCountText() {
+        if (selectedCategory === "Fijadas")
+            return appModel.pinnedCount + " fijadas"
+        if (selectedCategory === "Recientes")
+            return appModel.recentCount + " recientes"
+        return appModel.count + " aplicaciones"
+    }
+
+    function emptyCategoryText() {
+        if (selectedCategory === "Fijadas")
+            return "Todavía no has fijado aplicaciones. Usa ☆ en cualquier app."
+        if (selectedCategory === "Recientes")
+            return "Las aplicaciones que abras desde Inicio aparecerán aquí."
+        return "No hay aplicaciones en esta categoría."
+    }
+
     onVisibleChanged: {
         if (visible) {
-            selectedCategory = "Todas"
-            appModel.categoryFilter = "Todas"
+            selectedCategory = appModel.pinnedCount > 0 ? "Fijadas" : "Todas"
+            appModel.categoryFilter = selectedCategory
             appModel.filter = ""
             search.text = ""
             search.forceActiveFocus()
@@ -136,7 +152,7 @@ Rectangle {
                     spacing: 4
 
                     Label {
-                        text: "Categorías"
+                        text: "Inicio"
                         color: "#7998a6"
                         font.pixelSize: 10
                         font.bold: true
@@ -146,13 +162,9 @@ Rectangle {
 
                     Repeater {
                         model: [
-                            {name:"Todas", symbol:"▦"},
-                            {name:"Educación", symbol:"▣"},
-                            {name:"Productividad", symbol:"◆"},
-                            {name:"Multimedia", symbol:"▶"},
-                            {name:"Internet", symbol:"◎"},
-                            {name:"Sistema", symbol:"⚙"},
-                            {name:"Accesibilidad", symbol:"♿"}
+                            {name:"Fijadas", symbol:"★"},
+                            {name:"Recientes", symbol:"◷"},
+                            {name:"Todas", symbol:"▦"}
                         ]
 
                         delegate: Button {
@@ -191,12 +203,77 @@ Rectangle {
                         }
                     }
 
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                        Layout.topMargin: 4
+                        Layout.bottomMargin: 2
+                        height: 1
+                        color: "#294553"
+                    }
+
+                    Label {
+                        text: "Categorías"
+                        color: "#7998a6"
+                        font.pixelSize: 10
+                        font.bold: true
+                        Layout.leftMargin: 9
+                        Layout.topMargin: 2
+                    }
+
+                    Repeater {
+                        model: [
+                            {name:"Educación", symbol:"▣"},
+                            {name:"Productividad", symbol:"◆"},
+                            {name:"Multimedia", symbol:"▶"},
+                            {name:"Internet", symbol:"◎"},
+                            {name:"Sistema", symbol:"⚙"},
+                            {name:"Accesibilidad", symbol:"♿"}
+                        ]
+
+                        delegate: Button {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 37
+                            onClicked: {
+                                root.selectedCategory = modelData.name
+                                root.appModel.categoryFilter = modelData.name
+                            }
+                            background: Rectangle {
+                                radius: 12
+                                color: root.selectedCategory === modelData.name
+                                       ? "#174c66"
+                                       : (parent.hovered ? "#173543" : "transparent")
+                                border.width: root.selectedCategory === modelData.name ? 1 : 0
+                                border.color: "#2a82a0"
+                            }
+                            contentItem: RowLayout {
+                                spacing: 9
+                                Label {
+                                    text: modelData.symbol
+                                    color: root.selectedCategory === modelData.name ? "#65e9e2" : "#8da9b5"
+                                    font.pixelSize: 14
+                                    Layout.preferredWidth: 22
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                                Label {
+                                    text: modelData.name
+                                    color: root.selectedCategory === modelData.name ? "white" : "#c2d0d6"
+                                    font.pixelSize: 10
+                                    font.bold: root.selectedCategory === modelData.name
+                                    Layout.fillWidth: true
+                                }
+                            }
+                        }
+                    }
+
                     Item { Layout.fillHeight: true }
 
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#294553" }
                     Label {
                         Layout.leftMargin: 9
-                        text: appModel.count + " aplicaciones"
+                        text: root.categoryCountText()
                         color: "#708b97"
                         font.pixelSize: 9
                     }
@@ -235,20 +312,20 @@ Rectangle {
                         }
 
                         contentItem: ColumnLayout {
-                            spacing: 4
+                            spacing: 5
                             Item { Layout.fillHeight: true }
                             Rectangle {
                                 Layout.alignment: Qt.AlignHCenter
-                                width: 48
-                                height: 48
-                                radius: 14
+                                width: 50
+                                height: 50
+                                radius: 15
                                 color: appButton.hovered ? "#23556b" : "#1a4051"
 
                                 Image {
                                     id: appThemeIcon
                                     anchors.centerIn: parent
-                                    width: 34
-                                    height: 34
+                                    width: 35
+                                    height: 35
                                     source: "image://theme/" + iconName
                                     sourceSize.width: 40
                                     sourceSize.height: 40
@@ -274,14 +351,39 @@ Rectangle {
                                 font.pixelSize: 10
                                 font.bold: true
                             }
-                            Label {
-                                Layout.fillWidth: true
-                                text: appSource
-                                color: "#6f8995"
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: 8
-                            }
                             Item { Layout.fillHeight: true }
+                        }
+
+                        Rectangle {
+                            z: 5
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.topMargin: 7
+                            anchors.rightMargin: 7
+                            width: 26
+                            height: 26
+                            radius: 9
+                            visible: appPinned || appButton.hovered
+                            color: pinArea.containsMouse ? "#315c6f" : "#203e4d"
+                            border.width: appPinned ? 1 : 0
+                            border.color: "#43d8d0"
+
+                            Label {
+                                anchors.centerIn: parent
+                                text: appPinned ? "★" : "☆"
+                                color: appPinned ? "#70eee7" : "#9ab0b9"
+                                font.pixelSize: 14
+                            }
+
+                            MouseArea {
+                                id: pinArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: mouse => {
+                                    mouse.accepted = true
+                                    root.appModel.togglePinned(index)
+                                }
+                            }
                         }
                     }
                 }
@@ -352,11 +454,14 @@ Rectangle {
 
                 Label {
                     anchors.centerIn: parent
+                    width: Math.min(parent.width - 40, 420)
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
                     visible: (search.text.trim().length >= 2 && root.searchModel.count === 0)
                              || (search.text.trim().length < 2 && root.appModel.count === 0)
                     text: search.text.trim().length >= 2
                           ? "No encontramos resultados locales."
-                          : "No hay aplicaciones en esta categoría."
+                          : root.emptyCategoryText()
                     color: "#708a95"
                 }
             }
@@ -374,7 +479,26 @@ Rectangle {
                 font.pixelSize: 9
             }
             Item { Layout.fillWidth: true }
-            Button { text: "Archivos"; onClicked: { backend.openFiles(); root.closeRequested() } }
+
+            Button {
+                visible: search.text.trim().length < 2 && root.selectedCategory === "Recientes" && root.appModel.recentCount > 0
+                text: "Borrar recientes"
+                onClicked: root.appModel.clearRecent()
+            }
+            Button {
+                text: "Archivos"
+                onClicked: {
+                    backend.openFiles()
+                    root.closeRequested()
+                }
+            }
+            Button {
+                text: "Configuración"
+                onClicked: {
+                    backend.openSettings("")
+                    root.closeRequested()
+                }
+            }
             Button { text: "Apagar"; onClicked: backend.powerOff() }
         }
     }
