@@ -9,8 +9,8 @@ Rectangle {
     signal systemClicked()
 
     height: 46
-    color: "#e1091722"
-    border.color: "#173544"
+    color: "#F20B0D12"
+    border.color: "#252B35"
 
     Timer {
         interval: 30000
@@ -29,16 +29,22 @@ Rectangle {
             width: 30
             height: 30
             radius: 9
-            color: "#123544"
-            border.color: "#29d9d1"
-            Label { anchors.centerIn: parent; text: "MS"; color: "#c8fffb"; font.bold: true; font.pixelSize: 10 }
+            color: backend.accentColor
+            border.color: "#5B8CFF"
+            Label {
+                anchors.centerIn: parent
+                text: "MS"
+                color: "#FFFFFF"
+                font.bold: true
+                font.pixelSize: 10
+            }
         }
 
-        Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 15; font.bold: true }
+        Label { text: "MurSchol OS"; color: "#F8FAFC"; font.pixelSize: 15; font.bold: true }
         Label {
             visible: root.width > 1120
             text: "Aprender hoy, un mundo mejor mañana"
-            color: "#748f9c"
+            color: "#8B95A5"
             font.pixelSize: 9
         }
 
@@ -49,13 +55,13 @@ Rectangle {
             height: 26
             width: workspaceLabel.implicitWidth + 20
             radius: 13
-            color: "#143441"
-            border.color: "#2f6877"
+            color: "#151A23"
+            border.color: backend.accentColor
             Label {
                 id: workspaceLabel
                 anchors.centerIn: parent
                 text: backend.workspace
-                color: "#9fe7e2"
+                color: "#F8FAFC"
                 font.pixelSize: 9
                 font.bold: true
             }
@@ -63,7 +69,7 @@ Rectangle {
 
         Label {
             text: Qt.formatDateTime(root.now, "ddd, d MMM  hh:mm")
-            color: "#d9e5e9"
+            color: "#E5E7EB"
             font.pixelSize: 11
         }
 
@@ -72,12 +78,14 @@ Rectangle {
             width: 60
             height: 24
             radius: 12
-            color: "#122a35"
+            color: "#171C24"
+            border.color: "#252B35"
             Label {
                 anchors.centerIn: parent
                 text: "CPU " + backend.cpuUsage + "%"
-                color: "#81d9d4"
+                color: backend.accentColor
                 font.pixelSize: 8
+                font.bold: true
             }
         }
 
@@ -86,11 +94,12 @@ Rectangle {
             width: 60
             height: 24
             radius: 12
-            color: "#122a35"
+            color: "#171C24"
+            border.color: "#252B35"
             Label {
                 anchors.centerIn: parent
                 text: "RAM " + backend.memoryUsage + "%"
-                color: "#a9d7a7"
+                color: "#F8FAFC"
                 font.pixelSize: 8
             }
         }
@@ -98,7 +107,7 @@ Rectangle {
         Label {
             visible: backend.batteryAvailable
             text: (backend.charging ? "⚡ " : "") + backend.batteryPercent + "%"
-            color: backend.batteryPercent <= 20 ? "#efb36a" : "#d1e6d8"
+            color: backend.batteryPercent <= 20 ? "#E63946" : "#F8FAFC"
             font.pixelSize: 10
             font.bold: backend.batteryPercent <= 20
         }
@@ -108,10 +117,14 @@ Rectangle {
             height: 32
             text: "⚙"
             onClicked: root.systemClicked()
-            background: Rectangle { radius: 10; color: parent.hovered ? "#294758" : "transparent" }
+            background: Rectangle {
+                radius: 10
+                color: parent.hovered ? "#1E3A8A" : "transparent"
+                border.color: parent.hovered ? backend.accentColor : "transparent"
+            }
             contentItem: Label {
                 text: parent.text
-                color: "white"
+                color: "#F8FAFC"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 15
