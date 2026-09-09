@@ -116,6 +116,31 @@ Aplicación en MurSchol:
 - Mantener etiquetas de compatibilidad: Nativa, Excelente, Compatible, Experimental y No compatible.
 - Considerar a futuro mecanismos de sistema base protegido o recuperación, pero no introducir inmutabilidad durante la alpha sin una estrategia completa de actualización y rollback.
 
+### Labwc / escritorios ligeros Wayland
+
+MurSchol usa labwc como compositor base. La referencia más útil aquí no es estética sino arquitectónica: labwc está diseñado para apilar ventanas con pocos componentes y delegar panel, fondo, capturas y otras funciones a clientes independientes.
+
+Aplicación en MurSchol:
+- Mantener el compositor simple y estable.
+- Implementar identidad, panel, dock y aplicaciones en procesos separados.
+- No cargar el compositor con animaciones o servicios que pueden vivir en el shell.
+- Probar con especial cuidado múltiples pantallas, foco, Alt+Tab, decoraciones y cierre de ventanas.
+
+DistroWatch permite descubrir imágenes Debian ligeras recientes basadas en labwc, sway, wayfire y otros compositores. Entre las referencias a vigilar está LajtLinux, que publica imágenes Debian 13 con labwc; sirve como comparación práctica de arranque, tamaño de ISO y selección de componentes, no como base de MurSchol.
+
+## DistroWatch como fuente de descubrimiento
+
+DistroWatch se incorpora como catálogo para descubrir distribuciones, lanzamientos, screenshots y combinaciones de escritorio/compositor que merezcan análisis posterior.
+
+No se utilizará su **Page Hit Ranking** como medida de calidad, cuota de mercado ni número real de usuarios. Ese ranking mide accesos a páginas dentro de DistroWatch y es útil principalmente como señal de curiosidad o interés de sus visitantes.
+
+Uso previsto en MurSchol:
+- localizar distros nuevas con propuestas de UX interesantes;
+- vigilar escritorios ligeros Debian/Wayland;
+- comparar screenshots y decisiones de layout;
+- detectar nuevas combinaciones con labwc, LXQt, Wayfire, Sway o similares;
+- después contrastar cualquier idea importante con documentación oficial, repositorios y pruebas reales.
+
 ## Fuente G2
 
 La página de alternativas de G2 no es una referencia útil para comparar escritorios Linux: clasifica Deepin principalmente dentro de VDI/DaaS y propone productos como Citrix, VMware Horizon, Amazon WorkSpaces o VirtualBox. Puede servir como señal de que la categorización comercial es ambigua, pero no debe usarse para decisiones de UX de MurSchol.
@@ -150,3 +175,5 @@ MurSchol debe sentirse familiar sin ser un clon de Windows, elegante sin depende
 - https://www.reddit.com/r/linuxquestions/comments/ked9hs/the_best_linux_distro_for_deepin_de/
 - https://www.zdnet.com/article/most-windows-like-linux-distros/
 - https://www.youtube.com/watch?v=4629-IzQOIA&t=41
+- https://distrowatch.com/?language=ES
+- https://labwc.github.io/
