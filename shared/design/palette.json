@@ -1,0 +1,22 @@
+{
+  "name": "MurSchol Core Palette",
+  "version": 1,
+  "colors": {
+    "white": "#F8FAFC",
+    "whitePure": "#FFFFFF",
+    "black": "#0B0D12",
+    "blackSoft": "#11151C",
+    "blackRaised": "#171C24",
+    "blue": "#2563EB",
+    "blueHover": "#3B82F6",
+    "blueDeep": "#123A7A",
+    "blueSoft": "#EAF1FF",
+    "red": "#E63946",
+    "redHover": "#FF4D5A",
+    "gray100": "#EEF1F5",
+    "gray300": "#D8DEE9",
+    "gray500": "#9AA4B2",
+    "gray700": "#5B6573",
+    "gray850": "#252B35"
+  }
+}
