@@ -6,15 +6,22 @@ ColumnLayout {
     id: root
     property var backend
     property bool lightTheme: false
-    property color accent: "#29d9d1"
+    property color accent: "#2563EB"
     spacing: 14
+
+    readonly property color surface: lightTheme ? "#FFFFFF" : "#11151C"
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color border: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: 92
+        implicitHeight: 94
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         RowLayout {
             anchors.fill: parent
@@ -25,17 +32,17 @@ ColumnLayout {
                 width: 48
                 height: 48
                 radius: 15
-                color: lightTheme ? "#dcefed" : "#123d49"
-                Label { anchors.centerIn: parent; text: "▥"; color: root.accent; font.pixelSize: 22; font.bold: true }
+                color: root.lightTheme ? "#EAF1FF" : "#123A7A"
+                Label { anchors.centerIn: parent; text: "▥"; color: root.accent; font.pixelSize: 21; font.bold: true }
             }
 
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                Label { text: backend.installedCount + " aplicaciones detectadas"; color: lightTheme ? "#17303a" : "#f1f6f8"; font.pixelSize: 17; font.bold: true }
+                Label { text: backend.installedCount + " aplicaciones detectadas"; color: root.textPrimary; font.pixelSize: 17; font.bold: true }
                 Label {
-                    text: "MurSchol usa los estándares XDG para que cada tipo de archivo tenga una aplicación predeterminada real."
-                    color: lightTheme ? "#657983" : "#7f9aa6"
+                    text: "MurSchol usa asociaciones XDG reales para decidir qué aplicación abre cada tipo de archivo."
+                    color: root.textSecondary
                     font.pixelSize: 9
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
@@ -43,8 +50,23 @@ ColumnLayout {
             }
 
             Button {
+                id: refreshButton
                 text: "Actualizar"
                 onClicked: backend.refresh()
+                background: Rectangle {
+                    radius: 12
+                    color: refreshButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: refreshButton.hovered ? root.accent : root.border
+                }
+                contentItem: Label {
+                    text: refreshButton.text
+                    color: root.textPrimary
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 9
+                    font.bold: true
+                }
             }
         }
     }
@@ -66,27 +88,27 @@ ColumnLayout {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                implicitHeight: 88
+                implicitHeight: 90
                 radius: 16
-                color: lightTheme ? "#f7fafb" : "#0d202a"
-                border.color: lightTheme ? "#d8e2e5" : "#223f4e"
+                color: root.surface
+                border.color: root.border
 
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: 15
                     spacing: 12
                     Rectangle {
-                        width: 40
-                        height: 40
-                        radius: 12
-                        color: lightTheme ? "#e5efef" : "#14323e"
+                        width: 42
+                        height: 42
+                        radius: 13
+                        color: root.lightTheme ? "#EAF1FF" : "#123A7A"
                         Label { anchors.centerIn: parent; text: modelData.symbol; color: root.accent; font.pixelSize: modelData.symbol === "PDF" ? 9 : 18; font.bold: true }
                     }
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 1
-                        Label { text: modelData.title; color: lightTheme ? "#314852" : "#9cb2bc"; font.pixelSize: 9 }
-                        Label { text: modelData.value; color: lightTheme ? "#162e38" : "#eef5f7"; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true }
+                        Label { text: modelData.title; color: root.textSecondary; font.pixelSize: 9 }
+                        Label { text: modelData.value; color: root.textPrimary; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true }
                     }
                 }
             }
@@ -95,21 +117,21 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: browserColumn.implicitHeight + 32
+        implicitHeight: browserColumn.implicitHeight + 34
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         ColumnLayout {
             id: browserColumn
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: 16
-            spacing: 10
+            anchors.margins: 17
+            spacing: 11
 
-            Label { text: "Navegador predeterminado"; color: lightTheme ? "#19323c" : "#f0f6f8"; font.pixelSize: 13; font.bold: true }
-            Label { text: "El cambio se aplica a enlaces HTTP/HTTPS y páginas HTML."; color: lightTheme ? "#657983" : "#7d98a4"; font.pixelSize: 9 }
+            Label { text: "Navegador predeterminado"; color: root.textPrimary; font.pixelSize: 13; font.bold: true }
+            Label { text: "El cambio se aplica a enlaces HTTP/HTTPS y páginas HTML."; color: root.textSecondary; font.pixelSize: 9 }
 
             RowLayout {
                 spacing: 8
@@ -126,7 +148,7 @@ ColumnLayout {
                 Label {
                     visible: !backend.firefoxAvailable && !backend.edgeAvailable
                     text: "No hay un navegador compatible detectado."
-                    color: lightTheme ? "#7b6666" : "#c89595"
+                    color: root.danger
                     font.pixelSize: 9
                 }
             }
@@ -135,21 +157,21 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        implicitHeight: localColumn.implicitHeight + 32
+        implicitHeight: localColumn.implicitHeight + 34
         radius: 18
-        color: lightTheme ? "#f8fbfc" : "#0d202b"
-        border.color: lightTheme ? "#d7e2e6" : "#234454"
+        color: root.surface
+        border.color: root.border
 
         ColumnLayout {
             id: localColumn
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.margins: 16
-            spacing: 10
+            anchors.margins: 17
+            spacing: 11
 
-            Label { text: "Aplicaciones MurSchol"; color: lightTheme ? "#19323c" : "#f0f6f8"; font.pixelSize: 13; font.bold: true }
-            Label { text: "Puedes devolver estas asociaciones a las aplicaciones nativas de MurSchol sin tocar tus archivos."; color: lightTheme ? "#657983" : "#7d98a4"; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+            Label { text: "Aplicaciones MurSchol"; color: root.textPrimary; font.pixelSize: 13; font.bold: true }
+            Label { text: "Puedes devolver estas asociaciones a las aplicaciones nativas de MurSchol sin tocar tus archivos."; color: root.textSecondary; font.pixelSize: 9; wrapMode: Text.WordWrap; Layout.fillWidth: true }
 
             RowLayout {
                 spacing: 8
