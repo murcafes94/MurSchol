@@ -7,13 +7,18 @@ Rectangle {
     property var backend
     property var powerBackend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
     Layout.fillWidth: true
-    height: contentColumn.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    height: contentColumn.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
+
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color borderTone: lightTheme ? "#D8DEE9" : "#252B35"
 
     Timer {
         id: nightApplyTimer
@@ -27,23 +32,33 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
+        anchors.margins: 20
         spacing: 16
 
         RowLayout {
             Layout.fillWidth: true
             Label {
                 text: "Pantallas conectadas"
-                color: root.lightTheme ? "#1b323c" : "white"
+                color: root.textPrimary
                 font.pixelSize: 13
                 font.bold: true
                 Layout.fillWidth: true
             }
-            Label {
-                text: root.backend.screens.length + (root.backend.screens.length === 1 ? " pantalla" : " pantallas")
-                color: root.accent
-                font.pixelSize: 9
-                font.bold: true
+            Rectangle {
+                width: displayCount.implicitWidth + 22
+                height: 28
+                radius: 14
+                color: root.lightTheme ? "#EAF1FF" : "#123A7A"
+                border.width: 1
+                border.color: root.accent
+                Label {
+                    id: displayCount
+                    anchors.centerIn: parent
+                    text: root.backend.screens.length + (root.backend.screens.length === 1 ? " pantalla" : " pantallas")
+                    color: root.lightTheme ? "#123A7A" : "#DCE8FF"
+                    font.pixelSize: 9
+                    font.bold: true
+                }
             }
         }
 
@@ -52,27 +67,28 @@ Rectangle {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                height: 78
-                radius: 14
-                color: root.lightTheme ? "#edf2f4" : "#112630"
-                border.width: modelData.primary ? 1 : 0
-                border.color: root.accent
+                height: 82
+                radius: 15
+                color: root.raised
+                border.width: modelData.primary ? 2 : 1
+                border.color: modelData.primary ? root.accent : root.borderTone
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.margins: 13
-                    spacing: 12
+                    anchors.margins: 14
+                    spacing: 13
 
                     Rectangle {
-                        width: 58
-                        height: 38
-                        radius: 6
-                        color: root.lightTheme ? "#dbe6e9" : "#173441"
-                        border.color: modelData.primary ? root.accent : (root.lightTheme ? "#aebdc2" : "#42606c")
+                        width: 60
+                        height: 40
+                        radius: 8
+                        color: root.lightTheme ? "#FFFFFF" : "#0B0D12"
+                        border.width: 2
+                        border.color: modelData.primary ? root.accent : root.borderTone
                         Label {
                             anchors.centerIn: parent
                             text: "▣"
-                            color: modelData.primary ? root.accent : (root.lightTheme ? "#526a73" : "#7895a1")
+                            color: modelData.primary ? root.accent : root.textSecondary
                             font.pixelSize: 18
                         }
                     }
@@ -82,7 +98,7 @@ Rectangle {
                         spacing: 2
                         Label {
                             text: modelData.name + (modelData.primary ? " · Principal" : "")
-                            color: root.lightTheme ? "#18313b" : "#edf5f7"
+                            color: root.textPrimary
                             font.pixelSize: 11
                             font.bold: true
                             elide: Text.ElideRight
@@ -92,7 +108,7 @@ Rectangle {
                             text: modelData.width + " × " + modelData.height
                                   + " · " + modelData.refreshRate + " Hz"
                                   + " · escala " + Number(modelData.scale).toFixed(2) + "×"
-                            color: root.lightTheme ? "#6b7f88" : "#75929e"
+                            color: root.textSecondary
                             font.pixelSize: 8
                         }
                     }
@@ -100,12 +116,24 @@ Rectangle {
             }
         }
 
-        Label {
+        Rectangle {
             Layout.fillWidth: true
-            text: "Resolución, escala, orientación y disposición ya se detectan desde Qt/Wayland. Los cambios persistentes se habilitarán solo con confirmación y reversión automática para evitar dejar una pantalla inutilizable."
-            color: root.lightTheme ? "#71838b" : "#668694"
-            font.pixelSize: 8
-            wrapMode: Text.WordWrap
+            implicitHeight: displayNote.implicitHeight + 26
+            radius: 14
+            color: root.lightTheme ? "#F4F6F9" : "#0B0D12"
+            border.width: 1
+            border.color: root.borderTone
+            Label {
+                id: displayNote
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: 13
+                text: "Resolución, escala, orientación y disposición se detectan desde Qt/Wayland. Los cambios persistentes se habilitarán únicamente con confirmación y reversión automática."
+                color: root.textSecondary
+                font.pixelSize: 8
+                wrapMode: Text.WordWrap
+            }
         }
 
         ColumnLayout {
@@ -113,21 +141,22 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 10
 
-            Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+            Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
             RowLayout {
                 Layout.fillWidth: true
                 Label {
                     text: "Brillo"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                     Layout.fillWidth: true
                 }
                 Label {
                     text: root.powerBackend.brightnessPercent + "%"
-                    color: root.lightTheme ? "#334b55" : "#c8d9df"
+                    color: root.textSecondary
                     font.pixelSize: 9
+                    font.bold: true
                 }
             }
             RowLayout {
@@ -144,7 +173,7 @@ Rectangle {
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -153,7 +182,7 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Luz nocturna"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                 }
@@ -162,7 +191,7 @@ Rectangle {
                     text: root.backend.nightLightAvailable
                           ? "Reduce la luz azul usando una temperatura de color más cálida."
                           : "No disponible: Gammastep/Wayland no está instalado o no es compatible con esta sesión."
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap
                 }
@@ -186,7 +215,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Label {
                     text: "Más cálido"
-                    color: root.lightTheme ? "#7a8b92" : "#678490"
+                    color: root.textSecondary
                     font.pixelSize: 8
                 }
                 Slider {
@@ -198,12 +227,20 @@ Rectangle {
                     value: root.backend.nightLightTemperature
                     onMoved: nightApplyTimer.restart()
                 }
-                Label {
-                    text: Math.round(temperatureSlider.value) + " K"
-                    color: root.lightTheme ? "#334b55" : "#c8d9df"
-                    font.pixelSize: 8
-                    Layout.preferredWidth: 55
-                    horizontalAlignment: Text.AlignRight
+                Rectangle {
+                    width: 64
+                    height: 28
+                    radius: 9
+                    color: root.raised
+                    border.width: 1
+                    border.color: root.borderTone
+                    Label {
+                        anchors.centerIn: parent
+                        text: Math.round(temperatureSlider.value) + " K"
+                        color: root.textPrimary
+                        font.pixelSize: 8
+                        font.bold: true
+                    }
                 }
             }
 
@@ -211,17 +248,18 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
                 Button {
+                    id: softButton
                     text: "Suave"
                     Layout.fillWidth: true
                     onClicked: root.backend.applyNightLightPreset("Suave")
                     background: Rectangle {
                         radius: 12
-                        color: parent.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
-                        border.color: root.accent
+                        color: softButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                        border.color: softButton.hovered ? root.accent : root.borderTone
                     }
                     contentItem: Label {
-                        text: parent.text
-                        color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                        text: softButton.text
+                        color: root.textPrimary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 9
@@ -229,17 +267,18 @@ Rectangle {
                     }
                 }
                 Button {
+                    id: nightButton
                     text: "Nocturno"
                     Layout.fillWidth: true
                     onClicked: root.backend.applyNightLightPreset("Nocturno")
                     background: Rectangle {
                         radius: 12
-                        color: parent.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
-                        border.color: root.accent
+                        color: nightButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                        border.color: nightButton.hovered ? root.accent : root.borderTone
                     }
                     contentItem: Label {
-                        text: parent.text
-                        color: parent.parent.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                        text: nightButton.text
+                        color: root.textPrimary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 9
@@ -250,8 +289,8 @@ Rectangle {
 
             Label {
                 Layout.fillWidth: true
-                text: "La programación por horario se añadirá mediante un servicio de usuario pequeño. El filtro manual y sus presets ya usan Gammastep directamente; si el compositor no acepta control gamma, Settings lo informará en lugar de simularlo."
-                color: root.lightTheme ? "#71838b" : "#668694"
+                text: "La programación por horario se añadirá mediante un servicio de usuario pequeño. El filtro manual ya usa Gammastep directamente; si el compositor no acepta control gamma, Settings lo informará."
+                color: root.textSecondary
                 font.pixelSize: 8
                 wrapMode: Text.WordWrap
             }
