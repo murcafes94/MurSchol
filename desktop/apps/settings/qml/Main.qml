@@ -5,17 +5,26 @@ import MurScholSettings 1.0
 
 ApplicationWindow {
     id: root
-    width: 1180
-    height: 760
-    minimumWidth: 900
-    minimumHeight: 620
+    width: 1220
+    height: 780
+    minimumWidth: 920
+    minimumHeight: 640
     visible: true
     title: "MurSchol Settings"
-    color: lightTheme ? "#edf2f4" : "#07131d"
+    color: backgroundColor
 
     property string currentPage: "appearance"
     property bool lightTheme: backend.theme === "Claro"
     property color accent: backend.accentColor
+
+    readonly property color backgroundColor: lightTheme ? "#F4F6F9" : "#0B0D12"
+    readonly property color surfaceColor: lightTheme ? "#FFFFFF" : "#11151C"
+    readonly property color raisedColor: lightTheme ? "#EEF1F5" : "#171C24"
+    readonly property color borderColor: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
+
     property var pages: [
         { key: "display", title: "Pantalla", group: "Sistema", symbol: "▣", keywords: "monitor resolución escala brillo orientación luz nocturna filtro azul" },
         { key: "sound", title: "Sonido", group: "Sistema", symbol: "◕", keywords: "audio volumen micrófono altavoz pipewire" },
@@ -60,6 +69,14 @@ ApplicationWindow {
         return "Configuración"
     }
 
+    function pageGroup(key) {
+        for (let i = 0; i < pages.length; ++i) {
+            if (pages[i].key === key)
+                return pages[i].group
+        }
+        return "MurSchol OS"
+    }
+
     function pageDescription(key) {
         switch (key) {
         case "display": return "Pantallas, brillo y Luz nocturna con información real de Wayland."
@@ -96,54 +113,41 @@ ApplicationWindow {
                 || key === "compatibility"
     }
 
+    function refreshPage(key) {
+        if (key === "network") networkBackend.refresh()
+        if (key === "sound") soundBackend.refresh()
+        if (key === "bluetooth") bluetoothBackend.refresh()
+        if (key === "power") powerBackend.refresh()
+        if (key === "display") {
+            displayBackend.refresh()
+            powerBackend.refresh()
+        }
+        if (key === "storage") storageBackend.refresh()
+        if (key === "apps" || key === "compatibility") appsBackend.refresh()
+    }
+
+    function currentStatus() {
+        if (currentPage === "network") return networkBackend.statusText
+        if (currentPage === "sound") return soundBackend.statusText
+        if (currentPage === "bluetooth") return bluetoothBackend.statusText
+        if (currentPage === "power") return powerBackend.statusText
+        if (currentPage === "display") return displayBackend.statusText
+        if (currentPage === "storage") return storageBackend.statusText
+        if (currentPage === "apps" || currentPage === "compatibility") return appsBackend.statusText
+        return backend.statusText
+    }
+
+    function statusIsDanger() {
+        const status = currentStatus().toLowerCase()
+        return status.includes("error") || status.includes("no se") || status.includes("fall")
+    }
+
     Component.onCompleted: {
         if (initialPage && pageKnown(initialPage))
             currentPage = initialPage
         else if (initialPage === "settings")
             currentPage = "appearance"
-    }
-
-    header: Rectangle {
-        height: 62
-        color: lightTheme ? "#f8fbfc" : "#0b1d28"
-        border.color: lightTheme ? "#d5e0e4" : "#1e3c4a"
-
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: 18
-            anchors.rightMargin: 18
-            spacing: 14
-
-            Rectangle {
-                width: 34
-                height: 34
-                radius: 11
-                color: root.accent
-                Label { anchors.centerIn: parent; text: "MS"; color: "#07131d"; font.bold: true; font.pixelSize: 11 }
-            }
-
-            ColumnLayout {
-                spacing: 0
-                Label { text: "MurSchol Settings"; color: lightTheme ? "#132833" : "#f3f8fa"; font.pixelSize: 16; font.bold: true }
-                Label { text: "Configuración del sistema"; color: lightTheme ? "#6a7d86" : "#7897a5"; font.pixelSize: 9 }
-            }
-
-            Item { Layout.fillWidth: true }
-
-            TextField {
-                id: searchField
-                Layout.preferredWidth: 360
-                placeholderText: "Buscar un ajuste..."
-                color: lightTheme ? "#172c36" : "#eef7f9"
-                placeholderTextColor: lightTheme ? "#72858e" : "#698895"
-                selectByMouse: true
-                background: Rectangle {
-                    radius: 16
-                    color: lightTheme ? "#eaf0f2" : "#102833"
-                    border.color: searchField.activeFocus ? root.accent : (lightTheme ? "#cbd8dd" : "#294a59")
-                }
-            }
-        }
+        refreshPage(currentPage)
     }
 
     RowLayout {
@@ -151,70 +155,143 @@ ApplicationWindow {
         spacing: 0
 
         Rectangle {
-            Layout.preferredWidth: 278
+            Layout.preferredWidth: 264
+            Layout.minimumWidth: 248
             Layout.fillHeight: true
-            color: lightTheme ? "#f7fafb" : "#091923"
-            border.color: lightTheme ? "#d8e2e6" : "#173441"
+            color: root.surfaceColor
+            border.width: 0
+
+            Rectangle {
+                anchors.right: parent.right
+                width: 1
+                height: parent.height
+                color: root.borderColor
+            }
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 12
-                spacing: 8
+                anchors.margins: 14
+                spacing: 12
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    spacing: 11
+
+                    Rectangle {
+                        width: 38
+                        height: 38
+                        radius: 12
+                        color: "#2563EB"
+                        Label {
+                            anchors.centerIn: parent
+                            text: "MS"
+                            color: "#FFFFFF"
+                            font.bold: true
+                            font.pixelSize: 12
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 0
+                        Label { text: "MurSchol"; color: root.textPrimary; font.pixelSize: 15; font.bold: true }
+                        Label { text: "Configuración"; color: root.textSecondary; font.pixelSize: 9 }
+                    }
+                }
+
+                TextField {
+                    id: searchField
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 42
+                    placeholderText: "Buscar ajustes"
+                    color: root.textPrimary
+                    placeholderTextColor: root.textSecondary
+                    leftPadding: 14
+                    rightPadding: 14
+                    selectByMouse: true
+                    background: Rectangle {
+                        radius: 13
+                        color: root.raisedColor
+                        border.width: searchField.activeFocus ? 2 : 1
+                        border.color: searchField.activeFocus ? root.accent : root.borderColor
+                    }
+                }
 
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     clip: true
+
                     Column {
                         width: parent.width
-                        spacing: 5
+                        spacing: 3
+
                         Repeater {
                             model: root.pages
-                            delegate: Button {
-                                id: navButton
+                            delegate: Item {
+                                id: navItem
                                 required property var modelData
+                                required property int index
                                 width: parent.width
-                                height: root.matchesPage(modelData) ? 46 : 0
+                                height: root.matchesPage(modelData)
+                                        ? (groupLabel.visible ? 64 : 46)
+                                        : 0
                                 visible: root.matchesPage(modelData)
-                                text: modelData.title
-                                onClicked: {
-                                    root.currentPage = modelData.key
-                                    searchField.text = ""
-                                    if (modelData.key === "network") networkBackend.refresh()
-                                    if (modelData.key === "sound") soundBackend.refresh()
-                                    if (modelData.key === "bluetooth") bluetoothBackend.refresh()
-                                    if (modelData.key === "power") powerBackend.refresh()
-                                    if (modelData.key === "display") {
-                                        displayBackend.refresh()
-                                        powerBackend.refresh()
-                                    }
-                                    if (modelData.key === "storage") storageBackend.refresh()
-                                    if (modelData.key === "apps" || modelData.key === "compatibility")
-                                        appsBackend.refresh()
+
+                                Label {
+                                    id: groupLabel
+                                    visible: navItem.index === 0
+                                             || root.pages[navItem.index - 1].group !== navItem.modelData.group
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 10
+                                    anchors.top: parent.top
+                                    anchors.topMargin: 4
+                                    text: navItem.modelData.group.toUpperCase()
+                                    color: root.textSecondary
+                                    font.pixelSize: 8
+                                    font.bold: true
+                                    font.letterSpacing: 0.8
                                 }
-                                background: Rectangle {
-                                    radius: 13
-                                    color: root.currentPage === navButton.modelData.key
-                                           ? (lightTheme ? "#d8eeed" : "#123a44")
-                                           : (navButton.hovered ? (lightTheme ? "#e8eff1" : "#102731") : "transparent")
-                                    border.width: root.currentPage === navButton.modelData.key ? 1 : 0
-                                    border.color: root.accent
-                                }
-                                contentItem: RowLayout {
-                                    spacing: 9
-                                    Label {
-                                        text: navButton.modelData.symbol
-                                        color: root.currentPage === navButton.modelData.key ? root.accent : (lightTheme ? "#59707a" : "#83a2ae")
-                                        font.pixelSize: 15
-                                        font.bold: true
-                                        Layout.preferredWidth: 24
-                                        horizontalAlignment: Text.AlignHCenter
+
+                                Button {
+                                    id: navButton
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    height: 44
+                                    text: navItem.modelData.title
+                                    onClicked: {
+                                        root.currentPage = navItem.modelData.key
+                                        searchField.text = ""
+                                        root.refreshPage(navItem.modelData.key)
                                     }
-                                    ColumnLayout {
-                                        spacing: 0
-                                        Layout.fillWidth: true
-                                        Label { text: navButton.modelData.title; color: lightTheme ? "#17303a" : "#eef5f7"; font.pixelSize: 11; font.bold: root.currentPage === navButton.modelData.key }
-                                        Label { text: navButton.modelData.group; color: lightTheme ? "#7b8d95" : "#607f8c"; font.pixelSize: 7 }
+                                    background: Rectangle {
+                                        radius: 12
+                                        color: root.currentPage === navItem.modelData.key
+                                               ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
+                                               : (navButton.hovered ? root.raisedColor : "transparent")
+                                        border.width: root.currentPage === navItem.modelData.key ? 1 : 0
+                                        border.color: root.currentPage === navItem.modelData.key ? root.accent : "transparent"
+                                    }
+                                    contentItem: RowLayout {
+                                        spacing: 9
+                                        Label {
+                                            text: navItem.modelData.symbol
+                                            color: root.currentPage === navItem.modelData.key ? root.accent : root.textSecondary
+                                            font.pixelSize: 14
+                                            font.bold: true
+                                            Layout.preferredWidth: 24
+                                            horizontalAlignment: Text.AlignHCenter
+                                        }
+                                        Label {
+                                            Layout.fillWidth: true
+                                            text: navItem.modelData.title
+                                            color: root.textPrimary
+                                            font.pixelSize: 10
+                                            font.bold: root.currentPage === navItem.modelData.key
+                                            elide: Text.ElideRight
+                                        }
                                     }
                                 }
                             }
@@ -224,23 +301,26 @@ ApplicationWindow {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    height: 42
+                    Layout.preferredHeight: 46
                     radius: 13
-                    color: lightTheme ? "#edf3f4" : "#0f2731"
+                    color: root.raisedColor
+                    border.width: 1
+                    border.color: root.borderColor
+
                     RowLayout {
                         anchors.fill: parent
                         anchors.margins: 10
-                        Label { text: "●"; color: root.accent; font.pixelSize: 10 }
+                        spacing: 8
+                        Rectangle {
+                            width: 8
+                            height: 8
+                            radius: 4
+                            color: root.statusIsDanger() ? root.danger : root.accent
+                        }
                         Label {
                             Layout.fillWidth: true
-                            text: root.currentPage === "network" ? networkBackend.statusText
-                                  : (root.currentPage === "sound" ? soundBackend.statusText
-                                     : (root.currentPage === "bluetooth" ? bluetoothBackend.statusText
-                                        : (root.currentPage === "power" ? powerBackend.statusText
-                                           : (root.currentPage === "display" ? displayBackend.statusText
-                                              : (root.currentPage === "storage" ? storageBackend.statusText
-                                                 : ((root.currentPage === "apps" || root.currentPage === "compatibility") ? appsBackend.statusText : backend.statusText))))))
-                            color: lightTheme ? "#51666f" : "#7897a4"
+                            text: root.currentStatus()
+                            color: root.textSecondary
                             font.pixelSize: 8
                             elide: Text.ElideRight
                         }
@@ -252,29 +332,70 @@ ApplicationWindow {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: lightTheme ? "#edf2f4" : "#07131d"
+            color: root.backgroundColor
 
             ScrollView {
                 anchors.fill: parent
                 clip: true
-                ColumnLayout {
-                    width: Math.max(620, parent.width - 64)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 16
-                    topPadding: 30
-                    bottomPadding: 38
 
-                    ColumnLayout {
+                ColumnLayout {
+                    width: Math.max(620, Math.min(900, parent.width - 72))
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 18
+                    topPadding: 34
+                    bottomPadding: 42
+
+                    RowLayout {
                         Layout.fillWidth: true
-                        spacing: 3
-                        Label { text: root.pageTitle(root.currentPage); color: lightTheme ? "#122933" : "#f1f7f9"; font.pixelSize: 28; font.bold: true }
-                        Label {
-                            text: root.pageDescription(root.currentPage)
-                            color: lightTheme ? "#647984" : "#7895a2"
-                            font.pixelSize: 11
-                            wrapMode: Text.WordWrap
+                        spacing: 14
+
+                        ColumnLayout {
                             Layout.fillWidth: true
+                            spacing: 4
+                            Label {
+                                text: root.pageGroup(root.currentPage)
+                                color: root.accent
+                                font.pixelSize: 9
+                                font.bold: true
+                                font.letterSpacing: 0.6
+                            }
+                            Label {
+                                text: root.pageTitle(root.currentPage)
+                                color: root.textPrimary
+                                font.pixelSize: 30
+                                font.bold: true
+                            }
+                            Label {
+                                Layout.fillWidth: true
+                                text: root.pageDescription(root.currentPage)
+                                color: root.textSecondary
+                                font.pixelSize: 11
+                                wrapMode: Text.WordWrap
+                            }
                         }
+
+                        Rectangle {
+                            Layout.alignment: Qt.AlignTop
+                            width: 112
+                            height: 34
+                            radius: 17
+                            color: root.surfaceColor
+                            border.width: 1
+                            border.color: root.borderColor
+                            Label {
+                                anchors.centerIn: parent
+                                text: root.backend.profile
+                                color: root.textSecondary
+                                font.pixelSize: 9
+                                font.bold: true
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: root.borderColor
                     }
 
                     DisplayPage {
