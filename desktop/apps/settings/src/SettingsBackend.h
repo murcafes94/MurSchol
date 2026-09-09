@@ -80,7 +80,7 @@ private:
     static bool startFirstAvailable(const QStringList &commands);
 
     QString m_theme = QStringLiteral("Automático");
-    QString m_accentColor = QStringLiteral("#22d6cf");
+    QString m_accentColor = QStringLiteral("#2563EB");
     QString m_animationMode = QStringLiteral("Normal");
     bool m_dockAutoHide = true;
     int m_dockSize = 66;
