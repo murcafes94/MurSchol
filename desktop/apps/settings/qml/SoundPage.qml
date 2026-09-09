@@ -7,20 +7,26 @@ Rectangle {
     property var backend
     property var settingsBackend
     property bool lightTheme: false
-    property color accent: "#22d6cf"
+    property color accent: "#2563EB"
 
     Layout.fillWidth: true
-    height: contentColumn.implicitHeight + 36
-    radius: 20
-    color: lightTheme ? "#f9fbfc" : "#0d202a"
-    border.color: lightTheme ? "#d5e0e4" : "#284653"
+    height: contentColumn.implicitHeight + 40
+    radius: 18
+    color: lightTheme ? "#FFFFFF" : "#11151C"
+    border.color: lightTheme ? "#D8DEE9" : "#252B35"
+
+    readonly property color raised: lightTheme ? "#F4F6F9" : "#171C24"
+    readonly property color borderTone: lightTheme ? "#D8DEE9" : "#252B35"
+    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
+    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
+    readonly property color danger: "#E63946"
 
     ColumnLayout {
         id: contentColumn
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 18
+        anchors.margins: 20
         spacing: 16
 
         RowLayout {
@@ -30,13 +36,13 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Salida de audio"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                 }
                 Label {
                     text: root.backend.available ? root.backend.outputName : "WirePlumber no disponible"
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 9
                     elide: Text.ElideRight
                     Layout.fillWidth: true
@@ -49,12 +55,17 @@ Rectangle {
                 onClicked: root.backend.setOutputMuted(!root.backend.outputMuted)
                 background: Rectangle {
                     radius: 12
-                    color: outputMuteButton.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
-                    border.color: root.accent
+                    color: outputMuteButton.hovered
+                           ? (root.backend.outputMuted ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.danger)
+                           : root.raised
+                    border.width: 1
+                    border.color: outputMuteButton.hovered
+                                  ? (root.backend.outputMuted ? root.accent : root.danger)
+                                  : root.borderTone
                 }
                 contentItem: Label {
                     text: outputMuteButton.text
-                    color: outputMuteButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                    color: outputMuteButton.hovered && !root.backend.outputMuted ? "#FFFFFF" : root.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -67,7 +78,7 @@ Rectangle {
             Layout.fillWidth: true
             Label {
                 text: root.backend.outputMuted ? "◌" : "◕"
-                color: root.backend.outputMuted ? (root.lightTheme ? "#82939a" : "#627985") : root.accent
+                color: root.backend.outputMuted ? root.textSecondary : root.accent
                 font.pixelSize: 18
                 Layout.preferredWidth: 28
                 horizontalAlignment: Text.AlignHCenter
@@ -81,20 +92,28 @@ Rectangle {
                 enabled: root.backend.available
                 onMoved: root.backend.setOutputVolume(Math.round(value))
             }
-            Label {
-                text: root.backend.outputVolume + "%"
-                color: root.lightTheme ? "#334b55" : "#c8d9df"
-                font.pixelSize: 9
-                Layout.preferredWidth: 42
-                horizontalAlignment: Text.AlignRight
+            Rectangle {
+                width: 50
+                height: 30
+                radius: 10
+                color: root.raised
+                border.width: 1
+                border.color: root.borderTone
+                Label {
+                    anchors.centerIn: parent
+                    text: root.backend.outputVolume + "%"
+                    color: root.textPrimary
+                    font.pixelSize: 9
+                    font.bold: true
+                }
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         Label {
             text: "Dispositivo de salida"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 11
             font.bold: true
         }
@@ -104,13 +123,11 @@ Rectangle {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                height: 54
+                height: 56
                 radius: 13
-                color: modelData.active
-                       ? (root.lightTheme ? "#e2f0ef" : "#12343e")
-                       : (root.lightTheme ? "#edf2f4" : "#112630")
-                border.width: modelData.active ? 1 : 0
-                border.color: root.accent
+                color: modelData.active ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                border.width: modelData.active ? 2 : 1
+                border.color: modelData.active ? root.accent : root.borderTone
 
                 RowLayout {
                     anchors.fill: parent
@@ -119,13 +136,13 @@ Rectangle {
                     spacing: 9
                     Label {
                         text: modelData.active ? "●" : "○"
-                        color: modelData.active ? root.accent : (root.lightTheme ? "#7b8d95" : "#6e8792")
+                        color: modelData.active ? root.accent : root.textSecondary
                         font.pixelSize: 11
                     }
                     Label {
                         Layout.fillWidth: true
                         text: modelData.name
-                        color: root.lightTheme ? "#18313b" : "#edf5f7"
+                        color: root.textPrimary
                         font.pixelSize: 10
                         font.bold: modelData.active
                         elide: Text.ElideRight
@@ -137,12 +154,13 @@ Rectangle {
                         onClicked: root.backend.setDefaultOutput(modelData.id)
                         background: Rectangle {
                             radius: 10
-                            color: outputUseButton.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
+                            color: outputUseButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                            border.width: 1
                             border.color: root.accent
                         }
                         contentItem: Label {
                             text: outputUseButton.text
-                            color: outputUseButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                            color: root.textPrimary
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: 8
@@ -153,7 +171,7 @@ Rectangle {
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -162,13 +180,13 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Micrófono"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 13
                     font.bold: true
                 }
                 Label {
                     text: root.backend.available ? root.backend.inputName : "Entrada no disponible"
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 9
                     elide: Text.ElideRight
                     Layout.fillWidth: true
@@ -181,12 +199,17 @@ Rectangle {
                 onClicked: root.backend.setInputMuted(!root.backend.inputMuted)
                 background: Rectangle {
                     radius: 12
-                    color: inputMuteButton.hovered ? root.accent : (root.lightTheme ? "#e5edef" : "#15313c")
-                    border.color: root.accent
+                    color: inputMuteButton.hovered
+                           ? (root.backend.inputMuted ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.danger)
+                           : root.raised
+                    border.width: 1
+                    border.color: inputMuteButton.hovered
+                                  ? (root.backend.inputMuted ? root.accent : root.danger)
+                                  : root.borderTone
                 }
                 contentItem: Label {
                     text: inputMuteButton.text
-                    color: inputMuteButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                    color: inputMuteButton.hovered && !root.backend.inputMuted ? "#FFFFFF" : root.textPrimary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 9
@@ -199,7 +222,7 @@ Rectangle {
             Layout.fillWidth: true
             Label {
                 text: root.backend.inputMuted ? "◌" : "●"
-                color: root.backend.inputMuted ? (root.lightTheme ? "#82939a" : "#627985") : root.accent
+                color: root.backend.inputMuted ? root.textSecondary : root.accent
                 font.pixelSize: 14
                 Layout.preferredWidth: 28
                 horizontalAlignment: Text.AlignHCenter
@@ -213,19 +236,27 @@ Rectangle {
                 enabled: root.backend.available
                 onMoved: root.backend.setInputVolume(Math.round(value))
             }
-            Label {
-                text: root.backend.inputVolume + "%"
-                color: root.lightTheme ? "#334b55" : "#c8d9df"
-                font.pixelSize: 9
-                Layout.preferredWidth: 42
-                horizontalAlignment: Text.AlignRight
+            Rectangle {
+                width: 50
+                height: 30
+                radius: 10
+                color: root.raised
+                border.width: 1
+                border.color: root.borderTone
+                Label {
+                    anchors.centerIn: parent
+                    text: root.backend.inputVolume + "%"
+                    color: root.textPrimary
+                    font.pixelSize: 9
+                    font.bold: true
+                }
             }
         }
 
         Label {
             visible: root.backend.inputs.length > 0
             text: "Dispositivo de entrada"
-            color: root.lightTheme ? "#1b323c" : "white"
+            color: root.textPrimary
             font.pixelSize: 11
             font.bold: true
         }
@@ -235,13 +266,11 @@ Rectangle {
             delegate: Rectangle {
                 required property var modelData
                 Layout.fillWidth: true
-                height: 54
+                height: 56
                 radius: 13
-                color: modelData.active
-                       ? (root.lightTheme ? "#e2f0ef" : "#12343e")
-                       : (root.lightTheme ? "#edf2f4" : "#112630")
-                border.width: modelData.active ? 1 : 0
-                border.color: root.accent
+                color: modelData.active ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                border.width: modelData.active ? 2 : 1
+                border.color: modelData.active ? root.accent : root.borderTone
 
                 RowLayout {
                     anchors.fill: parent
@@ -250,13 +279,13 @@ Rectangle {
                     spacing: 9
                     Label {
                         text: modelData.active ? "●" : "○"
-                        color: modelData.active ? root.accent : (root.lightTheme ? "#7b8d95" : "#6e8792")
+                        color: modelData.active ? root.accent : root.textSecondary
                         font.pixelSize: 11
                     }
                     Label {
                         Layout.fillWidth: true
                         text: modelData.name
-                        color: root.lightTheme ? "#18313b" : "#edf5f7"
+                        color: root.textPrimary
                         font.pixelSize: 10
                         font.bold: modelData.active
                         elide: Text.ElideRight
@@ -268,12 +297,13 @@ Rectangle {
                         onClicked: root.backend.setDefaultInput(modelData.id)
                         background: Rectangle {
                             radius: 10
-                            color: inputUseButton.hovered ? root.accent : (root.lightTheme ? "#dbe9eb" : "#153744")
+                            color: inputUseButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                            border.width: 1
                             border.color: root.accent
                         }
                         contentItem: Label {
                             text: inputUseButton.text
-                            color: inputUseButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0")
+                            color: root.textPrimary
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             font.pixelSize: 8
@@ -288,12 +318,12 @@ Rectangle {
             visible: root.backend.available && root.backend.outputs.length === 0 && root.backend.inputs.length === 0
             Layout.fillWidth: true
             text: "PipeWire está disponible, pero todavía no se detectan dispositivos de audio."
-            color: root.lightTheme ? "#6a7d86" : "#77939f"
+            color: root.textSecondary
             font.pixelSize: 9
             wrapMode: Text.WordWrap
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.lightTheme ? "#dce5e8" : "#23414e" }
+        Rectangle { Layout.fillWidth: true; height: 1; color: root.borderTone }
 
         RowLayout {
             Layout.fillWidth: true
@@ -302,14 +332,14 @@ Rectangle {
                 spacing: 2
                 Label {
                     text: "Controles avanzados"
-                    color: root.lightTheme ? "#1b323c" : "white"
+                    color: root.textPrimary
                     font.pixelSize: 11
                     font.bold: true
                 }
                 Label {
                     Layout.fillWidth: true
                     text: "pavucontrol queda disponible para perfiles, puertos y mezcla por aplicación mientras completamos la interfaz MurSchol."
-                    color: root.lightTheme ? "#71838b" : "#77939f"
+                    color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap
                 }
@@ -321,14 +351,13 @@ Rectangle {
                 onClicked: root.settingsBackend.openAudioSettings()
                 background: Rectangle {
                     radius: 11
-                    color: advancedButton.enabled ? (advancedButton.hovered ? root.accent : (root.lightTheme ? "#dcebed" : "#153744"))
-                                                  : (root.lightTheme ? "#e0e5e7" : "#263942")
-                    border.color: advancedButton.enabled ? root.accent : "transparent"
+                    color: advancedButton.enabled && advancedButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
+                    border.width: 1
+                    border.color: advancedButton.enabled ? root.accent : root.borderTone
                 }
                 contentItem: Label {
                     text: advancedButton.text
-                    color: advancedButton.enabled ? (advancedButton.hovered ? "#07131d" : (root.lightTheme ? "#29434d" : "#d9eef0"))
-                                                  : (root.lightTheme ? "#8b989d" : "#71858d")
+                    color: advancedButton.enabled ? root.textPrimary : root.textSecondary
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: 8
