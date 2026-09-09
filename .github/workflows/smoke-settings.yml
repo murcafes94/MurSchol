@@ -1,0 +1,51 @@
+name: Smoke MurSchol Settings
+
+on:
+  push:
+    paths:
+      - 'desktop/apps/settings/**'
+      - '.github/workflows/smoke-settings.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke-settings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependencias Qt 6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build g++ \
+            qt6-base-dev qt6-declarative-dev
+
+      - name: Compilar Settings
+        run: |
+          cmake -S desktop/apps/settings -B build/settings -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/settings --parallel
+          test -x build/settings/murschol-settings
+
+      - name: Arranque QML sin pantalla
+        shell: bash
+        run: |
+          set +e
+          QT_QPA_PLATFORM=offscreen timeout 5s \
+            build/settings/murschol-settings --page appearance \
+            > settings-smoke.log 2>&1
+          code=$?
+          set -e
+
+          cat settings-smoke.log
+
+          if grep -Eqi 'failed to load component|Cannot assign to non-existent property|is not a type|module .+ is not installed' settings-smoke.log; then
+            echo 'Se detectó un error de carga QML en MurSchol Settings.' >&2
+            exit 1
+          fi
+
+          # 124 significa que la aplicación siguió viva durante los 5 segundos:
+          # ese es el resultado esperado de este smoke test.
+          if [ "$code" -ne 124 ]; then
+            echo "MurSchol Settings terminó antes de tiempo (código $code)." >&2
+            exit 1
+          fi
