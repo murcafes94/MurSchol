@@ -342,8 +342,7 @@ ApplicationWindow {
                     width: Math.max(620, Math.min(900, parent.width - 72))
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 18
-                    topPadding: 34
-                    bottomPadding: 42
+                    y: 34
 
                     RowLayout {
                         Layout.fillWidth: true
