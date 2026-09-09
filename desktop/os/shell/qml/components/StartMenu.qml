@@ -13,9 +13,9 @@ Rectangle {
     width: Math.min(900, parent ? parent.width - 70 : 900)
     height: Math.min(620, parent ? parent.height - 110 : 620)
     radius: 30
-    color: "#f20c1c29"
+    color: "#f20B0D12"
     border.width: 1
-    border.color: "#3d6577"
+    border.color: "#5B6573"
 
     function categoryCountText() {
         if (selectedCategory === "Fijadas")
@@ -56,12 +56,12 @@ Rectangle {
                 width: 46
                 height: 46
                 radius: 15
-                color: "#154052"
-                border.color: "#29d9d1"
+                color: "#123A7A"
+                border.color: "#2563EB"
                 Label {
                     anchors.centerIn: parent
                     text: "MS"
-                    color: "#cffffb"
+                    color: "#F8FAFC"
                     font.bold: true
                     font.pixelSize: 14
                 }
@@ -69,8 +69,8 @@ Rectangle {
 
             ColumnLayout {
                 spacing: 0
-                Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 23; font.bold: true }
-                Label { text: "Aprender. Crear. Sin límites."; color: "#7899a8"; font.pixelSize: 10 }
+                Label { text: "MurSchol OS"; color: "#F8FAFC"; font.pixelSize: 23; font.bold: true }
+                Label { text: "Aprender. Crear. Sin límites."; color: "#9AA4B2"; font.pixelSize: 10 }
             }
 
             Item { Layout.fillWidth: true }
@@ -79,11 +79,13 @@ Rectangle {
                 width: 130
                 height: 36
                 radius: 18
-                color: "#142f3c"
+                color: "#171C24"
+                border.width: 1
+                border.color: "#252B35"
                 Label {
                     anchors.centerIn: parent
                     text: "Espacio: " + backend.workspace
-                    color: "#9fe7e2"
+                    color: "#3B82F6"
                     font.pixelSize: 10
                     font.bold: true
                 }
@@ -94,10 +96,10 @@ Rectangle {
                 height: 38
                 text: "×"
                 onClicked: root.closeRequested()
-                background: Rectangle { radius: 12; color: parent.hovered ? "#29495a" : "transparent" }
+                background: Rectangle { radius: 12; color: parent.hovered ? "#3a1519" : "transparent" }
                 contentItem: Label {
                     text: parent.text
-                    color: "#dce8ec"
+                    color: "#F8FAFC"
                     font.pixelSize: 20
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -110,16 +112,16 @@ Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 48
             placeholderText: "Buscar aplicaciones, archivos, ajustes…"
-            color: "white"
-            placeholderTextColor: "#77929f"
+            color: "#F8FAFC"
+            placeholderTextColor: "#9AA4B2"
             leftPadding: 18
             rightPadding: 18
             font.pixelSize: 13
             background: Rectangle {
                 radius: 18
-                color: "#172d3a"
+                color: "#171C24"
                 border.width: search.activeFocus ? 2 : 1
-                border.color: search.activeFocus ? "#28d4d0" : "#355567"
+                border.color: search.activeFocus ? "#2563EB" : "#5B6573"
             }
             onTextChanged: {
                 root.appModel.filter = text
@@ -143,8 +145,8 @@ Rectangle {
                 Layout.preferredWidth: 185
                 Layout.fillHeight: true
                 radius: 20
-                color: "#8a102632"
-                border.color: "#294859"
+                color: "#e611151c"
+                border.color: "#252B35"
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -153,7 +155,7 @@ Rectangle {
 
                     Label {
                         text: "Inicio"
-                        color: "#7998a6"
+                        color: "#9AA4B2"
                         font.pixelSize: 10
                         font.bold: true
                         Layout.leftMargin: 9
@@ -178,23 +180,23 @@ Rectangle {
                             background: Rectangle {
                                 radius: 13
                                 color: root.selectedCategory === modelData.name
-                                       ? "#174c66"
-                                       : (parent.hovered ? "#173543" : "transparent")
+                                       ? "#123A7A"
+                                       : (parent.hovered ? "#171C24" : "transparent")
                                 border.width: root.selectedCategory === modelData.name ? 1 : 0
-                                border.color: "#2a82a0"
+                                border.color: "#2563EB"
                             }
                             contentItem: RowLayout {
                                 spacing: 9
                                 Label {
                                     text: modelData.symbol
-                                    color: root.selectedCategory === modelData.name ? "#65e9e2" : "#8da9b5"
+                                    color: root.selectedCategory === modelData.name ? "#3B82F6" : "#9AA4B2"
                                     font.pixelSize: 15
                                     Layout.preferredWidth: 22
                                     horizontalAlignment: Text.AlignHCenter
                                 }
                                 Label {
                                     text: modelData.name
-                                    color: root.selectedCategory === modelData.name ? "white" : "#c2d0d6"
+                                    color: root.selectedCategory === modelData.name ? "#F8FAFC" : "#D8DEE9"
                                     font.pixelSize: 11
                                     font.bold: root.selectedCategory === modelData.name
                                     Layout.fillWidth: true
@@ -210,12 +212,12 @@ Rectangle {
                         Layout.topMargin: 4
                         Layout.bottomMargin: 2
                         height: 1
-                        color: "#294553"
+                        color: "#252B35"
                     }
 
                     Label {
                         text: "Categorías"
-                        color: "#7998a6"
+                        color: "#9AA4B2"
                         font.pixelSize: 10
                         font.bold: true
                         Layout.leftMargin: 9
@@ -243,23 +245,23 @@ Rectangle {
                             background: Rectangle {
                                 radius: 12
                                 color: root.selectedCategory === modelData.name
-                                       ? "#174c66"
-                                       : (parent.hovered ? "#173543" : "transparent")
+                                       ? "#123A7A"
+                                       : (parent.hovered ? "#171C24" : "transparent")
                                 border.width: root.selectedCategory === modelData.name ? 1 : 0
-                                border.color: "#2a82a0"
+                                border.color: "#2563EB"
                             }
                             contentItem: RowLayout {
                                 spacing: 9
                                 Label {
                                     text: modelData.symbol
-                                    color: root.selectedCategory === modelData.name ? "#65e9e2" : "#8da9b5"
+                                    color: root.selectedCategory === modelData.name ? "#3B82F6" : "#9AA4B2"
                                     font.pixelSize: 14
                                     Layout.preferredWidth: 22
                                     horizontalAlignment: Text.AlignHCenter
                                 }
                                 Label {
                                     text: modelData.name
-                                    color: root.selectedCategory === modelData.name ? "white" : "#c2d0d6"
+                                    color: root.selectedCategory === modelData.name ? "#F8FAFC" : "#D8DEE9"
                                     font.pixelSize: 10
                                     font.bold: root.selectedCategory === modelData.name
                                     Layout.fillWidth: true
@@ -270,11 +272,11 @@ Rectangle {
 
                     Item { Layout.fillHeight: true }
 
-                    Rectangle { Layout.fillWidth: true; height: 1; color: "#294553" }
+                    Rectangle { Layout.fillWidth: true; height: 1; color: "#252B35" }
                     Label {
                         Layout.leftMargin: 9
                         text: root.categoryCountText()
-                        color: "#708b97"
+                        color: "#9AA4B2"
                         font.pixelSize: 9
                     }
                 }
@@ -305,9 +307,9 @@ Rectangle {
 
                         background: Rectangle {
                             radius: 18
-                            color: appButton.hovered ? "#21475a" : "#132b38"
+                            color: appButton.hovered ? "#123A7A" : "#11151C"
                             border.width: 1
-                            border.color: appButton.hovered ? "#3f7c91" : "#294b5c"
+                            border.color: appButton.hovered ? "#2563EB" : "#252B35"
                             Behavior on color { ColorAnimation { duration: 100 } }
                         }
 
@@ -319,7 +321,9 @@ Rectangle {
                                 width: 50
                                 height: 50
                                 radius: 15
-                                color: appButton.hovered ? "#23556b" : "#1a4051"
+                                color: appButton.hovered ? "#2563EB" : "#171C24"
+                                border.width: 1
+                                border.color: appButton.hovered ? "#3B82F6" : "#252B35"
 
                                 Image {
                                     id: appThemeIcon
@@ -337,7 +341,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     visible: appThemeIcon.status === Image.Error
                                     text: appName.length > 0 ? appName.substring(0, 1).toUpperCase() : "•"
-                                    color: "#7ceae4"
+                                    color: "#F8FAFC"
                                     font.pixelSize: 18
                                     font.bold: true
                                 }
@@ -345,7 +349,7 @@ Rectangle {
                             Label {
                                 Layout.fillWidth: true
                                 text: appName
-                                color: "#f0f6f8"
+                                color: "#F8FAFC"
                                 elide: Text.ElideRight
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pixelSize: 10
@@ -364,14 +368,14 @@ Rectangle {
                             height: 26
                             radius: 9
                             visible: appPinned || appButton.hovered
-                            color: pinArea.containsMouse ? "#315c6f" : "#203e4d"
+                            color: pinArea.containsMouse ? "#123A7A" : "#171C24"
                             border.width: appPinned ? 1 : 0
-                            border.color: "#43d8d0"
+                            border.color: "#2563EB"
 
                             Label {
                                 anchors.centerIn: parent
                                 text: appPinned ? "★" : "☆"
-                                color: appPinned ? "#70eee7" : "#9ab0b9"
+                                color: appPinned ? "#3B82F6" : "#9AA4B2"
                                 font.pixelSize: 14
                             }
 
@@ -405,8 +409,8 @@ Rectangle {
                         }
                         background: Rectangle {
                             radius: 16
-                            color: parent.hovered ? "#224758" : "#142c38"
-                            border.color: parent.hovered ? "#3b788d" : "#294958"
+                            color: parent.hovered ? "#123A7A" : "#11151C"
+                            border.color: parent.hovered ? "#2563EB" : "#252B35"
                         }
                         contentItem: RowLayout {
                             anchors.fill: parent
@@ -418,11 +422,11 @@ Rectangle {
                                 width: 40
                                 height: 40
                                 radius: 12
-                                color: resultKind === "Aplicación" ? "#174957" : (resultKind === "Documento" ? "#263e5a" : "#254339")
+                                color: resultKind === "Aplicación" ? "#123A7A" : "#171C24"
                                 Label {
                                     anchors.centerIn: parent
                                     text: resultKind === "Aplicación" ? "A" : (resultKind === "Documento" ? "D" : "→")
-                                    color: resultKind === "Aplicación" ? "#65e3dc" : (resultKind === "Documento" ? "#9fc8ff" : "#92e0af")
+                                    color: resultKind === "Aplicación" ? "#3B82F6" : "#F8FAFC"
                                     font.bold: true
                                 }
                             }
@@ -433,7 +437,7 @@ Rectangle {
                                 Label {
                                     Layout.fillWidth: true
                                     text: resultTitle
-                                    color: "white"
+                                    color: "#F8FAFC"
                                     font.bold: true
                                     font.pixelSize: 12
                                     elide: Text.ElideRight
@@ -441,13 +445,13 @@ Rectangle {
                                 Label {
                                     Layout.fillWidth: true
                                     text: resultSubtitle
-                                    color: "#7f99a5"
+                                    color: "#9AA4B2"
                                     font.pixelSize: 9
                                     elide: Text.ElideMiddle
                                 }
                             }
 
-                            Label { text: resultKind; color: "#8ea7b2"; font.pixelSize: 9 }
+                            Label { text: resultKind; color: "#9AA4B2"; font.pixelSize: 9 }
                         }
                     }
                 }
@@ -462,7 +466,7 @@ Rectangle {
                     text: search.text.trim().length >= 2
                           ? "No encontramos resultados locales."
                           : root.emptyCategoryText()
-                    color: "#708a95"
+                    color: "#9AA4B2"
                 }
             }
         }
@@ -475,7 +479,7 @@ Rectangle {
                 text: search.text.trim().length >= 2
                       ? root.searchModel.count + " resultados"
                       : "Alt+Tab cambia entre ventanas · Super+←/→ divide la pantalla"
-                color: "#718d99"
+                color: "#9AA4B2"
                 font.pixelSize: 9
             }
             Item { Layout.fillWidth: true }
@@ -484,12 +488,36 @@ Rectangle {
                 visible: search.text.trim().length < 2 && root.selectedCategory === "Recientes" && root.appModel.recentCount > 0
                 text: "Borrar recientes"
                 onClicked: root.appModel.clearRecent()
+                background: Rectangle {
+                    radius: 12
+                    color: parent.hovered ? "#3a1519" : "#11151C"
+                    border.width: 1
+                    border.color: "#E63946"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#E63946"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
             Button {
                 text: "Archivos"
                 onClicked: {
                     backend.openFiles()
                     root.closeRequested()
+                }
+                background: Rectangle {
+                    radius: 12
+                    color: parent.hovered ? "#171C24" : "#11151C"
+                    border.width: 1
+                    border.color: parent.hovered ? "#2563EB" : "#5B6573"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#F8FAFC"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
             Button {
@@ -498,8 +526,33 @@ Rectangle {
                     backend.openSettings("")
                     root.closeRequested()
                 }
+                background: Rectangle {
+                    radius: 12
+                    color: parent.hovered ? "#3B82F6" : "#2563EB"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#FFFFFF"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
-            Button { text: "Apagar"; onClicked: backend.powerOff() }
+            Button {
+                text: "Apagar"
+                onClicked: backend.powerOff()
+                background: Rectangle {
+                    radius: 12
+                    color: parent.hovered ? "#FF4D5A" : "#E63946"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#FFFFFF"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
         }
     }
 }
