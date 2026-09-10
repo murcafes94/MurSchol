@@ -119,10 +119,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Instalar dependencias Qt 6
+      - name: Instalar Qt 6 y TagLib
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev
+          sudo apt-get install -y \
+            cmake ninja-build g++ pkg-config \
+            qt6-base-dev qt6-declarative-dev \
+            libtag1-dev
 
       - name: Validar QML y compilar Music
         run: |
