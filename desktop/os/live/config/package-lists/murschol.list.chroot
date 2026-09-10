@@ -65,6 +65,13 @@ gvfs
 foot
 firefox-esr
 
+# Multimedia nativa MurSchol
+# Media usa libmpv como motor; Music usa TagLib para leer metadatos reales.
+pkg-config
+libmpv-dev
+libgl1-mesa-dev
+libtag1-dev
+
 # Herramientas necesarias para compilar MurSchol Desktop dentro del chroot
 cmake
 ninja-build
