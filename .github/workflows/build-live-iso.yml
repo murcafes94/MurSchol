@@ -9,6 +9,8 @@ on:
       - 'desktop/apps/photos/**'
       - 'desktop/apps/capture/**'
       - 'desktop/apps/settings/**'
+      - 'desktop/apps/media/**'
+      - 'desktop/apps/music/**'
       - '.github/workflows/build-live-iso.yml'
 
 permissions:
