@@ -33,6 +33,12 @@ cp -a "${REPO_DIR}/desktop/apps/capture/." "${WORK_DIR}/config/includes.chroot/u
 mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-settings"
 cp -a "${REPO_DIR}/desktop/apps/settings/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-settings/"
 
+mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-media"
+cp -a "${REPO_DIR}/desktop/apps/media/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-media/"
+
+mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-music"
+cp -a "${REPO_DIR}/desktop/apps/music/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-music/"
+
 cd "${WORK_DIR}"
 
 lb clean --purge || true
