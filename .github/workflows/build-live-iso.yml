@@ -62,7 +62,10 @@ jobs:
           bash -n desktop/os/live/build-live.sh
           sh -n desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser
           sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          test ! -e desktop/os/live/config/includes.chroot/usr/local/bin/murschol-edge
+          test ! -e desktop/os/live/config/includes.chroot/usr/local/lib/murschol/install-edge-root
           xmllint --noout desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
 
       - name: Construir MurSchol OS Live 0.1
