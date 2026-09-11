@@ -6,6 +6,7 @@ set -eu
 # lógica ni los backends. Los componentes nuevos ya usan estos tokens de origen.
 normalize_legacy_palette() {
   for qml_root in \
+    /usr/src/murschol-shell/qml \
     /usr/src/murschol-photos/qml \
     /usr/src/murschol-settings/qml \
     /usr/src/murschol-music/qml \
@@ -25,6 +26,8 @@ normalize_legacy_palette() {
       -e 's/#F8FAFC/#F3EEE5/g' \
       -e 's/#9AA4B2/#A79E94/g' \
       -e 's/#5B6573/#7F766D/g' \
+      -e 's/#0a1620/#0B0E12/g' \
+      -e 's/#08141e/#0B0E12/g' \
       -e 's/#08141d/#0B0E12/g' \
       -e 's/#07131d/#0B0E12/g' \
       -e 's/#071119/#080A0D/g' \
@@ -43,6 +46,13 @@ normalize_legacy_palette() {
       -e 's/#143647/#49352B/g' \
       -e 's/#14374a/#49352B/g' \
       -e 's/#17485a/#49352B/g' \
+      -e 's/#164052/#49352B/g' \
+      -e 's/#194353/#49352B/g' \
+      -e 's/#18394a/#24211D/g' \
+      -e 's/#214353/#24211D/g' \
+      -e 's/#245667/#49352B/g' \
+      -e 's/#142a36/#171B21/g' \
+      -e 's/#132b37/#171B21/g' \
       -e 's/#1A2230/#24211D/g' \
       -e 's/#0F172A/#15181D/g' \
       -e 's/#1c3a4a/#35312D/g' \
@@ -50,12 +60,18 @@ normalize_legacy_palette() {
       -e 's/#173446/#35312D/g' \
       -e 's/#1e3d4b/#35312D/g' \
       -e 's/#203f4d/#35312D/g' \
+      -e 's/#1e3948/#35312D/g' \
+      -e 's/#1f3b49/#35312D/g' \
+      -e 's/#1f3b4a/#35312D/g' \
+      -e 's/#294756/#51463B/g' \
       -e 's/#234657/#51463B/g' \
       -e 's/#244655/#51463B/g' \
       -e 's/#28536a/#51463B/g' \
       -e 's/#285d73/#51463B/g' \
       -e 's/#315569/#51463B/g' \
       -e 's/#31596c/#51463B/g' \
+      -e 's/#2dd7d1/#D6A85F/g' \
+      -e 's/#2bd6d1/#D6A85F/g' \
       -e 's/#73eae3/#D6A85F/g' \
       -e 's/#73e0da/#D6A85F/g' \
       -e 's/#70e9e1/#D6A85F/g' \
@@ -74,12 +90,20 @@ normalize_legacy_palette() {
       -e 's/#7f9aa5/#A79E94/g' \
       -e 's/#7793a1/#A79E94/g' \
       -e 's/#7997a5/#A79E94/g' \
+      -e 's/#6f8d99/#A79E94/g' \
+      -e 's/#6e8a97/#A79E94/g' \
+      -e 's/#67838f/#7F766D/g' \
+      -e 's/#6c8792/#7F766D/g' \
       -e 's/#f2f7f8/#F3EEE5/g' \
       -e 's/#f4f8fa/#F3EEE5/g' \
       -e 's/#f3f7f9/#F3EEE5/g' \
-      -e 's/#f4f8fa/#F3EEE5/g' \
       -e 's/#eef7f8/#F3EEE5/g' \
       -e 's/#eff7f8/#F3EEE5/g' \
+      -e 's/#d4fffc/#F3EEE5/g' \
+      -e 's/#dbe7ec/#F3EEE5/g' \
+      -e 's/#d9e8ed/#F3EEE5/g' \
+      -e 's/#dce8ed/#F3EEE5/g' \
+      -e 's/#cbd9df/#C9C0B6/g' \
       -e 's/#c8d8de/#C9C0B6/g' \
       -e 's/#cfe0e5/#C9C0B6/g' \
       -e 's/#ff9d9d/#E28A78/g' \
