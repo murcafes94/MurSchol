@@ -6,10 +6,10 @@ Rectangle {
     id: root
 
     property bool pointerInside: dockHover.hovered
-    property int preferredSize: 66
+    property int preferredSize: 64
     property bool magnifyOnHover: true
-    property color accentColor: "#2563EB"
-    readonly property real sizeFactor: Math.max(0.82, Math.min(1.28, preferredSize / 66.0))
+    property color accentColor: "#D6A85F"
+    readonly property real sizeFactor: Math.max(0.84, Math.min(1.22, preferredSize / 64.0))
     signal startClicked()
     signal filesClicked()
     signal browserClicked()
@@ -17,21 +17,21 @@ Rectangle {
     signal appManagerClicked()
     signal systemClicked()
 
-    width: Math.round(432 * sizeFactor)
-    height: Math.round(66 * sizeFactor)
-    radius: Math.round(21 * sizeFactor)
-    color: "#f20B0D12"
+    width: Math.round(438 * sizeFactor)
+    height: Math.round(64 * sizeFactor)
+    radius: Math.round(20 * sizeFactor)
+    color: "#F21A1D22"
     border.width: 1
-    border.color: "#5B6573"
+    border.color: "#6A5A493C"
 
     Rectangle {
         anchors.fill: parent
-        anchors.margins: 1
-        radius: root.radius - 1
-        color: "transparent"
+        anchors.margins: 2
+        radius: root.radius - 2
+        color: "#15181D"
+        opacity: 0.82
         border.width: 1
-        border.color: "#252B35"
-        opacity: 0.92
+        border.color: "#332C2723"
     }
 
     HoverHandler { id: dockHover }
@@ -42,12 +42,12 @@ Rectangle {
 
         Repeater {
             model: [
-                {label:"Inicio", icon:"", fallback:"MS", action:"start"},
-                {label:"Archivos", icon:"system-file-manager", fallback:"▰", action:"files"},
-                {label:"Navegador", icon:"firefox-esr", fallback:"◎", action:"browser"},
-                {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal"},
-                {label:"Instalar aplicaciones", icon:"system-software-install", fallback:"+", action:"install"},
-                {label:"Configuración", icon:"preferences-system", fallback:"⚙", action:"system"}
+                {label:"Inicio", icon:"", fallback:"✝", action:"start", tone:"#2A211B"},
+                {label:"Archivos", icon:"system-file-manager", fallback:"▰", action:"files", tone:"#B78947"},
+                {label:"MurSchol Browser", icon:"web-browser", fallback:"◉", action:"browser", tone:"#2E5878"},
+                {label:"Aplicaciones", icon:"system-software-install", fallback:"▦", action:"install", tone:"#74504A"},
+                {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal", tone:"#242B31"},
+                {label:"Configuración", icon:"preferences-system", fallback:"⚙", action:"system", tone:"#4B4F55"}
             ]
 
             delegate: Button {
@@ -55,11 +55,11 @@ Rectangle {
                 required property var modelData
                 width: Math.round(58 * root.sizeFactor)
                 height: Math.round(54 * root.sizeFactor)
-                scale: root.magnifyOnHover && hovered ? 1.06 : 1.0
+                scale: root.magnifyOnHover && hovered ? 1.08 : 1.0
 
                 ToolTip.visible: hovered
                 ToolTip.text: modelData.label
-                ToolTip.delay: 420
+                ToolTip.delay: 350
 
                 Behavior on scale {
                     NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
@@ -68,68 +68,45 @@ Rectangle {
                 background: Rectangle {
                     radius: Math.round(15 * root.sizeFactor)
                     color: dockButton.down
-                           ? "#123A7A"
-                           : (dockButton.hovered ? "#171C24" : "transparent")
+                           ? "#40332629"
+                           : (dockButton.hovered ? "#29251F24" : "transparent")
                     border.width: dockButton.hovered ? 1 : 0
-                    border.color: dockButton.hovered ? root.accentColor : "#5B6573"
-                    Behavior on color { ColorAnimation { duration: 110 } }
+                    border.color: dockButton.hovered ? root.accentColor : "transparent"
                 }
 
                 contentItem: Item {
                     anchors.fill: parent
 
                     Rectangle {
-                        visible: modelData.action === "start"
                         anchors.centerIn: parent
-                        width: Math.round(34 * root.sizeFactor)
-                        height: Math.round(34 * root.sizeFactor)
+                        width: Math.round(36 * root.sizeFactor)
+                        height: Math.round(36 * root.sizeFactor)
                         radius: Math.round(11 * root.sizeFactor)
-                        color: dockButton.hovered ? "#2563EB" : "#123A7A"
+                        color: modelData.tone
                         border.width: 1
-                        border.color: dockButton.hovered ? "#3B82F6" : root.accentColor
+                        border.color: dockButton.hovered ? root.accentColor : "#5A50473C"
+
+                        Image {
+                            id: themeIcon
+                            visible: modelData.action !== "start"
+                            anchors.centerIn: parent
+                            width: Math.round(24 * root.sizeFactor)
+                            height: Math.round(24 * root.sizeFactor)
+                            source: modelData.icon.length > 0 ? "image://theme/" + modelData.icon : ""
+                            sourceSize.width: Math.round(30 * root.sizeFactor)
+                            sourceSize.height: Math.round(30 * root.sizeFactor)
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                        }
 
                         Label {
                             anchors.centerIn: parent
-                            text: "MS"
-                            color: "#F8FAFC"
+                            visible: modelData.action === "start" || themeIcon.status === Image.Error
+                            text: modelData.fallback
+                            color: dockButton.hovered ? root.accentColor : "#F2EEE6"
+                            font.pixelSize: Math.round((modelData.action === "terminal" ? 12 : 18) * root.sizeFactor)
                             font.bold: true
-                            font.pixelSize: Math.round(11 * root.sizeFactor)
                         }
-                    }
-
-                    Image {
-                        id: themeIcon
-                        visible: modelData.action !== "start"
-                        anchors.centerIn: parent
-                        width: Math.round(29 * root.sizeFactor)
-                        height: Math.round(29 * root.sizeFactor)
-                        source: modelData.icon.length > 0 ? "image://theme/" + modelData.icon : ""
-                        sourceSize.width: Math.round(34 * root.sizeFactor)
-                        sourceSize.height: Math.round(34 * root.sizeFactor)
-                        fillMode: Image.PreserveAspectFit
-                        smooth: true
-                    }
-
-                    Label {
-                        anchors.centerIn: parent
-                        visible: modelData.action !== "start" && themeIcon.status === Image.Error
-                        text: modelData.fallback
-                        color: dockButton.hovered ? root.accentColor : "#F8FAFC"
-                        font.pixelSize: Math.round((modelData.action === "terminal" ? 13 : 19) * root.sizeFactor)
-                        font.bold: true
-                    }
-
-                    // Reserva visual para el futuro estado de aplicaciones abiertas:
-                    // el punto se activará cuando el modelo de ventanas de labwc esté conectado.
-                    Rectangle {
-                        visible: false
-                        width: Math.max(4, Math.round(5 * root.sizeFactor))
-                        height: width
-                        radius: width / 2
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 2
-                        color: root.accentColor
                     }
                 }
 
@@ -148,8 +125,8 @@ Rectangle {
     }
 
     Rectangle {
-        width: Math.round(46 * root.sizeFactor)
-        height: Math.max(2, Math.round(3 * root.sizeFactor))
+        width: Math.round(42 * root.sizeFactor)
+        height: Math.max(2, Math.round(2 * root.sizeFactor))
         radius: 2
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
