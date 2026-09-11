@@ -3,6 +3,12 @@
 # Propaga el entorno de la sesión a servicios iniciados por systemd/dbus.
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
 
+# Fuerza el orden de controles también en aplicaciones GTK con decoración de cliente.
+# Labwc ya usa icon:iconify,max,close para las decoraciones de servidor.
+if command -v gsettings >/dev/null 2>&1; then
+  gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' 2>/dev/null || true
+fi
+
 DESKTOP_LOG="$HOME/murschol-desktop.log"
 PANEL_LOG="$HOME/murschol-panel.log"
 PANEL_PID=""
