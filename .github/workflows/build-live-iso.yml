@@ -91,7 +91,17 @@ jobs:
           grep -q '^calamares-settings-debian$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q 'Name=Instalar MurSchol OS' desktop/os/live/config/hooks/live/030-installer.hook.chroot
           grep -q 'Exec=/usr/bin/calamares-install-debian' desktop/os/live/config/hooks/live/030-installer.hook.chroot
+          grep -q 'branding: murschol' desktop/os/live/config/hooks/live/030-installer.hook.chroot
           grep -q '^application/pdf=murschol-reader.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
+
+          BRANDING_DIR=desktop/os/live/config/includes.chroot/etc/calamares/branding/murschol
+          test -f "$BRANDING_DIR/branding.desc"
+          test -f "$BRANDING_DIR/murschol-mark.svg"
+          test -f "$BRANDING_DIR/murschol-welcome.svg"
+          grep -q '^componentName: murschol$' "$BRANDING_DIR/branding.desc"
+          grep -q 'productName: "MurSchol OS"' "$BRANDING_DIR/branding.desc"
+          grep -q '<svg' "$BRANDING_DIR/murschol-mark.svg"
+          grep -q '<svg' "$BRANDING_DIR/murschol-welcome.svg"
 
           THEME_DIR=desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc
           test -f "$THEME_DIR/themerc"
