@@ -87,7 +87,7 @@ jobs:
           test -f "$THEME_DIR/themerc"
           test -f "$THEME_DIR/iconify.xbm"
           test -f "$THEME_DIR/max.xbm"
-          test -f "$THEME_DIR/restore.xbm"
+          test -f "$THEME_DIR/max_toggled.xbm"
           test -f "$THEME_DIR/close.xbm"
           grep -q '<layout>icon:iconify,max,close</layout>' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
 
