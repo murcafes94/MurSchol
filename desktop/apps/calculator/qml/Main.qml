@@ -10,7 +10,18 @@ ApplicationWindow {
     minimumHeight: 560
     visible: true
     title: "MurSchol Calculator"
-    color: "#08141d"
+    color: "#0B0E12"
+
+    palette.window: "#0B0E12"
+    palette.windowText: "#F3EEE5"
+    palette.base: "#171B21"
+    palette.alternateBase: "#1E2025"
+    palette.text: "#F3EEE5"
+    palette.button: "#1E2025"
+    palette.buttonText: "#F3EEE5"
+    palette.highlight: "#D6A85F"
+    palette.highlightedText: "#201B17"
+    palette.placeholderText: "#7F766D"
 
     property string mode: "standard"
     property bool historyOpen: true
@@ -58,8 +69,8 @@ ApplicationWindow {
 
     header: Rectangle {
         height: 58
-        color: "#0d202c"
-        border.color: "#1c3a4a"
+        color: "#15181D"
+        border.color: "#35312D"
 
         RowLayout {
             anchors.fill: parent
@@ -67,12 +78,35 @@ ApplicationWindow {
             anchors.rightMargin: 16
             spacing: 8
 
-            Label {
-                text: "MurSchol Calculator"
-                color: "#f2f7f8"
-                font.bold: true
-                font.pixelSize: 16
+            Rectangle {
+                width: 30
+                height: 30
+                radius: 10
+                color: "#49352B"
+                border.color: "#D6A85F"
+                Label {
+                    anchors.centerIn: parent
+                    text: "∑"
+                    color: "#D6A85F"
+                    font.pixelSize: 14
+                    font.bold: true
+                }
+            }
+
+            ColumnLayout {
                 Layout.fillWidth: true
+                spacing: 0
+                Label {
+                    text: "MurSchol Calculator"
+                    color: "#F3EEE5"
+                    font.bold: true
+                    font.pixelSize: 15
+                }
+                Label {
+                    text: "Cálculo y conversión para estudio"
+                    color: "#A79E94"
+                    font.pixelSize: 9
+                }
             }
 
             ToolButton {
@@ -91,7 +125,7 @@ ApplicationWindow {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "#08141d"
+            color: "#0B0E12"
 
             ColumnLayout {
                 anchors.fill: parent
@@ -110,11 +144,25 @@ ApplicationWindow {
                             {label: "Programador", value: "programmer"}
                         ]
                         delegate: Button {
+                            id: modeButton
                             required property var modelData
                             text: modelData.label
                             checkable: true
                             checked: root.mode === modelData.value
                             onClicked: root.mode = modelData.value
+                            background: Rectangle {
+                                radius: 12
+                                color: modeButton.checked ? "#49352B" : (modeButton.hovered ? "#24211D" : "#171B21")
+                                border.width: 1
+                                border.color: modeButton.checked ? "#D6A85F" : "#35312D"
+                            }
+                            contentItem: Label {
+                                text: modeButton.text
+                                color: modeButton.checked ? "#F6E5C8" : "#C9C0B6"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.bold: modeButton.checked
+                            }
                         }
                     }
                 }
@@ -123,8 +171,8 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: root.mode === "convert" ? 150 : 134
                     radius: 18
-                    color: "#0d202c"
-                    border.color: "#244655"
+                    color: "#15181D"
+                    border.color: "#51463B"
 
                     ColumnLayout {
                         anchors.fill: parent
@@ -136,7 +184,7 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             visible: root.mode !== "convert"
                             placeholderText: root.mode === "programmer" ? "Ej. 255, 0xFF, 0b1010, 5 << 2" : "Escribe una expresión…"
-                            color: "#eaf4f6"
+                            color: "#F3EEE5"
                             font.pixelSize: 20
                             horizontalAlignment: Text.AlignRight
                             selectByMouse: true
@@ -148,7 +196,7 @@ ApplicationWindow {
                             visible: root.mode !== "convert"
                             Layout.fillWidth: true
                             text: calculatorBackend.result.length ? calculatorBackend.result : "0"
-                            color: "#ffffff"
+                            color: "#F7F2E8"
                             font.pixelSize: 30
                             font.bold: true
                             horizontalAlignment: Text.AlignRight
@@ -160,7 +208,7 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             Label {
                                 text: calculatorBackend.errorText
-                                color: "#ff9d9d"
+                                color: "#E28A78"
                                 font.pixelSize: 10
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
@@ -199,7 +247,7 @@ ApplicationWindow {
                                     Layout.fillWidth: true
                                     model: root.unitSets[categoryBox.currentText] || []
                                 }
-                                Label { text: "→"; color: "#73e0da"; font.pixelSize: 20 }
+                                Label { text: "→"; color: "#D6A85F"; font.pixelSize: 20 }
                                 ComboBox {
                                     id: toUnit
                                     Layout.fillWidth: true
@@ -215,7 +263,7 @@ ApplicationWindow {
                             Label {
                                 Layout.fillWidth: true
                                 text: calculatorBackend.result.length ? calculatorBackend.result : "Resultado"
-                                color: "#ffffff"
+                                color: "#F7F2E8"
                                 font.pixelSize: 24
                                 font.bold: true
                                 horizontalAlignment: Text.AlignRight
@@ -228,7 +276,7 @@ ApplicationWindow {
                     visible: root.mode === "scientific"
                     Layout.fillWidth: true
                     spacing: 6
-                    Label { text: "Ángulo"; color: "#7f9aa5" }
+                    Label { text: "Ángulo"; color: "#A79E94" }
                     Button {
                         text: "DEG"
                         checkable: true
@@ -242,7 +290,7 @@ ApplicationWindow {
                         onClicked: calculatorBackend.degreeMode = false
                     }
                     Item { Layout.fillWidth: true }
-                    Label { text: "π y e están disponibles como constantes"; color: "#607f8c"; font.pixelSize: 10 }
+                    Label { text: "π y e están disponibles como constantes"; color: "#7F766D"; font.pixelSize: 10 }
                 }
 
                 GridLayout {
@@ -267,7 +315,7 @@ ApplicationWindow {
                     visible: root.mode === "programmer"
                     Layout.fillWidth: true
                     spacing: 6
-                    Label { text: "Salida"; color: "#7f9aa5" }
+                    Label { text: "Salida"; color: "#A79E94" }
                     Repeater {
                         model: ["BIN", "OCT", "DEC", "HEX"]
                         delegate: Button {
@@ -279,7 +327,7 @@ ApplicationWindow {
                     Item { Layout.fillWidth: true }
                     Label {
                         text: "Usa 0x para hexadecimal y 0b para binario en la entrada"
-                        color: "#607f8c"
+                        color: "#7F766D"
                         font.pixelSize: 10
                     }
                 }
@@ -302,12 +350,29 @@ ApplicationWindow {
                             {label: "ANS", token: "ans"}, {label: "=", token: "equals"}
                         ]
                         delegate: Button {
+                            id: keyButton
                             required property var modelData
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.columnSpan: modelData.token === "equals" ? 3 : 1
                             text: modelData.label
                             font.pixelSize: 17
+                            background: Rectangle {
+                                radius: 13
+                                color: modelData.token === "equals"
+                                       ? (keyButton.down ? "#8E6A42" : "#D6A85F")
+                                       : (keyButton.down ? "#2B2722" : (keyButton.hovered ? "#24211D" : "#171B21"))
+                                border.width: 1
+                                border.color: modelData.token === "equals" ? "#E3BB78" : "#35312D"
+                            }
+                            contentItem: Label {
+                                text: keyButton.text
+                                color: modelData.token === "equals" ? "#201B17" : "#F3EEE5"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font.pixelSize: keyButton.font.pixelSize
+                                font.bold: modelData.token === "equals"
+                            }
                             onClicked: {
                                 if (modelData.token === "clear")
                                     expression.clear()
@@ -328,7 +393,7 @@ ApplicationWindow {
                     visible: root.mode === "standard"
                     Layout.fillWidth: true
                     text: "También puedes escribir directamente expresiones y conversiones, por ejemplo: 2 kg * 9.81 m/s^2"
-                    color: "#567682"
+                    color: "#7F766D"
                     font.pixelSize: 10
                     wrapMode: Text.WordWrap
                 }
@@ -339,8 +404,8 @@ ApplicationWindow {
             visible: root.historyOpen
             Layout.preferredWidth: 300
             Layout.fillHeight: true
-            color: "#0b1b25"
-            border.color: "#1e3d4b"
+            color: "#11151C"
+            border.color: "#35312D"
 
             ColumnLayout {
                 anchors.fill: parent
@@ -351,7 +416,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Label {
                         text: "Historial"
-                        color: "white"
+                        color: "#F3EEE5"
                         font.bold: true
                         font.pixelSize: 16
                         Layout.fillWidth: true
@@ -374,15 +439,15 @@ ApplicationWindow {
                         width: ListView.view.width
                         height: historyText.implicitHeight + 20
                         radius: 10
-                        color: "#102633"
-                        border.color: "#203f4d"
+                        color: "#171B21"
+                        border.color: "#35312D"
 
                         Label {
                             id: historyText
                             anchors.fill: parent
                             anchors.margins: 10
                             text: modelData
-                            color: "#cfe0e5"
+                            color: "#E3D8C7"
                             wrapMode: Text.WrapAnywhere
                             font.pixelSize: 11
                         }
@@ -392,7 +457,7 @@ ApplicationWindow {
                         anchors.centerIn: parent
                         visible: calculatorBackend.history.length === 0
                         text: "Tus cálculos aparecerán aquí"
-                        color: "#5e7b87"
+                        color: "#7F766D"
                         font.pixelSize: 11
                     }
                 }
