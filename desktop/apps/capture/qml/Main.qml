@@ -11,7 +11,16 @@ ApplicationWindow {
     minimumHeight: 300
     visible: true
     title: "MurSchol Capture"
-    color: "#08141d"
+    color: "#0B0E12"
+
+    palette.window: "#0B0E12"
+    palette.windowText: "#F3EEE5"
+    palette.base: "#171B21"
+    palette.text: "#F3EEE5"
+    palette.button: "#1E2025"
+    palette.buttonText: "#F3EEE5"
+    palette.highlight: "#D6A85F"
+    palette.highlightedText: "#201B17"
 
     CaptureBackend { id: capture }
 
@@ -28,13 +37,13 @@ ApplicationWindow {
                 width: 42
                 height: 42
                 radius: 13
-                color: "#123347"
-                border.color: "#285d73"
+                color: "#49352B"
+                border.color: "#D6A85F"
                 Label {
                     anchors.centerIn: parent
-                    text: "MS"
-                    color: "#73eae3"
-                    font.pixelSize: 10
+                    text: "▣"
+                    color: "#D6A85F"
+                    font.pixelSize: 15
                     font.bold: true
                 }
             }
@@ -44,13 +53,13 @@ ApplicationWindow {
                 spacing: 1
                 Label {
                     text: "MurSchol Capture"
-                    color: "#f4f8fa"
+                    color: "#F3EEE5"
                     font.pixelSize: 21
                     font.bold: true
                 }
                 Label {
                     text: "Captura rápido, edita solo cuando lo necesites"
-                    color: "#7897a6"
+                    color: "#A79E94"
                     font.pixelSize: 10
                 }
             }
@@ -69,21 +78,49 @@ ApplicationWindow {
             spacing: 12
 
             Button {
+                id: regionButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 enabled: !capture.busy
                 text: "▱\nSeleccionar área\nSuper + Shift + S"
                 font.pixelSize: 14
                 onClicked: capture.captureRegion(delayBox.seconds[delayBox.currentIndex])
+                background: Rectangle {
+                    radius: 18
+                    color: regionButton.down ? "#49352B" : (regionButton.hovered ? "#24211D" : "#171B21")
+                    border.width: 1
+                    border.color: regionButton.hovered ? "#D6A85F" : "#35312D"
+                }
+                contentItem: Label {
+                    text: regionButton.text
+                    color: "#F3EEE5"
+                    font.pixelSize: regionButton.font.pixelSize
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
 
             Button {
+                id: screenButton
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 enabled: !capture.busy
                 text: "▣\nPantalla completa\nPrint Screen"
                 font.pixelSize: 14
                 onClicked: capture.captureScreen(delayBox.seconds[delayBox.currentIndex])
+                background: Rectangle {
+                    radius: 18
+                    color: screenButton.down ? "#49352B" : (screenButton.hovered ? "#24211D" : "#171B21")
+                    border.width: 1
+                    border.color: screenButton.hovered ? "#D6A85F" : "#35312D"
+                }
+                contentItem: Label {
+                    text: screenButton.text
+                    color: "#F3EEE5"
+                    font.pixelSize: screenButton.font.pixelSize
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
         }
 
@@ -91,8 +128,8 @@ ApplicationWindow {
             Layout.fillWidth: true
             height: 58
             radius: 16
-            color: "#0e2431"
-            border.color: "#234657"
+            color: "#15181D"
+            border.color: "#35312D"
 
             RowLayout {
                 anchors.fill: parent
@@ -106,7 +143,7 @@ ApplicationWindow {
                     Label {
                         Layout.fillWidth: true
                         text: capture.message.length ? capture.message : "Las capturas se guardan en Imágenes/Capturas de pantalla"
-                        color: capture.busy ? "#72e5df" : "#c8d8de"
+                        color: capture.busy ? "#D6A85F" : "#C9C0B6"
                         font.pixelSize: 10
                         elide: Text.ElideMiddle
                     }
@@ -114,7 +151,7 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         visible: capture.lastCapture.length > 0
                         text: capture.lastCapture
-                        color: "#637f8c"
+                        color: "#7F766D"
                         font.pixelSize: 8
                         elide: Text.ElideMiddle
                     }
