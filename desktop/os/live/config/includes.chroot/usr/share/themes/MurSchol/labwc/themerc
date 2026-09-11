@@ -6,7 +6,7 @@ window.titlebar.padding.width: 8
 window.titlebar.padding.height: 5
 window.button.width: 28
 window.button.height: 28
-window.button.spacing: 3
+window.button.spacing: 4
 
 window.active.border.color: #6A5847
 window.inactive.border.color: #35312D
@@ -21,6 +21,12 @@ window.active.label.text.color: #F3EEE5
 window.inactive.label.text.color: #958D84
 window.label.text.justify: Left
 
+# Fondo común de hover para los tres controles de ventana.
+# Con botones cuadrados de 28 px y radio 14 queda circular y discreto.
+window.button.hover.bg.color: #FFFFFF12
+window.button.hover.bg.corner-radius: 14
+
+# Estado base de los controles.
 window.active.button.unpressed.image.color: #DED6CB
 window.active.button.hover.image.color: #D6A85F
 window.active.button.pressed.image.color: #F6E5C8
@@ -28,9 +34,27 @@ window.inactive.button.unpressed.image.color: #837C74
 window.inactive.button.hover.image.color: #B79B75
 window.inactive.button.pressed.image.color: #D6A85F
 
+# Minimizar: discreto, pero visible al pasar el puntero.
+window.active.button.iconify.unpressed.image.color: #C7BDB0
+window.active.button.iconify.hover.image.color: #CBA66E
+window.active.button.iconify.pressed.image.color: #E4C795
+window.inactive.button.iconify.unpressed.image.color: #756E67
+window.inactive.button.iconify.hover.image.color: #A58B69
+
+# Maximizar/restaurar: dorado MurSchol al interactuar.
+window.active.button.max.unpressed.image.color: #DED6CB
+window.active.button.max.hover.image.color: #D6A85F
+window.active.button.max.pressed.image.color: #F3D59B
+window.inactive.button.max.unpressed.image.color: #837C74
+window.inactive.button.max.hover.image.color: #B79B75
+
+# Cerrar: conserva el lenguaje cálido, pero cambia a rojo suave para indicar riesgo.
+window.active.button.close.unpressed.image.color: #DED6CB
 window.active.button.close.hover.image.color: #E28A78
 window.active.button.close.pressed.image.color: #F0B09F
+window.inactive.button.close.unpressed.image.color: #837C74
 window.inactive.button.close.hover.image.color: #B56D60
+window.inactive.button.close.pressed.image.color: #D98B7D
 
 window.active.shadow.size: 42
 window.active.shadow.color: #00000090
