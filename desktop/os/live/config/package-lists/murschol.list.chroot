@@ -54,6 +54,8 @@ thunar
 gvfs
 foot
 firefox-esr
+calamares
+calamares-settings-debian
 pkg-config
 libmpv-dev
 libgl1-mesa-dev
