@@ -6,7 +6,7 @@ Rectangle {
     id: root
     required property var backend
     property bool lightTheme: false
-    property color accent: "#2563EB"
+    property color accent: "#D6A85F"
 
     implicitHeight: content.implicitHeight + 36
     radius: 20
@@ -38,7 +38,7 @@ Rectangle {
                     onClicked: root.backend.setTheme(modelData)
                     background: Rectangle {
                         radius: 14
-                        color: themeButton.checked ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : (root.lightTheme ? "#EEF1F5" : "#171C24")
+                        color: themeButton.checked ? (root.lightTheme ? "#F8EEDC" : "#3C2D24") : (root.lightTheme ? "#EEF1F5" : "#171C24")
                         border.width: themeButton.checked ? 2 : 1
                         border.color: themeButton.checked ? root.accent : (root.lightTheme ? "#D8DEE9" : "#252B35")
                     }
@@ -56,7 +56,7 @@ Rectangle {
 
         Label { text: "Color de énfasis"; color: lightTheme ? "#0B0D12" : "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
         Label {
-            text: "Azul para interacción e identidad; rojo para un énfasis más fuerte. Blanco y negro estructuran el tema."
+            text: "El dorado cálido es la identidad predeterminada de MurSchol. Puedes elegir tonos azul, burdeos o neutros si prefieres otro énfasis."
             color: lightTheme ? "#5B6573" : "#9AA4B2"
             font.pixelSize: 9
             wrapMode: Text.WordWrap
@@ -65,7 +65,7 @@ Rectangle {
         RowLayout {
             spacing: 10
             Repeater {
-                model: ["#2563EB", "#3B82F6", "#123A7A", "#E63946"]
+                model: ["#D6A85F", "#B98B4E", "#2E5878", "#74504A", "#9A9188"]
                 delegate: Button {
                     id: accentButton
                     required property string modelData
@@ -100,7 +100,7 @@ Rectangle {
                     onClicked: root.backend.setAnimationMode(modelData)
                     background: Rectangle {
                         radius: 13
-                        color: animationButton.checked ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : (root.lightTheme ? "#EEF1F5" : "#171C24")
+                        color: animationButton.checked ? (root.lightTheme ? "#F8EEDC" : "#3C2D24") : (root.lightTheme ? "#EEF1F5" : "#171C24")
                         border.color: animationButton.checked ? root.accent : (root.lightTheme ? "#D8DEE9" : "#252B35")
                     }
                     contentItem: Label {
@@ -141,7 +141,7 @@ Rectangle {
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: "Restaura tema, azul MurSchol, animaciones y dock. No modifica archivos, red, aplicaciones ni el perfil de rendimiento."
+                        text: "Restaura el tema oscuro MurSchol, el acento dorado, animaciones y dock visible. No modifica archivos, red ni aplicaciones."
                         color: root.lightTheme ? "#5B6573" : "#9AA4B2"
                         font.pixelSize: 8
                         wrapMode: Text.WordWrap
@@ -153,7 +153,7 @@ Rectangle {
                     onClicked: resetDialog.open()
                     background: Rectangle {
                         radius: 12
-                        color: parent.hovered ? "#B91C2B" : "#E63946"
+                        color: parent.hovered ? "#5A3A32" : "#74504A"
                     }
                     contentItem: Label {
                         text: parent.text
@@ -184,17 +184,17 @@ Rectangle {
         standardButtons: Dialog.Ok | Dialog.Cancel
 
         onAccepted: {
-            root.backend.setTheme("Automático")
-            root.backend.setAccentColor("#2563EB")
+            root.backend.setTheme("Oscuro")
+            root.backend.setAccentColor("#D6A85F")
             root.backend.setAnimationMode("Normal")
-            root.backend.setDockAutoHide(true)
-            root.backend.setDockSize(66)
+            root.backend.setDockAutoHide(false)
+            root.backend.setDockSize(64)
             root.backend.setDockMagnify(true)
         }
 
         contentItem: Label {
             width: 360
-            text: "MurSchol volverá a su apariencia predeterminada. Tus archivos, aplicaciones, conexiones y perfil de rendimiento permanecerán intactos."
+            text: "MurSchol volverá a la apariencia oficial oscura con acento dorado y dock visible. Tus archivos, aplicaciones y conexiones permanecerán intactos."
             color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
             wrapMode: Text.WordWrap
             font.pixelSize: 10
