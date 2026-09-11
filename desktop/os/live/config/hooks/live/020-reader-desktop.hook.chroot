@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+# 010-build-murschol instala el binario. Este hook se ejecuta después para
+# registrar la versión funcional de Reader como visor PDF del escritorio.
+cat > /usr/share/applications/murschol-reader.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Reader
+GenericName=Lector PDF
+Comment=Lee, busca y navega documentos PDF en MurSchol OS
+Exec=/usr/local/bin/murschol-reader %f
+Icon=accessories-ebook-reader
+Terminal=false
+MimeType=application/pdf;
+Categories=Office;Viewer;Education;
+Keywords=pdf;lector;documentos;reader;estudio;
+StartupNotify=true
+EOF
+
+chmod 0644 /usr/share/applications/murschol-reader.desktop
