@@ -12,7 +12,17 @@ ApplicationWindow {
     minimumHeight: 480
     visible: true
     title: player.mediaTitle.length > 0 ? player.mediaTitle + " — MurSchol Media" : "MurSchol Media"
-    color: "#07131d"
+    color: "#0B0E12"
+
+    palette.window: "#0B0E12"
+    palette.windowText: "#F3EEE5"
+    palette.base: "#171B21"
+    palette.alternateBase: "#1E2025"
+    palette.text: "#F3EEE5"
+    palette.button: "#1E2025"
+    palette.buttonText: "#F3EEE5"
+    palette.highlight: "#D6A85F"
+    palette.highlightedText: "#201B17"
 
     property bool controlsVisible: true
     property bool settingsOpen: false
@@ -44,7 +54,7 @@ ApplicationWindow {
     Rectangle {
         anchors.fill: parent
         visible: player.audioOnly && player.filePath.length > 0
-        color: "#091824"
+        color: "#0B0E12"
 
         ColumnLayout {
             anchors.centerIn: parent
@@ -55,14 +65,14 @@ ApplicationWindow {
                 width: Math.min(280, root.height * 0.42)
                 height: width
                 radius: 34
-                color: "#102b3a"
+                color: "#171B21"
                 border.width: 1
-                border.color: "#28536a"
+                border.color: "#51463B"
 
                 Label {
                     anchors.centerIn: parent
                     text: "♫"
-                    color: "#65e5dd"
+                    color: "#D6A85F"
                     font.pixelSize: 84
                 }
             }
@@ -71,7 +81,7 @@ ApplicationWindow {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.maximumWidth: 500
                 text: player.mediaTitle
-                color: "#f4f8fa"
+                color: "#F3EEE5"
                 font.pixelSize: 24
                 font.bold: true
                 elide: Text.ElideRight
@@ -80,7 +90,7 @@ ApplicationWindow {
             Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Audio local"
-                color: "#7897a6"
+                color: "#A79E94"
                 font.pixelSize: 11
             }
         }
@@ -89,7 +99,7 @@ ApplicationWindow {
     Rectangle {
         anchors.fill: parent
         visible: player.filePath.length === 0
-        color: "#081722"
+        color: "#0B0E12"
 
         ColumnLayout {
             anchors.centerIn: parent
@@ -100,12 +110,12 @@ ApplicationWindow {
                 width: 92
                 height: 92
                 radius: 28
-                color: "#123347"
-                border.color: "#285d73"
+                color: "#49352B"
+                border.color: "#D6A85F"
                 Label {
                     anchors.centerIn: parent
                     text: "▶"
-                    color: "#63e4dc"
+                    color: "#D6A85F"
                     font.pixelSize: 36
                 }
             }
@@ -113,7 +123,7 @@ ApplicationWindow {
             Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "MurSchol Media"
-                color: "white"
+                color: "#F3EEE5"
                 font.pixelSize: 27
                 font.bold: true
             }
@@ -121,14 +131,14 @@ ApplicationWindow {
             Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Arrastra aquí un vídeo o audio para reproducirlo"
-                color: "#89a5b1"
+                color: "#A79E94"
                 font.pixelSize: 12
             }
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "MP4 · MKV · WebM · MOV · MP3 · FLAC · WAV · OGG · M4A"
-                color: "#577787"
+                color: "#7F766D"
                 font.pixelSize: 9
             }
         }
@@ -158,7 +168,8 @@ ApplicationWindow {
         anchors.top: parent.top
         height: 58
         visible: root.controlsVisible || player.audioOnly || player.filePath.length === 0
-        color: "#df091923"
+        color: "#E615181D"
+        border.color: "#35312D"
 
         RowLayout {
             anchors.fill: parent
@@ -170,12 +181,14 @@ ApplicationWindow {
                 width: 34
                 height: 34
                 radius: 11
-                color: "#143647"
+                color: "#49352B"
+                border.width: 1
+                border.color: "#D6A85F"
                 Label {
                     anchors.centerIn: parent
-                    text: "MS"
-                    color: "#75ece5"
-                    font.pixelSize: 9
+                    text: "▶"
+                    color: "#D6A85F"
+                    font.pixelSize: 12
                     font.bold: true
                 }
             }
@@ -186,7 +199,7 @@ ApplicationWindow {
                 Label {
                     Layout.fillWidth: true
                     text: player.mediaTitle.length > 0 ? player.mediaTitle : "MurSchol Media"
-                    color: "#eff6f8"
+                    color: "#F3EEE5"
                     font.pixelSize: 13
                     font.bold: true
                     elide: Text.ElideRight
@@ -195,7 +208,7 @@ ApplicationWindow {
                     visible: player.filePath.length > 0
                     Layout.fillWidth: true
                     text: player.audioOnly ? "Audio" : "Vídeo"
-                    color: "#6e8c9b"
+                    color: "#8F867D"
                     font.pixelSize: 9
                     elide: Text.ElideMiddle
                 }
@@ -230,7 +243,8 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         height: 118
         visible: player.filePath.length > 0 && (root.controlsVisible || player.audioOnly)
-        color: "#e6091923"
+        color: "#EA15181D"
+        border.color: "#35312D"
 
         ColumnLayout {
             anchors.fill: parent
@@ -255,7 +269,7 @@ ApplicationWindow {
 
                 Label {
                     text: root.formatTime(player.position) + " / " + root.formatTime(player.duration)
-                    color: "#8fa8b3"
+                    color: "#A79E94"
                     font.pixelSize: 10
                     Layout.preferredWidth: 118
                 }
@@ -269,10 +283,23 @@ ApplicationWindow {
                 }
                 Button { text: "↶ 10"; onClicked: player.seekRelative(-10) }
                 Button {
+                    id: playButton
                     width: 54
                     height: 42
                     text: player.paused ? "▶" : "Ⅱ"
                     onClicked: player.togglePause()
+                    background: Rectangle {
+                        radius: 14
+                        color: playButton.down ? "#8E6A42" : (playButton.hovered ? "#E3BB78" : "#D6A85F")
+                    }
+                    contentItem: Label {
+                        text: playButton.text
+                        color: "#201B17"
+                        font.bold: true
+                        font.pixelSize: 16
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
                 }
                 Button { text: "10 ↷"; onClicked: player.seekRelative(10) }
                 Button {
@@ -283,7 +310,7 @@ ApplicationWindow {
 
                 Item { Layout.fillWidth: true }
 
-                Label { text: "🔊"; color: "#c8d7dd" }
+                Label { text: "🔊"; color: "#C9C0B6" }
                 Slider {
                     Layout.preferredWidth: 120
                     from: 0
@@ -328,16 +355,16 @@ ApplicationWindow {
         anchors.top: topBar.bottom
         anchors.rightMargin: 14
         anchors.topMargin: 10
-        color: "#f30d202c"
-        border.color: "#31596c"
+        color: "#F315181D"
+        border.color: "#51463B"
 
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 16
             spacing: 10
 
-            Label { text: "Reproducción"; color: "white"; font.pixelSize: 16; font.bold: true }
-            Label { text: "Velocidad"; color: "#7895a2"; font.pixelSize: 10 }
+            Label { text: "Reproducción"; color: "#F3EEE5"; font.pixelSize: 16; font.bold: true }
+            Label { text: "Velocidad"; color: "#A79E94"; font.pixelSize: 10 }
             RowLayout {
                 Repeater {
                     model: [0.75, 1.0, 1.25, 1.5]
@@ -363,7 +390,7 @@ ApplicationWindow {
             Label {
                 Layout.fillWidth: true
                 text: "La posición se guarda automáticamente para continuar después."
-                color: "#6f8995"
+                color: "#8F867D"
                 font.pixelSize: 9
                 wrapMode: Text.WordWrap
             }
@@ -377,15 +404,15 @@ ApplicationWindow {
         anchors.bottom: bottomControls.visible ? bottomControls.top : parent.bottom
         anchors.bottomMargin: 18
         radius: 14
-        color: "#ec172b38"
-        border.color: "#3e6575"
+        color: "#ED24211D"
+        border.color: "#51463B"
         width: Math.min(520, statusLabel.implicitWidth + 36)
         height: 42
         Label {
             id: statusLabel
             anchors.centerIn: parent
             text: root.statusText
-            color: "#e8f1f4"
+            color: "#F3EEE5"
             font.pixelSize: 11
         }
     }
