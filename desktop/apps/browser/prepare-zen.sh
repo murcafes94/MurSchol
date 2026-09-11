@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${1:-$SCRIPT_DIR/.work/zen}"
-ZEN_REF="${ZEN_REF:-dev}"
+ZEN_REF="${ZEN_REF:-stable}"
 ZEN_REPO="${ZEN_REPO:-https://github.com/zen-browser/desktop.git}"
 
 rm -rf "$DEST"
