@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=MurSchol Browser
+GenericName=Navegador web
+Comment=Navega, investiga y estudia con el navegador de MurSchol OS
+Exec=/usr/local/bin/murschol-browser %U
+Icon=web-browser
+Terminal=false
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+Categories=Network;WebBrowser;Education;
+Keywords=internet;navegador;web;browser;estudio;investigacion;
+StartupNotify=true
+StartupWMClass=zen
