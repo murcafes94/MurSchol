@@ -59,9 +59,6 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
     QDir().mkpath(sharedSettingsDirectory());
     m_settingsPath = sharedSettingsPath();
 
-    // Migración silenciosa desde la configuración anterior de MurSchol Desktop.
-    // Así Settings puede centralizar preferencias sin perder el perfil o el espacio
-    // que el usuario ya tenía guardados.
     QSettings shared(m_settingsPath, QSettings::IniFormat);
     QSettings legacy;
     const QStringList migratableKeys = {
@@ -77,6 +74,13 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
 
     m_profile = shared.value(QStringLiteral("performance/profile")).toString();
     m_workspace = shared.value(QStringLiteral("workspace/active"), QStringLiteral("Estudio")).toString();
+    if (m_workspace != QStringLiteral("Estudio")
+        && m_workspace != QStringLiteral("Biblioteca")
+        && m_workspace != QStringLiteral("Ministerium")
+        && m_workspace != QStringLiteral("Personal")) {
+        m_workspace = QStringLiteral("Estudio");
+        shared.setValue(QStringLiteral("workspace/active"), m_workspace);
+    }
     m_studyLayout = shared.value(QStringLiteral("study/layout"), QStringLiteral("PDF + NotCan")).toString();
     m_theme = shared.value(QStringLiteral("appearance/theme"), m_theme).toString();
     m_accentColor = shared.value(QStringLiteral("appearance/accent"), m_accentColor).toString();
@@ -84,6 +88,7 @@ SystemBackend::SystemBackend(QObject *parent) : QObject(parent)
     m_dockAutoHide = shared.value(QStringLiteral("dock/autoHide"), m_dockAutoHide).toBool();
     m_dockSize = qBound(54, shared.value(QStringLiteral("dock/size"), m_dockSize).toInt(), 84);
     m_dockMagnify = shared.value(QStringLiteral("dock/magnify"), m_dockMagnify).toBool();
+    shared.sync();
 
     refreshStats();
     if (m_profile.isEmpty()) {
@@ -248,7 +253,11 @@ void SystemBackend::reloadSharedSettings()
     }
 
     const QString newWorkspace = settings.value(QStringLiteral("workspace/active"), m_workspace).toString();
-    if (newWorkspace != m_workspace) {
+    if ((newWorkspace == QStringLiteral("Estudio")
+         || newWorkspace == QStringLiteral("Biblioteca")
+         || newWorkspace == QStringLiteral("Ministerium")
+         || newWorkspace == QStringLiteral("Personal"))
+        && newWorkspace != m_workspace) {
         m_workspace = newWorkspace;
         emit workspaceChanged();
     }
@@ -306,7 +315,8 @@ void SystemBackend::applyRecommendedProfile()
 void SystemBackend::setWorkspace(const QString &workspace)
 {
     if (workspace != QStringLiteral("Estudio")
-        && workspace != QStringLiteral("Trabajos")
+        && workspace != QStringLiteral("Biblioteca")
+        && workspace != QStringLiteral("Ministerium")
         && workspace != QStringLiteral("Personal"))
         return;
     if (workspace == m_workspace)
@@ -349,7 +359,6 @@ bool SystemBackend::startFirstAvailable(const QStringList &commands, const QStri
 
 void SystemBackend::openFiles()
 {
-    // Abrimos primero el gestor propio. Thunar queda como respaldo durante la alpha.
     if (startFirstAvailable({QStringLiteral("murschol-files"), QStringLiteral("thunar")}))
         return;
 
@@ -359,18 +368,14 @@ void SystemBackend::openFiles()
 
 void SystemBackend::openBrowser()
 {
-    // Edge es la primera opción cuando el usuario lo instala; Firefox ESR sigue
-    // disponible como navegador libre y como respaldo de la Live ISO.
     if (!startFirstAvailable({
-            QStringLiteral("microsoft-edge-stable"),
-            QStringLiteral("microsoft-edge"),
+            QStringLiteral("murschol-browser"),
+            QStringLiteral("zen"),
+            QStringLiteral("zen-browser"),
             QStringLiteral("firefox-esr"),
-            QStringLiteral("firefox"),
-            QStringLiteral("chromium"),
-            QStringLiteral("google-chrome"),
-            QStringLiteral("brave-browser")
+            QStringLiteral("firefox")
         }))
-        updateStatus(QStringLiteral("No se encontró un navegador"));
+        updateStatus(QStringLiteral("No se encontró MurSchol Browser ni un navegador de respaldo"));
 }
 
 void SystemBackend::openTerminal()
