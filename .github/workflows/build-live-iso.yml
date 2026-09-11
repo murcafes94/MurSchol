@@ -65,6 +65,9 @@ jobs:
         run: |
           bash -n desktop/os/live/build-live.sh
           sh -n desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
+          sh -n desktop/os/live/config/hooks/live/020-reader-desktop.hook.chroot
+          sh -n desktop/os/live/config/hooks/live/030-installer.hook.chroot
+          test -x desktop/os/live/config/hooks/live/030-installer.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser
           sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
@@ -82,6 +85,13 @@ jobs:
           grep -q 'murschol-reader' desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
           grep -q '^libqalculate-dev$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^libqt6sql6-sqlite$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^qml6-module-qtquick-pdf$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^qml6-module-qtquick-dialogs$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^calamares$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^calamares-settings-debian$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q 'Name=Instalar MurSchol OS' desktop/os/live/config/hooks/live/030-installer.hook.chroot
+          grep -q 'Exec=/usr/bin/calamares-install-debian' desktop/os/live/config/hooks/live/030-installer.hook.chroot
+          grep -q '^application/pdf=murschol-reader.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
 
           THEME_DIR=desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc
           test -f "$THEME_DIR/themerc"
