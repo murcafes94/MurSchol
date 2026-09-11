@@ -1,0 +1,33 @@
+---
+componentName: murschol
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 920px,630px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+
+strings:
+    productName: "MurSchol OS"
+    shortProductName: "MurSchol"
+    version: "0.1"
+    shortVersion: "0.1"
+    versionedName: "MurSchol OS 0.1"
+    shortVersionedName: "MurSchol 0.1"
+    bootloaderEntryName: "MurSchol OS"
+    productUrl: "https://github.com/murcafes94/MurSchol"
+    supportUrl: "https://github.com/murcafes94/MurSchol/issues"
+    knownIssuesUrl: "https://github.com/murcafes94/MurSchol/issues"
+    releaseNotesUrl: "https://github.com/murcafes94/MurSchol/releases"
+
+images:
+    productIcon: "murschol-mark.svg"
+    productLogo: "murschol-mark.svg"
+    productWelcome: "murschol-welcome.svg"
+
+style:
+    SidebarBackground: "#15181D"
+    SidebarText: "#F3EEE5"
+    SidebarTextCurrent: "#15120F"
+    SidebarBackgroundCurrent: "#D6A85F"
