@@ -1,6 +1,93 @@
 #!/bin/sh
 set -eu
 
+# Algunas aplicaciones nacieron antes del sistema visual cálido actual. La ISO
+# normaliza únicamente colores QML heredados antes de compilar, sin tocar su
+# lógica ni los backends. Los componentes nuevos ya usan estos tokens de origen.
+normalize_legacy_palette() {
+  for qml_root in \
+    /usr/src/murschol-photos/qml \
+    /usr/src/murschol-settings/qml \
+    /usr/src/murschol-music/qml \
+    /usr/src/murschol-reader/qml; do
+    [ -d "$qml_root" ] || continue
+    find "$qml_root" -type f -name '*.qml' -exec sed -i \
+      -e 's/#0B0D12/#0B0E12/g' \
+      -e 's/#11151C/#11151C/g' \
+      -e 's/#171C24/#171B21/g' \
+      -e 's/#252B35/#35312D/g' \
+      -e 's/#2563EB/#D6A85F/g' \
+      -e 's/#3B82F6/#E3BB78/g' \
+      -e 's/#123A7A/#49352B/g' \
+      -e 's/#EAF1FF/#F0E2CF/g' \
+      -e 's/#E63946/#E28A78/g' \
+      -e 's/#FF4D5A/#F0B09F/g' \
+      -e 's/#F8FAFC/#F3EEE5/g' \
+      -e 's/#9AA4B2/#A79E94/g' \
+      -e 's/#5B6573/#7F766D/g' \
+      -e 's/#08141d/#0B0E12/g' \
+      -e 's/#07131d/#0B0E12/g' \
+      -e 's/#071119/#080A0D/g' \
+      -e 's/#081722/#0B0E12/g' \
+      -e 's/#091824/#0B0E12/g' \
+      -e 's/#0d202c/#15181D/g' \
+      -e 's/#0b1d29/#15181D/g' \
+      -e 's/#0b1b25/#11151C/g' \
+      -e 's/#0b1b27/#11151C/g' \
+      -e 's/#0e2431/#15181D/g' \
+      -e 's/#102633/#171B21/g' \
+      -e 's/#102735/#171B21/g' \
+      -e 's/#102b3a/#171B21/g' \
+      -e 's/#0d2230/#171B21/g' \
+      -e 's/#123347/#49352B/g' \
+      -e 's/#143647/#49352B/g' \
+      -e 's/#14374a/#49352B/g' \
+      -e 's/#17485a/#49352B/g' \
+      -e 's/#1A2230/#24211D/g' \
+      -e 's/#0F172A/#15181D/g' \
+      -e 's/#1c3a4a/#35312D/g' \
+      -e 's/#163448/#35312D/g' \
+      -e 's/#173446/#35312D/g' \
+      -e 's/#1e3d4b/#35312D/g' \
+      -e 's/#203f4d/#35312D/g' \
+      -e 's/#234657/#51463B/g' \
+      -e 's/#244655/#51463B/g' \
+      -e 's/#28536a/#51463B/g' \
+      -e 's/#285d73/#51463B/g' \
+      -e 's/#315569/#51463B/g' \
+      -e 's/#31596c/#51463B/g' \
+      -e 's/#73eae3/#D6A85F/g' \
+      -e 's/#73e0da/#D6A85F/g' \
+      -e 's/#70e9e1/#D6A85F/g' \
+      -e 's/#72e5df/#D6A85F/g' \
+      -e 's/#65ded7/#D6A85F/g' \
+      -e 's/#67ddd6/#D6A85F/g' \
+      -e 's/#63e4dc/#D6A85F/g' \
+      -e 's/#65e5dd/#D6A85F/g' \
+      -e 's/#75ece5/#D6A85F/g' \
+      -e 's/#52e4dd/#D6A85F/g' \
+      -e 's/#4edbd5/#D6A85F/g' \
+      -e 's/#67e6df/#D6A85F/g' \
+      -e 's/#93C5FD/#D6A85F/g' \
+      -e 's/#7897a6/#A79E94/g' \
+      -e 's/#7894a2/#A79E94/g' \
+      -e 's/#7f9aa5/#A79E94/g' \
+      -e 's/#7793a1/#A79E94/g' \
+      -e 's/#7997a5/#A79E94/g' \
+      -e 's/#f2f7f8/#F3EEE5/g' \
+      -e 's/#f4f8fa/#F3EEE5/g' \
+      -e 's/#f3f7f9/#F3EEE5/g' \
+      -e 's/#f4f8fa/#F3EEE5/g' \
+      -e 's/#eef7f8/#F3EEE5/g' \
+      -e 's/#eff7f8/#F3EEE5/g' \
+      -e 's/#c8d8de/#C9C0B6/g' \
+      -e 's/#cfe0e5/#C9C0B6/g' \
+      -e 's/#ff9d9d/#E28A78/g' \
+      -e 's/#f2a6a6/#E28A78/g' \
+      {} +
+  done
+}
+
 build_murschol_app() {
   source_dir="$1"
   build_dir="$2"
@@ -15,6 +102,8 @@ build_murschol_app() {
   cmake --build "$build_dir" --parallel "$(nproc)"
   cmake --install "$build_dir"
 }
+
+normalize_legacy_palette
 
 build_murschol_app /usr/src/murschol-shell /tmp/murschol-build "shell"
 build_murschol_app /usr/src/murschol-photos /tmp/murschol-photos-build "MurSchol Photos"
@@ -210,7 +299,6 @@ else
   echo "[MurSchol] Aviso: panel global no disponible; el shell conservará el dock integrado."
 fi
 
-# Actualiza asociaciones para que Inicio y la búsqueda detecten todas las apps.
 update-desktop-database /usr/share/applications 2>/dev/null || true
 
 rm -rf \
