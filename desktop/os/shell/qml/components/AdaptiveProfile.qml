@@ -9,8 +9,9 @@ Rectangle {
     width: 430
     height: 226
     radius: 24
-    color: "#e20d202d"
-    border.color: "#39687b"
+    color: "#E816191E"
+    border.width: 1
+    border.color: "#5E50443A"
 
     ColumnLayout {
         anchors.fill: parent
@@ -21,23 +22,25 @@ Rectangle {
             Layout.fillWidth: true
             ColumnLayout {
                 spacing: 1
-                Label { text: "Modo de rendimiento"; color: "white"; font.bold: true; font.pixelSize: 16 }
+                Label { text: "Modo de rendimiento"; color: "#F3EEE5"; font.bold: true; font.pixelSize: 16 }
                 Label {
                     text: "Recomendado: " + root.backend.recommendedProfile
-                    color: "#78d8d1"
+                    color: "#C9A86F"
                     font.pixelSize: 10
                 }
             }
             Item { Layout.fillWidth: true }
             Rectangle {
-                width: 58
-                height: 24
-                radius: 12
-                color: "#173b49"
+                width: 62
+                height: 26
+                radius: 13
+                color: "#302820"
+                border.width: 1
+                border.color: "#5A493A"
                 Label {
                     anchors.centerIn: parent
                     text: Math.round(root.backend.totalMemoryGb) + " GB"
-                    color: "#b9d5df"
+                    color: "#D7CFC5"
                     font.pixelSize: 9
                     font.bold: true
                 }
@@ -67,9 +70,9 @@ Rectangle {
 
                     background: Rectangle {
                         radius: 17
-                        color: parent.checked ? "#17485e" : (parent.hovered ? "#173847" : "#122d3a")
+                        color: parent.checked ? "#3C2D242A" : (parent.hovered ? "#29251F24" : "#1A1D22")
                         border.width: parent.checked ? 2 : 1
-                        border.color: parent.checked ? "#2bd6e1" : "#315262"
+                        border.color: parent.checked ? root.backend.accentColor : "#4A423A34"
                     }
 
                     contentItem: ColumnLayout {
@@ -78,14 +81,14 @@ Rectangle {
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             text: modelData.symbol
-                            color: parent.parent.checked ? "#66ebe5" : "#9eb7c2"
+                            color: parent.parent.checked ? root.backend.accentColor : "#B8AEA4"
                             font.pixelSize: 20
                             font.bold: true
                         }
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             text: modelData.name
-                            color: "white"
+                            color: "#F3EEE5"
                             font.bold: true
                             font.pixelSize: 11
                         }
@@ -95,12 +98,14 @@ Rectangle {
                             width: recommendedLabel.implicitWidth + 12
                             height: 20
                             radius: 10
-                            color: "#196a59"
+                            color: "#273E30"
+                            border.width: 1
+                            border.color: "#537A60"
                             Label {
                                 id: recommendedLabel
                                 anchors.centerIn: parent
                                 text: "Recomendado"
-                                color: "#baffdf"
+                                color: "#A5D1AF"
                                 font.pixelSize: 8
                                 font.bold: true
                             }
@@ -108,7 +113,7 @@ Rectangle {
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             text: modelData.description
-                            color: "#9bb0ba"
+                            color: "#91877D"
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: 8
                         }
@@ -123,10 +128,15 @@ Rectangle {
             visible: root.backend.profile !== root.backend.recommendedProfile
             text: "Usar recomendado"
             onClicked: root.backend.applyRecommendedProfile()
-            background: Rectangle { radius: 11; color: parent.hovered ? "#287b83" : "#205f67" }
+            background: Rectangle {
+                radius: 11
+                color: parent.hovered ? "#4A392D" : "#332820"
+                border.width: 1
+                border.color: root.backend.accentColor
+            }
             contentItem: Label {
                 text: parent.text
-                color: "white"
+                color: "#F1DEC1"
                 font.bold: true
                 font.pixelSize: 9
                 horizontalAlignment: Text.AlignHCenter
