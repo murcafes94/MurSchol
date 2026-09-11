@@ -15,6 +15,7 @@ class SettingsBackend : public QObject
     Q_PROPERTY(int dockSize READ dockSize WRITE setDockSize NOTIFY dockChanged)
     Q_PROPERTY(bool dockMagnify READ dockMagnify WRITE setDockMagnify NOTIFY dockChanged)
     Q_PROPERTY(QString profile READ profile WRITE setProfile NOTIFY profileChanged)
+    Q_PROPERTY(QString workspace READ workspace WRITE setWorkspace NOTIFY workspaceChanged)
     Q_PROPERTY(QString recommendedProfile READ recommendedProfile CONSTANT)
     Q_PROPERTY(QString distroName READ distroName CONSTANT)
     Q_PROPERTY(QString kernelVersion READ kernelVersion CONSTANT)
@@ -37,6 +38,7 @@ public:
     int dockSize() const { return m_dockSize; }
     bool dockMagnify() const { return m_dockMagnify; }
     QString profile() const { return m_profile; }
+    QString workspace() const { return m_workspace; }
     QString recommendedProfile() const { return m_recommendedProfile; }
 
     QString distroName() const { return m_distroName; }
@@ -58,6 +60,7 @@ public:
     Q_INVOKABLE void setDockSize(int value);
     Q_INVOKABLE void setDockMagnify(bool value);
     Q_INVOKABLE void setProfile(const QString &value);
+    Q_INVOKABLE void setWorkspace(const QString &value);
 
     Q_INVOKABLE bool openNetworkSettings();
     Q_INVOKABLE bool openAudioSettings();
@@ -68,6 +71,7 @@ signals:
     void appearanceChanged();
     void dockChanged();
     void profileChanged();
+    void workspaceChanged();
     void statusChanged();
 
 private:
@@ -86,6 +90,7 @@ private:
     int m_dockSize = 64;
     bool m_dockMagnify = true;
     QString m_profile = QStringLiteral("Normal");
+    QString m_workspace = QStringLiteral("Estudio");
     QString m_recommendedProfile = QStringLiteral("Normal");
 
     QString m_distroName = QStringLiteral("Linux");
