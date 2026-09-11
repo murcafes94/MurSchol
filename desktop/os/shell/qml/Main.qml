@@ -49,7 +49,7 @@ ApplicationWindow {
             dockHideTimer.stop()
             return
         }
-        if (!startOpen && !appManagerOpen && !dock.pointerInside)
+        if (!startOpen && !systemOpen && !appManagerOpen && !dock.pointerInside)
             dockHideTimer.restart()
     }
 
@@ -68,7 +68,7 @@ ApplicationWindow {
         interval: 850
         repeat: false
         onTriggered: {
-            if (systemBackend.dockAutoHide && !root.startOpen && !root.appManagerOpen && !dock.pointerInside)
+            if (systemBackend.dockAutoHide && !root.startOpen && !root.systemOpen && !root.appManagerOpen && !dock.pointerInside)
                 root.dockRaised = false
         }
     }
@@ -368,11 +368,10 @@ ApplicationWindow {
             root.showDock()
         }
         onSystemClicked: {
-            systemBackend.openSettings("appearance")
+            root.systemOpen = !root.systemOpen
             root.startOpen = false
-            root.systemOpen = false
             root.appManagerOpen = false
-            root.scheduleDockHide()
+            root.showDock()
         }
     }
 
