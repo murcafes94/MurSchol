@@ -1,65 +1,34 @@
 #!/bin/sh
 set -eu
 
-echo "[MurSchol] Compilando shell dentro de Debian Live..."
-cmake -S /usr/src/murschol-shell \
-      -B /tmp/murschol-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
+build_murschol_app() {
+  source_dir="$1"
+  build_dir="$2"
+  label="$3"
 
-cmake --build /tmp/murschol-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-build
+  echo "[MurSchol] Compilando ${label}..."
+  cmake -S "$source_dir" \
+        -B "$build_dir" \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local
+  cmake --build "$build_dir" --parallel "$(nproc)"
+  cmake --install "$build_dir"
+}
 
-echo "[MurSchol] Compilando MurSchol Photos..."
-cmake -S /usr/src/murschol-photos \
-      -B /tmp/murschol-photos-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake --build /tmp/murschol-photos-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-photos-build
-
-echo "[MurSchol] Compilando MurSchol Capture..."
-cmake -S /usr/src/murschol-capture \
-      -B /tmp/murschol-capture-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake --build /tmp/murschol-capture-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-capture-build
-
-echo "[MurSchol] Compilando MurSchol Settings..."
-cmake -S /usr/src/murschol-settings \
-      -B /tmp/murschol-settings-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake --build /tmp/murschol-settings-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-settings-build
-
-echo "[MurSchol] Compilando MurSchol Media..."
-cmake -S /usr/src/murschol-media \
-      -B /tmp/murschol-media-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake --build /tmp/murschol-media-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-media-build
-
-echo "[MurSchol] Compilando MurSchol Music..."
-cmake -S /usr/src/murschol-music \
-      -B /tmp/murschol-music-build \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr/local
-cmake --build /tmp/murschol-music-build --parallel "$(nproc)"
-cmake --install /tmp/murschol-music-build
+build_murschol_app /usr/src/murschol-shell /tmp/murschol-build "shell"
+build_murschol_app /usr/src/murschol-photos /tmp/murschol-photos-build "MurSchol Photos"
+build_murschol_app /usr/src/murschol-capture /tmp/murschol-capture-build "MurSchol Capture"
+build_murschol_app /usr/src/murschol-settings /tmp/murschol-settings-build "MurSchol Settings"
+build_murschol_app /usr/src/murschol-media /tmp/murschol-media-build "MurSchol Media"
+build_murschol_app /usr/src/murschol-music /tmp/murschol-music-build "MurSchol Music"
+build_murschol_app /usr/src/murschol-calculator /tmp/murschol-calculator-build "MurSchol Calculator"
+build_murschol_app /usr/src/murschol-calendar /tmp/murschol-calendar-build "MurSchol Calendar"
+build_murschol_app /usr/src/murschol-reader /tmp/murschol-reader-build "MurSchol Reader"
 
 # Durante la alpha, Settings y Photos se ejecutan mediante un wrapper mínimo
 # que registra automáticamente un fallo de arranque y abre el diagnóstico si
-# el proceso muere en los primeros segundos. Esto evita pedir al usuario que
-# copie comandos en una sesión Live cuando una app falla.
+# el proceso muere en los primeros segundos.
 install -d /usr/local/lib/murschol
 mv /usr/local/bin/murschol-settings /usr/local/lib/murschol/murschol-settings-bin
 cat > /usr/local/bin/murschol-settings <<'EOF'
@@ -81,6 +50,7 @@ Comment=Escritorio principal de MurSchol OS
 Exec=/usr/local/bin/murschol-desktop
 Terminal=false
 Categories=System;Education;
+NoDisplay=true
 EOF
 
 cat > /usr/share/applications/murschol-files.desktop <<'EOF'
@@ -95,6 +65,7 @@ Terminal=false
 MimeType=inode/directory;
 Categories=System;FileTools;Utility;
 Keywords=archivos;carpetas;documentos;files;folders;
+StartupNotify=true
 EOF
 
 cat > /usr/share/applications/murschol-photos.desktop <<'EOF'
@@ -109,6 +80,7 @@ Terminal=false
 MimeType=image/jpeg;image/png;image/gif;image/svg+xml;image/webp;
 Categories=Graphics;Viewer;
 Keywords=fotos;imagenes;capturas;photos;images;
+StartupNotify=true
 EOF
 
 cat > /usr/share/applications/murschol-capture.desktop <<'EOF'
@@ -122,6 +94,7 @@ Icon=applets-screenshooter
 Terminal=false
 Categories=Graphics;Utility;
 Keywords=captura;pantalla;screenshot;screen;
+StartupNotify=true
 EOF
 
 cat > /usr/share/applications/murschol-settings.desktop <<'EOF'
@@ -135,6 +108,7 @@ Icon=preferences-system
 Terminal=false
 Categories=Settings;System;
 Keywords=configuracion;ajustes;settings;sistema;apariencia;dock;rendimiento;
+StartupNotify=true
 EOF
 
 cat > /usr/share/applications/murschol-media.desktop <<'EOF'
@@ -166,15 +140,66 @@ Keywords=musica;canciones;audio;letras;listas;music;
 StartupNotify=true
 EOF
 
-chmod 0755 /usr/local/bin/murschol-desktop
-chmod 0755 /usr/local/bin/murschol-files
-chmod 0755 /usr/local/bin/murschol-photos
-chmod 0755 /usr/local/bin/murschol-capture
-chmod 0755 /usr/local/bin/murschol-settings
-chmod 0755 /usr/local/bin/murschol-media
-chmod 0755 /usr/local/bin/murschol-music
-chmod 0755 /usr/local/bin/murschol-browser
-chmod 0755 /usr/local/bin/murschol-launch
+cat > /usr/share/applications/murschol-calculator.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Calculator
+GenericName=Calculadora
+Comment=Calculadora estándar, científica, conversor y programador
+Exec=/usr/local/bin/murschol-calculator
+Icon=accessories-calculator
+Terminal=false
+Categories=Utility;Calculator;Education;
+Keywords=calculadora;matematicas;cientifica;conversion;calculator;
+StartupNotify=true
+EOF
+
+cat > /usr/share/applications/murschol-calendar.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Calendar
+GenericName=Calendario
+Comment=Organiza clases, tareas, celebraciones y recordatorios
+Exec=/usr/local/bin/murschol-calendar
+Icon=x-office-calendar
+Terminal=false
+Categories=Office;Calendar;Education;
+Keywords=calendario;agenda;eventos;recordatorios;calendar;
+StartupNotify=true
+EOF
+
+cat > /usr/share/applications/murschol-reader.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=MurSchol Reader (Preview)
+GenericName=Biblioteca y lector
+Comment=Vista previa de la biblioteca y experiencia de lectura de MurSchol
+Exec=/usr/local/bin/murschol-reader
+Icon=accessories-ebook-reader
+Terminal=false
+Categories=Office;Viewer;Education;
+Keywords=biblioteca;lector;libros;reader;estudio;
+StartupNotify=true
+EOF
+
+for binary in \
+  murschol-desktop \
+  murschol-files \
+  murschol-photos \
+  murschol-capture \
+  murschol-settings \
+  murschol-media \
+  murschol-music \
+  murschol-calculator \
+  murschol-calendar \
+  murschol-reader \
+  murschol-browser \
+  murschol-launch; do
+  if [ -e "/usr/local/bin/$binary" ]; then
+    chmod 0755 "/usr/local/bin/$binary"
+  fi
+done
+
 chmod 0755 /usr/local/lib/murschol/murschol-settings-bin
 chmod 0755 /usr/local/lib/murschol/murschol-photos-bin
 
@@ -185,7 +210,7 @@ else
   echo "[MurSchol] Aviso: panel global no disponible; el shell conservará el dock integrado."
 fi
 
-# Actualiza asociaciones para que Start/Apps detecten las aplicaciones nativas.
+# Actualiza asociaciones para que Inicio y la búsqueda detecten todas las apps.
 update-desktop-database /usr/share/applications 2>/dev/null || true
 
 rm -rf \
@@ -195,12 +220,18 @@ rm -rf \
   /tmp/murschol-settings-build \
   /tmp/murschol-media-build \
   /tmp/murschol-music-build \
+  /tmp/murschol-calculator-build \
+  /tmp/murschol-calendar-build \
+  /tmp/murschol-reader-build \
   /usr/src/murschol-shell \
   /usr/src/murschol-photos \
   /usr/src/murschol-capture \
   /usr/src/murschol-settings \
   /usr/src/murschol-media \
-  /usr/src/murschol-music
+  /usr/src/murschol-music \
+  /usr/src/murschol-calculator \
+  /usr/src/murschol-calendar \
+  /usr/src/murschol-reader
 
 echo "[MurSchol] Shell instalado en /usr/local/bin/murschol-desktop"
 echo "[MurSchol] MurSchol Files instalado en /usr/local/bin/murschol-files"
@@ -209,5 +240,8 @@ echo "[MurSchol] MurSchol Capture instalado en /usr/local/bin/murschol-capture"
 echo "[MurSchol] MurSchol Settings instalado en /usr/local/bin/murschol-settings"
 echo "[MurSchol] MurSchol Media instalado en /usr/local/bin/murschol-media"
 echo "[MurSchol] MurSchol Music instalado en /usr/local/bin/murschol-music"
+echo "[MurSchol] MurSchol Calculator instalado en /usr/local/bin/murschol-calculator"
+echo "[MurSchol] MurSchol Calendar instalado en /usr/local/bin/murschol-calendar"
+echo "[MurSchol] MurSchol Reader Preview instalado en /usr/local/bin/murschol-reader"
 echo "[MurSchol] MurSchol Browser registrado en /usr/local/bin/murschol-browser"
 echo "[MurSchol] Lanzador de diagnóstico instalado en /usr/local/bin/murschol-launch"
