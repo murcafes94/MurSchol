@@ -85,6 +85,8 @@ ApplicationWindow {
         sequence: "Meta+Space"
         onActivated: {
             root.startOpen = !root.startOpen
+            root.systemOpen = false
+            root.appManagerOpen = false
             root.showDock()
         }
     }
@@ -193,11 +195,9 @@ ApplicationWindow {
         anchors.right: parent.right
         backend: systemBackend
         onSystemClicked: {
-            systemBackend.openSettings("system")
+            root.systemOpen = !root.systemOpen
             root.startOpen = false
-            root.systemOpen = false
             root.appManagerOpen = false
-            root.scheduleDockHide()
         }
     }
 
