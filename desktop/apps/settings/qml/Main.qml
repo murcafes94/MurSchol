@@ -17,13 +17,15 @@ ApplicationWindow {
     property bool lightTheme: backend.theme === "Claro"
     property color accent: backend.accentColor
 
-    readonly property color backgroundColor: lightTheme ? "#F4F6F9" : "#0B0D12"
+    readonly property color backgroundColor: lightTheme ? "#F7F2E8" : "#0B0E12"
     readonly property color surfaceColor: lightTheme ? "#FFFFFF" : "#11151C"
-    readonly property color raisedColor: lightTheme ? "#EEF1F5" : "#171C24"
-    readonly property color borderColor: lightTheme ? "#D8DEE9" : "#252B35"
-    readonly property color textPrimary: lightTheme ? "#0B0D12" : "#F8FAFC"
-    readonly property color textSecondary: lightTheme ? "#5B6573" : "#9AA4B2"
-    readonly property color danger: "#E63946"
+    readonly property color raisedColor: lightTheme ? "#FFFDF9" : "#171B21"
+    readonly property color hoverColor: lightTheme ? "#F1E8DA" : "#24211D"
+    readonly property color selectedColor: lightTheme ? "#F0E2CF" : "#49352B"
+    readonly property color borderColor: lightTheme ? "#D5C5AE" : "#35312D"
+    readonly property color textPrimary: lightTheme ? "#201B17" : "#F3EEE5"
+    readonly property color textSecondary: lightTheme ? "#6B625A" : "#A79E94"
+    readonly property color danger: lightTheme ? "#B96455" : "#E28A78"
 
     property var pages: [
         { key: "display", title: "Pantalla", group: "Sistema", symbol: "▣", keywords: "monitor resolución escala brillo orientación luz nocturna filtro azul" },
@@ -32,16 +34,14 @@ ApplicationWindow {
         { key: "bluetooth", title: "Bluetooth", group: "Sistema", symbol: "ᛒ", keywords: "bluetooth dispositivos auriculares" },
         { key: "power", title: "Energía", group: "Sistema", symbol: "ϟ", keywords: "batería energía suspensión brillo corriente" },
         { key: "storage", title: "Almacenamiento", group: "Sistema", symbol: "▤", keywords: "disco almacenamiento espacio archivos usb papelera limpieza expulsar" },
-        { key: "appearance", title: "Apariencia", group: "Personalización", symbol: "◈", keywords: "tema claro oscuro color animaciones apariencia" },
+        { key: "appearance", title: "Apariencia", group: "Personalización", symbol: "◈", keywords: "tema claro oscuro dorado color animaciones apariencia" },
         { key: "dock", title: "Dock y panel", group: "Personalización", symbol: "▰", keywords: "dock panel ocultar tamaño iconos ampliar" },
-        { key: "workspaces", title: "Espacios", group: "Personalización", symbol: "▦", keywords: "espacios estudio trabajos personal escritorios" },
+        { key: "workspaces", title: "Espacios", group: "Personalización", symbol: "▦", keywords: "espacios estudio biblioteca ministerium personal escritorios" },
         { key: "apps", title: "Aplicaciones", group: "Aplicaciones", symbol: "▥", keywords: "apps instaladas predeterminadas navegador fotos archivos pdf mime" },
         { key: "compatibility", title: "Compatibilidad", group: "Aplicaciones", symbol: "⇄", keywords: "linux android windows waydroid wine bottles flatpak" },
         { key: "performance", title: "Rendimiento", group: "Dispositivo", symbol: "▲", keywords: "ligero normal rendimiento memoria cpu perfil" },
         { key: "system", title: "Sistema y hardware", group: "Dispositivo", symbol: "◉", keywords: "cpu ram kernel hardware sistema información" },
-        { key: "updates", title: "Actualizaciones", group: "MurSchol OS", symbol: "↻", keywords: "actualizar update debian flatpak sistema" },
-        { key: "accessibility", title: "Accesibilidad", group: "MurSchol OS", symbol: "◇", keywords: "accesibilidad texto contraste animaciones" },
-        { key: "about", title: "Acerca de", group: "MurSchol OS", symbol: "i", keywords: "versión acerca de licencia sistema" }
+        { key: "about", title: "Acerca de", group: "MurSchol OS", symbol: "i", keywords: "versión acerca licencia sistema" }
     ]
 
     SettingsBackend { id: backend }
@@ -61,38 +61,31 @@ ApplicationWindow {
         return false
     }
 
-    function pageTitle(key) {
+    function pageMeta(key) {
         for (let i = 0; i < pages.length; ++i) {
             if (pages[i].key === key)
-                return pages[i].title
+                return pages[i]
         }
-        return "Configuración"
-    }
-
-    function pageGroup(key) {
-        for (let i = 0; i < pages.length; ++i) {
-            if (pages[i].key === key)
-                return pages[i].group
-        }
-        return "MurSchol OS"
+        return { key: "appearance", title: "Configuración", group: "MurSchol OS", symbol: "◈", keywords: "" }
     }
 
     function pageDescription(key) {
         switch (key) {
         case "display": return "Pantallas, brillo y Luz nocturna con información real de Wayland."
-        case "appearance": return "Tema, color y movimiento del entorno MurSchol."
-        case "dock": return "Comportamiento del dock global y del panel."
-        case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
-        case "system": return "Información real detectada en este equipo."
-        case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
         case "sound": return "Salida, entrada y volumen controlados mediante PipeWire/WirePlumber."
+        case "network": return "Wi-Fi y conectividad leídos directamente desde NetworkManager."
         case "bluetooth": return "Adaptador y dispositivos controlados directamente mediante BlueZ."
         case "power": return "Batería, brillo y suspensión conectados a UPower, brightnessctl y logind."
         case "storage": return "Discos internos y USB, espacio disponible, papelera y limpieza segura."
+        case "appearance": return "Tema, color y movimiento del entorno MurSchol."
+        case "dock": return "Comportamiento del dock global y del panel."
+        case "workspaces": return "Cambia el contexto activo entre Estudio, Biblioteca, Ministerium y Personal."
         case "apps": return "Aplicaciones instaladas y asociaciones predeterminadas mediante XDG."
         case "compatibility": return "Estado real de las capas Linux, Flatpak, Android y Windows."
+        case "performance": return "Perfil compartido para priorizar ligereza o respuesta."
+        case "system": return "Información real detectada en este equipo."
         case "about": return "Información de MurSchol OS y de esta configuración."
-        default: return "Esta sección se conectará al subsistema correspondiente sin duplicar su estado."
+        default: return "Configuración de MurSchol OS."
         }
     }
 
@@ -103,14 +96,6 @@ ApplicationWindow {
         return page.title.toLowerCase().includes(query)
                 || page.group.toLowerCase().includes(query)
                 || page.keywords.toLowerCase().includes(query)
-    }
-
-    function pageImplemented(key) {
-        return key === "appearance" || key === "dock" || key === "performance"
-                || key === "system" || key === "storage" || key === "about"
-                || key === "network" || key === "sound" || key === "bluetooth"
-                || key === "power" || key === "display" || key === "apps"
-                || key === "compatibility"
     }
 
     function refreshPage(key) {
@@ -145,7 +130,7 @@ ApplicationWindow {
     Component.onCompleted: {
         if (initialPage && pageKnown(initialPage))
             currentPage = initialPage
-        else if (initialPage === "settings")
+        else
             currentPage = "appearance"
         refreshPage(currentPage)
     }
@@ -155,11 +140,10 @@ ApplicationWindow {
         spacing: 0
 
         Rectangle {
-            Layout.preferredWidth: 264
-            Layout.minimumWidth: 248
+            Layout.preferredWidth: 270
+            Layout.minimumWidth: 250
             Layout.fillHeight: true
             color: root.surfaceColor
-            border.width: 0
 
             Rectangle {
                 anchors.right: parent.right
@@ -175,27 +159,29 @@ ApplicationWindow {
 
                 RowLayout {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 48
+                    Layout.preferredHeight: 50
                     spacing: 11
 
                     Rectangle {
                         width: 38
                         height: 38
                         radius: 12
-                        color: "#2563EB"
+                        color: root.selectedColor
+                        border.width: 1
+                        border.color: root.accent
                         Label {
                             anchors.centerIn: parent
-                            text: "MS"
-                            color: "#FFFFFF"
+                            text: "✝"
+                            color: root.accent
                             font.bold: true
-                            font.pixelSize: 12
+                            font.pixelSize: 16
                         }
                     }
 
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 0
-                        Label { text: "MurSchol"; color: root.textPrimary; font.pixelSize: 15; font.bold: true }
+                        Label { text: "MurSchol OS"; color: root.textPrimary; font.pixelSize: 15; font.bold: true }
                         Label { text: "Configuración"; color: root.textSecondary; font.pixelSize: 9 }
                     }
                 }
@@ -234,9 +220,7 @@ ApplicationWindow {
                                 required property var modelData
                                 required property int index
                                 width: parent.width
-                                height: root.matchesPage(modelData)
-                                        ? (groupLabel.visible ? 64 : 46)
-                                        : 0
+                                height: root.matchesPage(modelData) ? (groupLabel.visible ? 64 : 46) : 0
                                 visible: root.matchesPage(modelData)
 
                                 Label {
@@ -260,7 +244,6 @@ ApplicationWindow {
                                     anchors.right: parent.right
                                     anchors.bottom: parent.bottom
                                     height: 44
-                                    text: navItem.modelData.title
                                     onClicked: {
                                         root.currentPage = navItem.modelData.key
                                         searchField.text = ""
@@ -269,8 +252,8 @@ ApplicationWindow {
                                     background: Rectangle {
                                         radius: 12
                                         color: root.currentPage === navItem.modelData.key
-                                               ? (root.lightTheme ? "#EAF1FF" : "#123A7A")
-                                               : (navButton.hovered ? root.raisedColor : "transparent")
+                                               ? root.selectedColor
+                                               : (navButton.hovered ? root.hoverColor : "transparent")
                                         border.width: root.currentPage === navItem.modelData.key ? 1 : 0
                                         border.color: root.currentPage === navItem.modelData.key ? root.accent : "transparent"
                                     }
@@ -301,7 +284,7 @@ ApplicationWindow {
 
                 Rectangle {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 46
+                    Layout.preferredHeight: 48
                     radius: 13
                     color: root.raisedColor
                     border.width: 1
@@ -352,14 +335,14 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             spacing: 4
                             Label {
-                                text: root.pageGroup(root.currentPage)
+                                text: root.pageMeta(root.currentPage).group
                                 color: root.accent
                                 font.pixelSize: 9
                                 font.bold: true
                                 font.letterSpacing: 0.6
                             }
                             Label {
-                                text: root.pageTitle(root.currentPage)
+                                text: root.pageMeta(root.currentPage).title
                                 color: root.textPrimary
                                 font.pixelSize: 30
                                 font.bold: true
@@ -375,15 +358,16 @@ ApplicationWindow {
 
                         Rectangle {
                             Layout.alignment: Qt.AlignTop
-                            width: 112
+                            width: activeBadge.implicitWidth + 26
                             height: 34
                             radius: 17
                             color: root.surfaceColor
                             border.width: 1
                             border.color: root.borderColor
                             Label {
+                                id: activeBadge
                                 anchors.centerIn: parent
-                                text: root.backend.profile
+                                text: root.currentPage === "workspaces" ? root.backend.workspace : root.backend.profile
                                 color: root.textSecondary
                                 font.pixelSize: 9
                                 font.bold: true
@@ -391,11 +375,7 @@ ApplicationWindow {
                         }
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 1
-                        color: root.borderColor
-                    }
+                    Rectangle { Layout.fillWidth: true; height: 1; color: root.borderColor }
 
                     DisplayPage {
                         visible: root.currentPage === "display"
@@ -405,9 +385,34 @@ ApplicationWindow {
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
-                    AppearancePage { visible: root.currentPage === "appearance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
-                    DockPage { visible: root.currentPage === "dock"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
-                    PerformancePage { visible: root.currentPage === "performance"; Layout.fillWidth: true; backend: backend; lightTheme: root.lightTheme; accent: root.accent }
+                    AppearancePage {
+                        visible: root.currentPage === "appearance"
+                        Layout.fillWidth: true
+                        backend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    DockPage {
+                        visible: root.currentPage === "dock"
+                        Layout.fillWidth: true
+                        backend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    WorkspacesPage {
+                        visible: root.currentPage === "workspaces"
+                        Layout.fillWidth: true
+                        backend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
+                    PerformancePage {
+                        visible: root.currentPage === "performance"
+                        Layout.fillWidth: true
+                        backend: backend
+                        lightTheme: root.lightTheme
+                        accent: root.accent
+                    }
                     SystemPage {
                         visible: root.currentPage === "system" || root.currentPage === "about"
                         Layout.fillWidth: true
@@ -469,11 +474,8 @@ ApplicationWindow {
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
-                    PlaceholderPage {
-                        visible: !root.pageImplemented(root.currentPage)
-                        Layout.fillWidth: true
-                        lightTheme: root.lightTheme
-                    }
+
+                    Item { Layout.preferredHeight: 28 }
                 }
             }
         }
