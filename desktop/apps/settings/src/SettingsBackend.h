@@ -79,11 +79,11 @@ private:
     void setStatus(const QString &text);
     static bool startFirstAvailable(const QStringList &commands);
 
-    QString m_theme = QStringLiteral("Automático");
-    QString m_accentColor = QStringLiteral("#2563EB");
+    QString m_theme = QStringLiteral("Oscuro");
+    QString m_accentColor = QStringLiteral("#D6A85F");
     QString m_animationMode = QStringLiteral("Normal");
-    bool m_dockAutoHide = true;
-    int m_dockSize = 66;
+    bool m_dockAutoHide = false;
+    int m_dockSize = 64;
     bool m_dockMagnify = true;
     QString m_profile = QStringLiteral("Normal");
     QString m_recommendedProfile = QStringLiteral("Normal");
