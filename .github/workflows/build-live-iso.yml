@@ -68,6 +68,15 @@ jobs:
           test ! -e desktop/os/live/config/includes.chroot/usr/local/lib/murschol/install-edge-root
           xmllint --noout desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
 
+          # Toda ventana normal debe ofrecer minimizar, maximizar/restaurar y cerrar.
+          grep -q '<layout>icon:iconify,max,close</layout>' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          grep -q '^MOZ_GTK_TITLEBAR_DECORATION=system$' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/environment
+          grep -q "button-layout ':minimize,maximize,close'" desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          test -s desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc/iconify.xbm
+          test -s desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc/max.xbm
+          test -s desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc/max_toggled.xbm
+          test -s desktop/os/live/config/includes.chroot/usr/share/themes/MurSchol/labwc/close.xbm
+
       - name: Construir MurSchol OS Live 0.1
         run: sudo ./desktop/os/live/build-live.sh
 
