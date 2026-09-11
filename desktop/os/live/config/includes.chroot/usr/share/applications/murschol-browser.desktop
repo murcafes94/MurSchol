@@ -2,12 +2,12 @@
 Type=Application
 Name=MurSchol Browser
 GenericName=Navegador web
-Comment=Navega, investiga y estudia con el navegador de MurSchol OS
+Comment=Navega, investiga, estudia y abre documentos PDF con MurSchol OS
 Exec=/usr/local/bin/murschol-browser %U
 Icon=web-browser
 Terminal=false
-MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+MimeType=text/html;application/xhtml+xml;application/pdf;x-scheme-handler/http;x-scheme-handler/https;
 Categories=Network;WebBrowser;Education;
-Keywords=internet;navegador;web;browser;estudio;investigacion;
+Keywords=internet;navegador;web;browser;estudio;investigacion;pdf;
 StartupNotify=true
 StartupWMClass=zen
