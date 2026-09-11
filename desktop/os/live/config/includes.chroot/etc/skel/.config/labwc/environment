@@ -2,5 +2,8 @@
 # El asistente de primera configuración permitirá cambiar estas opciones.
 XKB_DEFAULT_LAYOUT=latam
 MOZ_ENABLE_WAYLAND=1
+# Firefox/Zen usan la decoración del sistema para heredar los controles
+# minimizar, maximizar/restaurar y cerrar del tema MurSchol.
+MOZ_GTK_TITLEBAR_DECORATION=system
 GDK_BACKEND=wayland,x11
 XCURSOR_SIZE=24
