@@ -47,7 +47,7 @@ Rectangle {
                 {label:"MurSchol Browser", icon:"web-browser", fallback:"◉", action:"browser", tone:"#5A4638"},
                 {label:"Aplicaciones", icon:"system-software-install", fallback:"▦", action:"install", tone:"#74504A"},
                 {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal", tone:"#242B31"},
-                {label:"Configuración", icon:"preferences-system", fallback:"⚙", action:"system", tone:"#4B4F55"}
+                {label:"Sistema", icon:"preferences-system", fallback:"⚙", action:"system", tone:"#4B4F55"}
             ]
 
             delegate: Button {
