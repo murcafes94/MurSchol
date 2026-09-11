@@ -8,8 +8,9 @@ Rectangle {
     width: 470
     height: 680
     radius: 26
-    color: "#f0142531"
-    border.color: "#3a5e6e"
+    color: "#F016191E"
+    border.width: 1
+    border.color: "#5E50443A"
 
     ColumnLayout {
         anchors.fill: parent
@@ -20,16 +21,18 @@ Rectangle {
             Layout.fillWidth: true
             ColumnLayout {
                 spacing: 0
-                Label { text: "Centro del sistema"; color: "white"; font.pixelSize: 21; font.bold: true }
-                Label { text: "Rendimiento, compatibilidad y estado"; color: "#7899a6"; font.pixelSize: 10 }
+                Label { text: "Centro del sistema"; color: "#F3EEE5"; font.pixelSize: 21; font.bold: true }
+                Label { text: "Rendimiento, compatibilidad y estado"; color: "#968C82"; font.pixelSize: 10 }
             }
             Item { Layout.fillWidth: true }
             Rectangle {
-                width: 82
-                height: 26
-                radius: 13
-                color: "#153845"
-                Label { anchors.centerIn: parent; text: root.backend.profile; color: "#8fe1dc"; font.pixelSize: 9; font.bold: true }
+                width: 86
+                height: 28
+                radius: 14
+                color: "#302820"
+                border.width: 1
+                border.color: root.backend.accentColor
+                Label { anchors.centerIn: parent; text: root.backend.profile; color: "#F1DEC1"; font.pixelSize: 9; font.bold: true }
             }
         }
 
@@ -38,51 +41,53 @@ Rectangle {
             spacing: 8
             Repeater {
                 model: [
-                    {n:"CPU", v:backend.cpuUsage, c:"#38bdf8"},
-                    {n:"RAM", v:backend.memoryUsage, c:"#55d58a"},
-                    {n:"Disco", v:backend.diskUsage, c:"#a36bf4"}
+                    {n:"CPU", v:backend.cpuUsage, c:root.backend.accentColor},
+                    {n:"RAM", v:backend.memoryUsage, c:"#78B58B"},
+                    {n:"Disco", v:backend.diskUsage, c:"#C58A6A"}
                 ]
                 delegate: Rectangle {
                     required property var modelData
                     Layout.fillWidth: true
                     height: 76
                     radius: 17
-                    color: "#192f3a"
+                    color: "#1A1D22"
+                    border.width: 1
                     border.color: modelData.c
                     Column {
                         anchors.centerIn: parent
                         spacing: 2
-                        Label { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.v + "%"; color: "white"; font.pixelSize: 19; font.bold: true }
-                        Label { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.n; color: "#9bb0ba"; font.pixelSize: 9 }
+                        Label { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.v + "%"; color: "#F3EEE5"; font.pixelSize: 19; font.bold: true }
+                        Label { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.n; color: "#A79E94"; font.pixelSize: 9 }
                     }
                 }
             }
         }
 
-        Label { text: "Equipo"; color: "#bdd0d8"; font.bold: true; font.pixelSize: 11 }
+        Label { text: "Equipo"; color: "#D7CFC5"; font.bold: true; font.pixelSize: 11 }
         Rectangle {
             Layout.fillWidth: true
             height: root.backend.batteryAvailable ? 100 : 82
             radius: 15
-            color: "#192e39"
-            border.color: "#294a59"
+            color: "#1A1D22"
+            border.width: 1
+            border.color: "#4A423A34"
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 11
                 spacing: 2
-                Label { text: root.backend.distroName; color: "white"; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true; font.pixelSize: 11 }
-                Label { text: root.backend.cpuModel + " · " + root.backend.cpuThreads + " hilos"; color: "#88a0ab"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
-                Label { text: "Kernel " + root.backend.kernelVersion + " · RAM " + root.backend.totalMemoryGb.toFixed(1) + " GB"; color: "#7895a1"; font.pixelSize: 9 }
+                Label { text: root.backend.distroName; color: "#F3EEE5"; font.bold: true; elide: Text.ElideRight; Layout.fillWidth: true; font.pixelSize: 11 }
+                Label { text: root.backend.cpuModel + " · " + root.backend.cpuThreads + " hilos"; color: "#AAA097"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label { text: "Kernel " + root.backend.kernelVersion + " · RAM " + root.backend.totalMemoryGb.toFixed(1) + " GB"; color: "#8E857D"; font.pixelSize: 9 }
                 Label {
                     visible: root.backend.batteryAvailable
                     text: "Batería " + root.backend.batteryPercent + "% · " + (root.backend.charging ? "cargando" : "en uso")
-                    color: root.backend.batteryPercent <= 20 ? "#efb36a" : "#72d9c7"
+                    color: root.backend.batteryPercent <= 20 ? "#E19A73" : "#78B58B"
                     font.pixelSize: 9
                 }
             }
         }
 
-        Label { text: "Compatibilidad"; color: "#bdd0d8"; font.bold: true; font.pixelSize: 11 }
+        Label { text: "Compatibilidad"; color: "#D7CFC5"; font.bold: true; font.pixelSize: 11 }
 
         RowLayout {
             Layout.fillWidth: true
@@ -98,26 +103,28 @@ Rectangle {
                     Layout.fillWidth: true
                     height: 70
                     radius: 15
-                    color: "#192e39"
-                    border.color: modelData.ready ? "#2c6b60" : "#4d4a3a"
+                    color: "#1A1D22"
+                    border.width: 1
+                    border.color: modelData.ready ? "#537A60" : "#675943"
                     ColumnLayout {
                         anchors.centerIn: parent
                         spacing: 1
-                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.symbol; color: modelData.ready ? "#6ce1ba" : "#d0ad72"; font.bold: true; font.pixelSize: 16 }
-                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.name; color: "white"; font.bold: true; font.pixelSize: 9 }
-                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.ready ? modelData.detail : "Pendiente"; color: modelData.ready ? "#72e2ad" : "#e7b86e"; font.pixelSize: 7 }
+                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.symbol; color: modelData.ready ? "#8FC7A0" : "#E3BB78"; font.bold: true; font.pixelSize: 16 }
+                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.name; color: "#F3EEE5"; font.bold: true; font.pixelSize: 9 }
+                        Label { Layout.alignment: Qt.AlignHCenter; text: modelData.ready ? modelData.detail : "No instalado"; color: modelData.ready ? "#82B892" : "#C9A86F"; font.pixelSize: 7 }
                     }
                 }
             }
         }
 
-        Label { text: "Modo de rendimiento"; color: "#bdd0d8"; font.bold: true; font.pixelSize: 11 }
+        Label { text: "Modo de rendimiento"; color: "#D7CFC5"; font.bold: true; font.pixelSize: 11 }
         Rectangle {
             Layout.fillWidth: true
             height: 126
             radius: 17
-            color: "#152b36"
-            border.color: "#2b4c5b"
+            color: "#15181D"
+            border.width: 1
+            border.color: "#4A423A34"
 
             RowLayout {
                 anchors.fill: parent
@@ -137,24 +144,26 @@ Rectangle {
                         onClicked: root.backend.setProfile(modelData.name)
                         background: Rectangle {
                             radius: 14
-                            color: root.backend.profile === modelData.name ? "#174a5e" : (parent.hovered ? "#183a47" : "#112732")
+                            color: root.backend.profile === modelData.name ? "#3C2D242A" : (parent.hovered ? "#29251F24" : "#111419")
                             border.width: root.backend.profile === modelData.name ? 2 : 1
-                            border.color: root.backend.profile === modelData.name ? "#2bd6e1" : "#2c4b59"
+                            border.color: root.backend.profile === modelData.name ? root.backend.accentColor : "#443C352F"
                         }
                         contentItem: ColumnLayout {
                             spacing: 2
                             Item { Layout.fillHeight: true }
-                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.symbol; color: "#70e5df"; font.pixelSize: 17; font.bold: true }
-                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.name; color: "white"; font.pixelSize: 9; font.bold: true }
-                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.desc; color: "#8fa8b2"; font.pixelSize: 7 }
+                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.symbol; color: root.backend.profile === modelData.name ? root.backend.accentColor : "#B8AEA4"; font.pixelSize: 17; font.bold: true }
+                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.name; color: "#F3EEE5"; font.pixelSize: 9; font.bold: true }
+                            Label { Layout.alignment: Qt.AlignHCenter; text: modelData.desc; color: "#91877D"; font.pixelSize: 7 }
                             Rectangle {
                                 Layout.alignment: Qt.AlignHCenter
                                 visible: modelData.name === root.backend.recommendedProfile
                                 width: rec.implicitWidth + 10
                                 height: 18
                                 radius: 9
-                                color: "#196a59"
-                                Label { id: rec; anchors.centerIn: parent; text: "Recomendado"; color: "#baffdf"; font.pixelSize: 7; font.bold: true }
+                                color: "#273E30"
+                                border.width: 1
+                                border.color: "#537A60"
+                                Label { id: rec; anchors.centerIn: parent; text: "Recomendado"; color: "#A5D1AF"; font.pixelSize: 7; font.bold: true }
                             }
                             Item { Layout.fillHeight: true }
                         }
@@ -166,11 +175,25 @@ Rectangle {
         Item { Layout.fillHeight: true }
         RowLayout {
             Layout.fillWidth: true
-            Label { text: root.backend.statusText; color: "#6f929f"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
+            Label { text: root.backend.statusText; color: "#857C73"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
             Button {
                 visible: root.backend.profile !== root.backend.recommendedProfile
                 text: "Usar recomendado"
                 onClicked: root.backend.applyRecommendedProfile()
+                background: Rectangle {
+                    radius: 11
+                    color: parent.hovered ? "#4A392D" : "#332820"
+                    border.width: 1
+                    border.color: root.backend.accentColor
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#F1DEC1"
+                    font.pixelSize: 9
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
         }
     }
