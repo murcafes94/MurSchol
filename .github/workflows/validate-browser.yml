@@ -1,0 +1,50 @@
+name: Validate MurSchol Browser
+
+on:
+  push:
+    paths:
+      - 'desktop/apps/browser/**'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-browser.desktop'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list'
+      - '.github/workflows/validate-browser.yml'
+  pull_request:
+    paths:
+      - 'desktop/apps/browser/**'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-browser.desktop'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list'
+      - '.github/workflows/validate-browser.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate scripts
+        run: |
+          bash -n desktop/apps/browser/prepare-zen.sh
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser
+
+      - name: Validate Surfer configuration
+        run: |
+          jq -e '.name == "MurSchol Browser"' desktop/apps/browser/murschol-surfer.json
+          jq -e '.binaryName == "murschol-browser"' desktop/apps/browser/murschol-surfer.json
+          jq -e '.version.product == "firefox"' desktop/apps/browser/murschol-surfer.json
+          jq -e '.license.licenseType == "MPL-2.0"' desktop/apps/browser/murschol-surfer.json
+
+      - name: Validate desktop integration
+        run: |
+          grep -q '^Name=MurSchol Browser$' desktop/os/live/config/includes.chroot/usr/share/applications/murschol-browser.desktop
+          grep -q '^Exec=/usr/local/bin/murschol-browser %U$' desktop/os/live/config/includes.chroot/usr/share/applications/murschol-browser.desktop
+          grep -q '^x-scheme-handler/http=murschol-browser.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
+          grep -q '^x-scheme-handler/https=murschol-browser.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
+
+      - name: Ensure Edge integration stays removed
+        run: |
+          test ! -e desktop/os/live/config/includes.chroot/usr/local/bin/murschol-edge
+          test ! -e desktop/os/live/config/includes.chroot/usr/local/lib/murschol/install-edge-root
+          ! grep -R -n --exclude-dir=.git 'murschol-edge\|Microsoft Edge' desktop/os/live/config
