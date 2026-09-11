@@ -44,7 +44,7 @@ Rectangle {
             model: [
                 {label:"Inicio", icon:"", fallback:"✝", action:"start", tone:"#2A211B"},
                 {label:"Archivos", icon:"system-file-manager", fallback:"▰", action:"files", tone:"#B78947"},
-                {label:"MurSchol Browser", icon:"web-browser", fallback:"◉", action:"browser", tone:"#2E5878"},
+                {label:"MurSchol Browser", icon:"web-browser", fallback:"◉", action:"browser", tone:"#5A4638"},
                 {label:"Aplicaciones", icon:"system-software-install", fallback:"▦", action:"install", tone:"#74504A"},
                 {label:"Terminal", icon:"utilities-terminal", fallback:">_", action:"terminal", tone:"#242B31"},
                 {label:"Configuración", icon:"preferences-system", fallback:"⚙", action:"system", tone:"#4B4F55"}
