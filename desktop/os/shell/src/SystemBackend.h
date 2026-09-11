@@ -76,9 +76,6 @@ public:
     Q_INVOKABLE void setStudyLayout(const QString &layout);
     Q_INVOKABLE void openFiles();
     Q_INVOKABLE void openBrowser();
-    Q_INVOKABLE void openCalendar();
-    Q_INVOKABLE void openCalculator();
-    Q_INVOKABLE void openReader();
     Q_INVOKABLE void openTerminal();
     Q_INVOKABLE void openSettings(const QString &page = QString());
     Q_INVOKABLE void openAndroid();
