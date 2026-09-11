@@ -1,0 +1,51 @@
+# MurSchol OS window theme for labwc
+# Dark charcoal + warm bronze/gold visual language.
+
+border.width: 1
+window.titlebar.padding.width: 8
+window.titlebar.padding.height: 5
+window.button.width: 28
+window.button.height: 28
+window.button.spacing: 3
+
+window.active.border.color: #6A5847
+window.inactive.border.color: #35312D
+
+window.active.title.bg: Gradient Vertical
+window.active.title.bg.color: #1E2025
+window.active.title.bg.colorTo: #16191E
+window.inactive.title.bg: Solid
+window.inactive.title.bg.color: #15181C
+
+window.active.label.text.color: #F3EEE5
+window.inactive.label.text.color: #958D84
+window.label.text.justify: Left
+
+window.active.button.unpressed.image.color: #DED6CB
+window.active.button.hover.image.color: #D6A85F
+window.active.button.pressed.image.color: #F6E5C8
+window.inactive.button.unpressed.image.color: #837C74
+window.inactive.button.hover.image.color: #B79B75
+window.inactive.button.pressed.image.color: #D6A85F
+
+window.active.button.close.hover.image.color: #E28A78
+window.active.button.close.pressed.image.color: #F0B09F
+window.inactive.button.close.hover.image.color: #B56D60
+
+window.active.shadow.size: 42
+window.active.shadow.color: #00000090
+window.inactive.shadow.size: 28
+window.inactive.shadow.color: #00000066
+
+menu.items.bg.color: #181B20
+menu.items.text.color: #EAE4DA
+menu.items.active.bg.color: #3A2D25
+menu.items.active.text.color: #F5E5CB
+menu.separator.color: #4B4138
+menu.title.bg.color: #211D19
+menu.title.text.color: #D6A85F
+
+osd.bg.color: #181B20
+osd.border.color: #6A5847
+osd.border.width: 1
+osd.label.text.color: #F0EAE1
