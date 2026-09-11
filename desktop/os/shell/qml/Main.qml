@@ -102,8 +102,6 @@ ApplicationWindow {
         }
     }
 
-    // Fondo propio: oscuro, cálido y sobrio, inspirado en el concepto visual
-    // de MurSchol sin depender de una imagen estática de la interfaz.
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
@@ -143,10 +141,9 @@ ApplicationWindow {
 
         onPaint: {
             var ctx = getContext("2d")
-            ctx.reset()
-
             var w = width
             var h = height
+            ctx.clearRect(0, 0, w, h)
 
             ctx.fillStyle = "#0B1117"
             ctx.beginPath()
