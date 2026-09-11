@@ -1,0 +1,37 @@
+{
+  "name": "MurSchol Browser",
+  "vendor": "MurSchol",
+  "appId": "org.murschol.browser",
+  "binaryName": "murschol-browser",
+  "version": {
+    "product": "firefox",
+    "version": "155.0.1",
+    "candidate": "155.0.1",
+    "candidateBuild": 1
+  },
+  "buildOptions": {
+    "generateBranding": true,
+    "windowsUseSymbolicLinks": false
+  },
+  "addons": {},
+  "brands": {
+    "release": {
+      "backgroundColor": "#282A33",
+      "brandShorterName": "MurSchol",
+      "brandShortName": "MurSchol",
+      "brandFullName": "MurSchol Browser",
+      "release": {
+        "displayVersion": "0.1.0",
+        "github": {
+          "repo": "murcafes94/MurSchol"
+        }
+      }
+    }
+  },
+  "license": {
+    "ignoredFiles": [
+      ".*\\.json"
+    ],
+    "licenseType": "MPL-2.0"
+  }
+}
