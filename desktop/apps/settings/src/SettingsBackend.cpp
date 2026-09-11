@@ -61,11 +61,12 @@ void SettingsBackend::loadPreferences()
     m_theme = settings.value(QStringLiteral("appearance/theme"), m_theme).toString();
     m_accentColor = settings.value(QStringLiteral("appearance/accent"), m_accentColor).toString();
 
-    // La identidad anterior usaba teal como color por defecto. Si el usuario
-    // conserva exactamente ese valor heredado, migramos al azul oficial. Un
-    // color elegido manualmente por el usuario no se modifica.
-    if (m_accentColor.compare(QStringLiteral("#22d6cf"), Qt::CaseInsensitive) == 0) {
-        m_accentColor = QStringLiteral("#2563EB");
+    // Migra únicamente los colores oficiales heredados (teal/azul) al dorado
+    // actual. Un color distinto elegido manualmente por el usuario se respeta.
+    if (m_accentColor.compare(QStringLiteral("#22d6cf"), Qt::CaseInsensitive) == 0
+        || m_accentColor.compare(QStringLiteral("#2563EB"), Qt::CaseInsensitive) == 0
+        || m_accentColor.compare(QStringLiteral("#3B82F6"), Qt::CaseInsensitive) == 0) {
+        m_accentColor = QStringLiteral("#D6A85F");
         settings.setValue(QStringLiteral("appearance/accent"), m_accentColor);
     }
 
@@ -78,6 +79,18 @@ void SettingsBackend::loadPreferences()
     m_profile = savedProfile.isEmpty() ? m_recommendedProfile : savedProfile;
     if (savedProfile.isEmpty())
         settings.setValue(QStringLiteral("performance/profile"), m_profile);
+
+    const QString savedWorkspace = settings.value(QStringLiteral("workspace/active"), m_workspace).toString();
+    if (savedWorkspace == QStringLiteral("Estudio")
+        || savedWorkspace == QStringLiteral("Biblioteca")
+        || savedWorkspace == QStringLiteral("Ministerium")
+        || savedWorkspace == QStringLiteral("Personal")) {
+        m_workspace = savedWorkspace;
+    } else {
+        m_workspace = QStringLiteral("Estudio");
+        settings.setValue(QStringLiteral("workspace/active"), m_workspace);
+    }
+
     settings.sync();
 }
 
@@ -250,6 +263,22 @@ void SettingsBackend::setProfile(const QString &value)
     saveValue(QStringLiteral("performance/profile"), value);
     emit profileChanged();
     setStatus(QStringLiteral("Perfil cambiado a %1").arg(value));
+}
+
+void SettingsBackend::setWorkspace(const QString &value)
+{
+    if (value != QStringLiteral("Estudio")
+        && value != QStringLiteral("Biblioteca")
+        && value != QStringLiteral("Ministerium")
+        && value != QStringLiteral("Personal"))
+        return;
+    if (m_workspace == value)
+        return;
+
+    m_workspace = value;
+    saveValue(QStringLiteral("workspace/active"), value);
+    emit workspaceChanged();
+    setStatus(QStringLiteral("Espacio activo: %1").arg(value));
 }
 
 bool SettingsBackend::startFirstAvailable(const QStringList &commands)
