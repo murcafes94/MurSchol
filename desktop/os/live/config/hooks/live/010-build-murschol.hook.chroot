@@ -187,6 +187,7 @@ chmod 0755 /usr/local/bin/murschol-capture
 chmod 0755 /usr/local/bin/murschol-settings
 chmod 0755 /usr/local/bin/murschol-media
 chmod 0755 /usr/local/bin/murschol-music
+chmod 0755 /usr/local/bin/murschol-browser
 chmod 0755 /usr/local/bin/murschol-edge
 chmod 0755 /usr/local/bin/murschol-launch
 chmod 0755 /usr/local/lib/murschol/murschol-settings-bin
@@ -224,5 +225,6 @@ echo "[MurSchol] MurSchol Capture instalado en /usr/local/bin/murschol-capture"
 echo "[MurSchol] MurSchol Settings instalado en /usr/local/bin/murschol-settings"
 echo "[MurSchol] MurSchol Media instalado en /usr/local/bin/murschol-media"
 echo "[MurSchol] MurSchol Music instalado en /usr/local/bin/murschol-music"
+echo "[MurSchol] MurSchol Browser registrado en /usr/local/bin/murschol-browser"
 echo "[MurSchol] Lanzador de diagnóstico instalado en /usr/local/bin/murschol-launch"
 echo "[MurSchol] Microsoft Edge disponible como instalación bajo demanda."
