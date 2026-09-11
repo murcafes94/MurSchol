@@ -21,23 +21,22 @@ cp -a "${SCRIPT_DIR}/config" "${WORK_DIR}/config"
 
 # El shell y las apps integradas se compilan dentro del chroot Debian para
 # evitar incompatibilidades de glibc/Qt entre el runner y la ISO final.
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-shell"
-cp -a "${OS_DIR}/shell/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-shell/"
+copy_source() {
+  local source="$1"
+  local target="$2"
+  mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/${target}"
+  cp -a "${source}/." "${WORK_DIR}/config/includes.chroot/usr/src/${target}/"
+}
 
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-photos"
-cp -a "${REPO_DIR}/desktop/apps/photos/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-photos/"
-
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-capture"
-cp -a "${REPO_DIR}/desktop/apps/capture/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-capture/"
-
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-settings"
-cp -a "${REPO_DIR}/desktop/apps/settings/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-settings/"
-
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-media"
-cp -a "${REPO_DIR}/desktop/apps/media/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-media/"
-
-mkdir -p "${WORK_DIR}/config/includes.chroot/usr/src/murschol-music"
-cp -a "${REPO_DIR}/desktop/apps/music/." "${WORK_DIR}/config/includes.chroot/usr/src/murschol-music/"
+copy_source "${OS_DIR}/shell" "murschol-shell"
+copy_source "${REPO_DIR}/desktop/apps/photos" "murschol-photos"
+copy_source "${REPO_DIR}/desktop/apps/capture" "murschol-capture"
+copy_source "${REPO_DIR}/desktop/apps/settings" "murschol-settings"
+copy_source "${REPO_DIR}/desktop/apps/media" "murschol-media"
+copy_source "${REPO_DIR}/desktop/apps/music" "murschol-music"
+copy_source "${REPO_DIR}/desktop/apps/calculator" "murschol-calculator"
+copy_source "${REPO_DIR}/desktop/apps/calendar" "murschol-calendar"
+copy_source "${REPO_DIR}/desktop/apps/reader" "murschol-reader"
 
 cd "${WORK_DIR}"
 
