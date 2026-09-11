@@ -35,6 +35,7 @@ qt_add_qml_module(murschol-settings
         qml/Main.qml
         qml/AppearancePage.qml
         qml/DockPage.qml
+        qml/WorkspacesPage.qml
         qml/PerformancePage.qml
         qml/SystemPage.qml
         qml/NetworkPage.qml
