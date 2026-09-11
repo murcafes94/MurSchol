@@ -105,8 +105,8 @@ Window {
         }
     }
 
-    // Se conserva durante la migración; el acceso visible abre MurSchol Settings.
     SystemCenter {
+        id: systemCenter
         visible: root.systemOpen
         anchors.right: parent.right
         anchors.bottom: dock.top
@@ -118,7 +118,7 @@ Window {
     Rectangle {
         visible: root.appManagerOpen
         anchors.fill: parent
-        color: "#6a02070c"
+        color: "#6A02070C"
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -176,11 +176,10 @@ Window {
             root.showDock()
         }
         onSystemClicked: {
-            backend.openSettings("appearance")
+            root.systemOpen = !root.systemOpen
             root.startOpen = false
-            root.systemOpen = false
             root.appManagerOpen = false
-            root.scheduleHide()
+            root.showDock()
         }
     }
 
@@ -191,7 +190,7 @@ Window {
         radius: 3
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        color: root.dockRaised ? backend.accentColor : "#547080"
+        color: root.dockRaised ? backend.accentColor : "#6D6257"
         opacity: root.dockRaised ? 0.72 : 0.46
     }
 }
