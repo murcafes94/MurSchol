@@ -175,20 +175,45 @@ Rectangle {
         Item { Layout.fillHeight: true }
         RowLayout {
             Layout.fillWidth: true
-            Label { text: root.backend.statusText; color: "#857C73"; font.pixelSize: 9; elide: Text.ElideRight; Layout.fillWidth: true }
+            spacing: 8
+
+            Label {
+                text: root.backend.statusText
+                color: "#857C73"
+                font.pixelSize: 9
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
+
             Button {
                 visible: root.backend.profile !== root.backend.recommendedProfile
                 text: "Usar recomendado"
                 onClicked: root.backend.applyRecommendedProfile()
                 background: Rectangle {
                     radius: 11
-                    color: parent.hovered ? "#4A392D" : "#332820"
+                    color: parent.hovered ? "#3B332C" : "#25211D"
                     border.width: 1
-                    border.color: root.backend.accentColor
+                    border.color: "#675A4B"
                 }
                 contentItem: Label {
                     text: parent.text
-                    color: "#F1DEC1"
+                    color: "#D7CFC5"
+                    font.pixelSize: 9
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+
+            Button {
+                text: "Abrir Configuración"
+                onClicked: root.backend.openSettings("appearance")
+                background: Rectangle {
+                    radius: 11
+                    color: parent.hovered ? "#E3BB78" : "#D6A85F"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#15120F"
                     font.pixelSize: 9
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
