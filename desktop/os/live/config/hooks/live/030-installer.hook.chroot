@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+# Calamares viene de Debian Trixie con una configuración probada para medios
+# Live. MurSchol conserva ese backend y presenta un único acceso propio.
+if [ ! -x /usr/bin/calamares-install-debian ]; then
+    echo "MurSchol installer: falta /usr/bin/calamares-install-debian" >&2
+    exit 1
+fi
+
+# Evita que la configuración Debian intente crear un icono genérico en un
+# escritorio tradicional. MurSchol publica el instalador mediante Inicio.
+rm -f /etc/xdg/autostart/calamares-desktop-icon.desktop
+
+# Oculta el lanzador Debian para no duplicar entradas en el índice de apps.
+if [ -f /usr/share/applications/calamares-install-debian.desktop ]; then
+    cat > /usr/share/applications/calamares-install-debian.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Debian Installer Backend
+Exec=/usr/bin/calamares-install-debian
+Icon=install-debian
+Terminal=false
+NoDisplay=true
+Categories=System;
+EOF
+fi
+
+cat > /usr/share/applications/murschol-installer.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Instalar MurSchol OS
+GenericName=Instalador del sistema
+Comment=Instala MurSchol OS de forma permanente en este equipo
+Exec=/usr/bin/calamares-install-debian
+Icon=install-debian
+Terminal=false
+Categories=System;Settings;
+Keywords=MurSchol;instalar;install;sistema;disco;Calamares;
+StartupNotify=true
+EOF
+
+chmod 0644 /usr/share/applications/murschol-installer.desktop
+
+echo "MurSchol installer: Calamares registrado como Instalar MurSchol OS"
