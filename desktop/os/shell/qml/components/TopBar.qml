@@ -77,7 +77,7 @@ Rectangle {
             text: Qt.formatDateTime(root.now, "ddd d 'de' MMMM   hh:mm")
             color: "#F3EFE7"
             font.pixelSize: 11
-            font.medium: true
+            font.weight: Font.Medium
             Layout.alignment: Qt.AlignHCenter
         }
 
