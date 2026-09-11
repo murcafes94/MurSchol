@@ -8,9 +8,17 @@ Rectangle {
     property date now: new Date()
     signal systemClicked()
 
-    height: 46
-    color: "#F20B0D12"
-    border.color: "#252B35"
+    height: 36
+    color: "#F2181A1F"
+    border.width: 0
+
+    Rectangle {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 1
+        color: "#40352B24"
+    }
 
     Timer {
         interval: 30000
@@ -21,113 +29,114 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 16
+        anchors.leftMargin: 14
         anchors.rightMargin: 14
         spacing: 10
 
         Rectangle {
-            width: 30
-            height: 30
-            radius: 9
-            color: backend.accentColor
-            border.color: "#5B8CFF"
+            width: 24
+            height: 24
+            radius: 12
+            color: "#16191F"
+            border.width: 1
+            border.color: backend.accentColor
             Label {
                 anchors.centerIn: parent
-                text: "MS"
-                color: "#FFFFFF"
+                text: "✝"
+                color: backend.accentColor
+                font.pixelSize: 13
                 font.bold: true
-                font.pixelSize: 10
             }
         }
 
-        Label { text: "MurSchol OS"; color: "#F8FAFC"; font.pixelSize: 15; font.bold: true }
         Label {
-            visible: root.width > 1120
-            text: "Aprender hoy, un mundo mejor mañana"
-            color: "#8B95A5"
-            font.pixelSize: 9
+            text: "MurSchol OS"
+            color: "#F5F1E8"
+            font.pixelSize: 13
+            font.bold: true
+        }
+
+        Rectangle {
+            width: 1
+            height: 16
+            color: "#59483A2C"
+        }
+
+        Label {
+            visible: root.width > 920
+            text: "Ad maiorem Dei gloriam"
+            color: "#D9C8AC"
+            font.pixelSize: 11
+            font.italic: true
+            font.family: "Noto Serif"
         }
 
         Item { Layout.fillWidth: true }
 
-        Rectangle {
-            visible: root.width > 960
-            height: 26
-            width: workspaceLabel.implicitWidth + 20
-            radius: 13
-            color: "#151A23"
-            border.color: backend.accentColor
-            Label {
-                id: workspaceLabel
-                anchors.centerIn: parent
-                text: backend.workspace
-                color: "#F8FAFC"
-                font.pixelSize: 9
-                font.bold: true
-            }
+        Label {
+            text: Qt.formatDateTime(root.now, "ddd d 'de' MMMM   hh:mm")
+            color: "#F3EFE7"
+            font.pixelSize: 11
+            font.medium: true
+            Layout.alignment: Qt.AlignHCenter
         }
+
+        Item { Layout.fillWidth: true }
 
         Label {
-            text: Qt.formatDateTime(root.now, "ddd, d MMM  hh:mm")
-            color: "#E5E7EB"
-            font.pixelSize: 11
+            visible: root.width > 980
+            text: "▣"
+            color: "#ECE8DF"
+            font.pixelSize: 12
         }
-
-        Rectangle {
-            visible: root.width > 1180
-            width: 60
-            height: 24
-            radius: 12
-            color: "#171C24"
-            border.color: "#252B35"
-            Label {
-                anchors.centerIn: parent
-                text: "CPU " + backend.cpuUsage + "%"
-                color: backend.accentColor
-                font.pixelSize: 8
-                font.bold: true
-            }
+        Label {
+            text: "⌁"
+            color: "#ECE8DF"
+            font.pixelSize: 16
         }
-
-        Rectangle {
-            visible: root.width > 1180
-            width: 60
-            height: 24
-            radius: 12
-            color: "#171C24"
-            border.color: "#252B35"
-            Label {
-                anchors.centerIn: parent
-                text: "RAM " + backend.memoryUsage + "%"
-                color: "#F8FAFC"
-                font.pixelSize: 8
-            }
+        Label {
+            text: "◕"
+            color: "#ECE8DF"
+            font.pixelSize: 13
         }
-
         Label {
             visible: backend.batteryAvailable
-            text: (backend.charging ? "⚡ " : "") + backend.batteryPercent + "%"
-            color: backend.batteryPercent <= 20 ? "#E63946" : "#F8FAFC"
+            text: (backend.charging ? "⚡" : "▰") + " " + backend.batteryPercent + "%"
+            color: backend.batteryPercent <= 20 ? "#E07A68" : "#ECE8DF"
             font.pixelSize: 10
-            font.bold: backend.batteryPercent <= 20
+        }
+        Label {
+            text: "●"
+            color: "#ECE8DF"
+            font.pixelSize: 8
+        }
+
+        Label {
+            visible: root.width > 1120
+            text: "Ora. Estudia. Sirve."
+            color: "#D9C8AC"
+            font.pixelSize: 10
+            font.italic: true
+            font.family: "Noto Serif"
         }
 
         Button {
-            width: 34
-            height: 32
+            width: 28
+            height: 28
             text: "⚙"
             onClicked: root.systemClicked()
             background: Rectangle {
-                radius: 10
-                color: parent.hovered ? "#1E3A8A" : "transparent"
-                border.color: parent.hovered ? backend.accentColor : "transparent"
+                radius: 9
+                color: parent.hovered ? "#332A211B" : "transparent"
+                border.width: parent.hovered ? 1 : 0
+                border.color: backend.accentColor
             }
             contentItem: Label {
                 text: parent.text
-                color: "#F8FAFC"
+                color: parent.hovered ? backend.accentColor : "#ECE8DF"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 15
+                font.pixelSize: 13
             }
         }
     }
