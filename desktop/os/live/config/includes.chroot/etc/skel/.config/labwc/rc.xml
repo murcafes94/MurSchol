@@ -2,7 +2,7 @@
 <labwc_config>
   <core>
     <decoration>server</decoration>
-    <gap>6</gap>
+    <gap>7</gap>
     <primarySelection>yes</primarySelection>
   </core>
 
@@ -12,11 +12,27 @@
   </placement>
 
   <theme>
-    <cornerRadius>10</cornerRadius>
+    <name>MurSchol</name>
+    <cornerRadius>12</cornerRadius>
     <keepBorder>yes</keepBorder>
     <maximizedDecoration>titlebar</maximizedDecoration>
-    <dropShadows>no</dropShadows>
-    <font name="sans" size="10" />
+    <dropShadows>yes</dropShadows>
+    <dropShadowsOnTiled>yes</dropShadowsOnTiled>
+    <font place="ActiveWindow">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>semibold</weight>
+    </font>
+    <font place="InactiveWindow">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>normal</weight>
+    </font>
+    <font place="OnScreenDisplay">
+      <name>Noto Sans</name>
+      <size>10</size>
+      <weight>medium</weight>
+    </font>
     <titlebar>
       <layout>icon:iconify,max,close</layout>
       <showTitle>yes</showTitle>
@@ -59,7 +75,7 @@
     <windowRule identifier="murschol-panel" serverDecoration="no" />
   </windowRules>
 
-  <!-- Alt+Tab muestra icono, nombre y vista previa de la ventana activa. -->
+  <!-- Alt+Tab conserva vistas previas, pero adopta los colores del tema MurSchol. -->
   <windowSwitcher preview="yes" outlines="yes" unshade="yes">
     <osd show="yes" style="classic" output="all" thumbnailLabelFormat="%T" />
     <fields>
