@@ -29,9 +29,7 @@ class MainActivity : Activity() {
         bind(R.id.tileMoodle, R.id.dockMoodle) { launchByLabels("moodle", "aula virtual") }
         bind(R.id.tileLibrary, R.id.dockLibrary) { showLibraryChooser() }
         bind(R.id.tileNotes, R.id.dockNotes, R.id.continueNotCan) { launchNotCan() }
-        bind(R.id.tileInternet, R.id.dockInternet) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com")))
-        }
+        bind(R.id.tileInternet, R.id.dockInternet) { openInternet() }
         bind(R.id.tileFiles) { openFiles() }
         bind(R.id.tileYoutube, R.id.dockYoutube) { openYouTube() }
         bind(R.id.appsButton, R.id.searchButton) {
@@ -74,6 +72,12 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun openInternet() {
+        if (!launchPackages(arrayOf("com.murschol.browser"))) {
+            openWebUrl("https://www.google.com")
+        }
+    }
+
     private fun showLibraryChooser() {
         val options = arrayOf("Moon+ Reader", "Kindle")
         AlertDialog.Builder(this)
@@ -110,7 +114,17 @@ class MainActivity : Activity() {
 
     private fun openYouTube() {
         if (!launchByLabels("youtube", "morphe", "revanced")) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com")))
+            openWebUrl("https://www.youtube.com")
+        }
+    }
+
+    private fun openWebUrl(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            })
+        } catch (_: Exception) {
+            Toast.makeText(this, "No encontré un navegador web.", Toast.LENGTH_SHORT).show()
         }
     }
 
