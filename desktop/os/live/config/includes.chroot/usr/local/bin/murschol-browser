@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+# MurSchol Browser desktop launcher.
+# The branded browser will live under /opt/murschol-browser. During the alpha,
+# keep safe fallbacks so a failed/missing browser artifact never leaves the
+# Live ISO without web access.
+
+if [ -x /opt/murschol-browser/murschol-browser ]; then
+  exec /opt/murschol-browser/murschol-browser "$@"
+fi
+
+if [ -x /opt/murschol-browser/zen ]; then
+  exec /opt/murschol-browser/zen "$@"
+fi
+
+if command -v murschol-browser-bin >/dev/null 2>&1; then
+  exec murschol-browser-bin "$@"
+fi
+
+if command -v zen >/dev/null 2>&1; then
+  exec zen "$@"
+fi
+
+if command -v zen-browser >/dev/null 2>&1; then
+  exec zen-browser "$@"
+fi
+
+# Temporary recovery path while the MurSchol/Zen artifact is being produced.
+if command -v firefox-esr >/dev/null 2>&1; then
+  exec firefox-esr "$@"
+fi
+
+if command -v firefox >/dev/null 2>&1; then
+  exec firefox "$@"
+fi
+
+MESSAGE="No se encontró MurSchol Browser ni un navegador de respaldo."
+printf '%s\n' "$MESSAGE" >&2
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "MurSchol Browser" "$MESSAGE" 2>/dev/null || true
+fi
+exit 127
