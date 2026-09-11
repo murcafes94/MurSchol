@@ -11,7 +11,18 @@ ApplicationWindow {
     minimumHeight: 560
     visible: true
     title: "MurSchol Calendar"
-    color: "#07131d"
+    color: "#0B0E12"
+
+    palette.window: "#0B0E12"
+    palette.windowText: "#F3EEE5"
+    palette.base: "#171B21"
+    palette.alternateBase: "#1E2025"
+    palette.text: "#F3EEE5"
+    palette.button: "#1E2025"
+    palette.buttonText: "#F3EEE5"
+    palette.highlight: "#D6A85F"
+    palette.highlightedText: "#201B17"
+    palette.placeholderText: "#7F766D"
 
     property date cursorDate: new Date()
     property var monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -63,8 +74,8 @@ ApplicationWindow {
 
     header: Rectangle {
         height: 66
-        color: "#0b1d29"
-        border.color: "#163448"
+        color: "#15181D"
+        border.color: "#35312D"
         border.width: 1
 
         RowLayout {
@@ -77,12 +88,14 @@ ApplicationWindow {
                 width: 38
                 height: 38
                 radius: 12
-                color: "#14374a"
+                color: "#49352B"
+                border.width: 1
+                border.color: "#D6A85F"
                 Label {
                     anchors.centerIn: parent
-                    text: "MS"
-                    color: "#70e9e1"
-                    font.pixelSize: 10
+                    text: "31"
+                    color: "#D6A85F"
+                    font.pixelSize: 11
                     font.bold: true
                 }
             }
@@ -92,13 +105,13 @@ ApplicationWindow {
                 spacing: 0
                 Label {
                     text: "MurSchol Calendar"
-                    color: "#f2f7f8"
+                    color: "#F3EEE5"
                     font.pixelSize: 17
                     font.bold: true
                 }
                 Label {
-                    text: "Local primero · sincronización opcional después"
-                    color: "#7793a1"
+                    text: "Agenda local para estudio, vida personal y ministerio"
+                    color: "#A79E94"
                     font.pixelSize: 10
                 }
             }
@@ -112,6 +125,7 @@ ApplicationWindow {
             }
 
             Button {
+                id: newEventButton
                 text: "+ Nuevo evento"
                 onClicked: {
                     dateField.text = events.selectedDate
@@ -122,6 +136,17 @@ ApplicationWindow {
                     notesField.text = ""
                     reminderBox.currentIndex = 1
                     eventDialog.open()
+                }
+                background: Rectangle {
+                    radius: 12
+                    color: newEventButton.down ? "#8E6A42" : (newEventButton.hovered ? "#E3BB78" : "#D6A85F")
+                }
+                contentItem: Label {
+                    text: newEventButton.text
+                    color: "#201B17"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
         }
@@ -137,8 +162,8 @@ ApplicationWindow {
             Layout.fillHeight: true
             Layout.preferredWidth: 760
             radius: 20
-            color: "#0b1b27"
-            border.color: "#173446"
+            color: "#11151C"
+            border.color: "#35312D"
             border.width: 1
 
             ColumnLayout {
@@ -157,7 +182,7 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         text: root.monthNames[root.cursorDate.getMonth()] + " " + root.cursorDate.getFullYear()
-                        color: "#f4f8fa"
+                        color: "#F3EEE5"
                         font.pixelSize: 22
                         font.bold: true
                     }
@@ -181,7 +206,7 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             horizontalAlignment: Text.AlignHCenter
                             text: modelData
-                            color: "#6f8c9a"
+                            color: "#A79E94"
                             font.pixelSize: 10
                             font.bold: true
                         }
@@ -206,9 +231,9 @@ ApplicationWindow {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             radius: 12
-                            color: isoDate === events.selectedDate ? "#17485a" : dayMouse.containsMouse ? "#102b3a" : "#0d2230"
-                            border.width: isoDate === Qt.formatDate(new Date(), "yyyy-MM-dd") ? 1 : 0
-                            border.color: "#65ded7"
+                            color: isoDate === events.selectedDate ? "#49352B" : dayMouse.containsMouse ? "#24211D" : "#171B21"
+                            border.width: isoDate === Qt.formatDate(new Date(), "yyyy-MM-dd") || isoDate === events.selectedDate ? 1 : 0
+                            border.color: "#D6A85F"
                             opacity: validDay ? 1.0 : 0.28
 
                             Label {
@@ -216,9 +241,20 @@ ApplicationWindow {
                                 anchors.left: parent.left
                                 anchors.margins: 10
                                 text: parent.validDay ? parent.dayNumber : ""
-                                color: parent.isoDate === events.selectedDate ? "#eafcfa" : "#c5d4db"
+                                color: parent.isoDate === events.selectedDate ? "#F6E5C8" : "#C9C0B6"
                                 font.pixelSize: 12
                                 font.bold: parent.isoDate === events.selectedDate
+                            }
+
+                            Rectangle {
+                                visible: parent.isoDate === Qt.formatDate(new Date(), "yyyy-MM-dd")
+                                width: 5
+                                height: 5
+                                radius: 3
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 7
+                                color: "#D6A85F"
                             }
 
                             MouseArea {
@@ -239,8 +275,8 @@ ApplicationWindow {
             Layout.preferredWidth: 350
             Layout.minimumWidth: 300
             radius: 20
-            color: "#0b1b27"
-            border.color: "#173446"
+            color: "#11151C"
+            border.color: "#35312D"
             border.width: 1
 
             ColumnLayout {
@@ -250,14 +286,14 @@ ApplicationWindow {
 
                 Label {
                     text: "Agenda"
-                    color: "#f3f7f9"
+                    color: "#F3EEE5"
                     font.pixelSize: 20
                     font.bold: true
                 }
 
                 Label {
                     text: events.selectedDate
-                    color: "#67ddd6"
+                    color: "#D6A85F"
                     font.pixelSize: 11
                 }
 
@@ -266,7 +302,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.topMargin: 22
                     text: "No hay eventos para este día."
-                    color: "#7894a2"
+                    color: "#A79E94"
                     wrapMode: Text.WordWrap
                 }
 
@@ -290,8 +326,8 @@ ApplicationWindow {
                         width: agendaList.width
                         height: notes.length > 0 ? 110 : 88
                         radius: 14
-                        color: "#102735"
-                        border.color: "#1f485b"
+                        color: "#171B21"
+                        border.color: "#51463B"
                         border.width: 1
 
                         ColumnLayout {
@@ -304,28 +340,40 @@ ApplicationWindow {
                                 Label {
                                     Layout.fillWidth: true
                                     text: title
-                                    color: "#eff7f8"
+                                    color: "#F3EEE5"
                                     font.pixelSize: 13
                                     font.bold: true
                                     elide: Text.ElideRight
                                 }
                                 Button {
+                                    id: deleteEventButton
                                     text: "×"
                                     width: 32
                                     height: 28
                                     onClicked: events.removeEvent(index)
+                                    background: Rectangle {
+                                        radius: 9
+                                        color: deleteEventButton.hovered ? "#4A2824" : "transparent"
+                                    }
+                                    contentItem: Label {
+                                        text: deleteEventButton.text
+                                        color: deleteEventButton.hovered ? "#F0B09F" : "#A79E94"
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.pixelSize: 16
+                                    }
                                 }
                             }
 
                             Label {
                                 text: allDay ? "Todo el día" : startTime + (endTime.length > 0 ? " — " + endTime : "")
-                                color: "#69ddd6"
+                                color: "#D6A85F"
                                 font.pixelSize: 10
                             }
 
                             Label {
                                 text: calendar + (reminderMinutes > 0 ? " · aviso " + reminderMinutes + " min antes" : "")
-                                color: "#718f9d"
+                                color: "#8F867D"
                                 font.pixelSize: 9
                             }
 
@@ -333,7 +381,7 @@ ApplicationWindow {
                                 visible: notes.length > 0
                                 Layout.fillWidth: true
                                 text: notes
-                                color: "#a9bbc3"
+                                color: "#C1B7AC"
                                 font.pixelSize: 9
                                 elide: Text.ElideRight
                             }
@@ -345,7 +393,7 @@ ApplicationWindow {
                     visible: root.statusText.length > 0
                     Layout.fillWidth: true
                     text: root.statusText
-                    color: "#f2a6a6"
+                    color: "#E28A78"
                     font.pixelSize: 10
                     wrapMode: Text.WordWrap
                 }
@@ -412,7 +460,7 @@ ApplicationWindow {
             ComboBox {
                 id: calendarBox
                 Layout.fillWidth: true
-                model: ["Personal", "Estudio", "Trabajo"]
+                model: ["Personal", "Estudio", "Ministerium", "Trabajo"]
             }
 
             ComboBox {
