@@ -14,7 +14,7 @@ ApplicationWindow {
     visibility: Window.Maximized
     flags: Qt.FramelessWindowHint
     title: "MurSchol OS"
-    color: "#07131f"
+    color: "#0B0E12"
 
     property bool startOpen: false
     property bool systemOpen: false
@@ -89,8 +89,9 @@ ApplicationWindow {
         }
     }
     Shortcut { sequence: "Meta+1"; onActivated: systemBackend.setWorkspace("Estudio") }
-    Shortcut { sequence: "Meta+2"; onActivated: systemBackend.setWorkspace("Trabajos") }
-    Shortcut { sequence: "Meta+3"; onActivated: systemBackend.setWorkspace("Personal") }
+    Shortcut { sequence: "Meta+2"; onActivated: systemBackend.setWorkspace("Biblioteca") }
+    Shortcut { sequence: "Meta+3"; onActivated: systemBackend.setWorkspace("Ministerium") }
+    Shortcut { sequence: "Meta+4"; onActivated: systemBackend.setWorkspace("Personal") }
     Shortcut {
         sequence: "Escape"
         onActivated: {
@@ -101,24 +102,90 @@ ApplicationWindow {
         }
     }
 
+    // Fondo propio: oscuro, cálido y sobrio, inspirado en el concepto visual
+    // de MurSchol sin depender de una imagen estática de la interfaz.
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0; color: "#06131f" }
-            GradientStop { position: 0.52; color: "#092d3f" }
-            GradientStop { position: 1; color: "#11182d" }
+            GradientStop { position: 0.0; color: "#080B10" }
+            GradientStop { position: 0.48; color: "#111820" }
+            GradientStop { position: 1.0; color: "#241A14" }
         }
     }
 
     Rectangle {
-        width: parent.width * 0.7
-        height: parent.height * 0.64
+        width: parent.width * 0.62
+        height: parent.height * 0.72
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: "#0e2940"
-        opacity: systemBackend.profile === "Ligero" ? 0.12 : 0.28
-        rotation: -7
-        radius: systemBackend.profile === "Ligero" ? 18 : 46
+        radius: width / 2
+        color: "#7A4D2D"
+        opacity: systemBackend.profile === "Ligero" ? 0.05 : 0.11
+    }
+
+    Rectangle {
+        width: parent.width * 0.72
+        height: parent.height * 0.34
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        color: "#111820"
+        opacity: 0.64
+        rotation: -4
+    }
+
+    Canvas {
+        id: skyline
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: Math.min(260, parent.height * 0.31)
+        opacity: systemBackend.profile === "Ligero" ? 0.38 : 0.62
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+
+            var w = width
+            var h = height
+
+            ctx.fillStyle = "#0B1117"
+            ctx.beginPath()
+            ctx.moveTo(0, h)
+            ctx.lineTo(0, h * 0.72)
+            ctx.lineTo(w * 0.10, h * 0.50)
+            ctx.lineTo(w * 0.20, h * 0.66)
+            ctx.lineTo(w * 0.33, h * 0.42)
+            ctx.lineTo(w * 0.44, h * 0.61)
+            ctx.lineTo(w * 0.57, h * 0.39)
+            ctx.lineTo(w * 0.70, h * 0.63)
+            ctx.lineTo(w * 0.82, h * 0.46)
+            ctx.lineTo(w, h * 0.68)
+            ctx.lineTo(w, h)
+            ctx.closePath()
+            ctx.fill()
+
+            ctx.fillStyle = "#12161A"
+            ctx.fillRect(0, h * 0.76, w, h * 0.24)
+
+            var baseX = w * 0.79
+            var baseY = h * 0.76
+            ctx.strokeStyle = "#8E6A42"
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.arc(baseX, baseY - 39, 28, Math.PI, 0)
+            ctx.stroke()
+            ctx.beginPath()
+            ctx.moveTo(baseX - 28, baseY - 39)
+            ctx.lineTo(baseX - 28, baseY)
+            ctx.moveTo(baseX + 28, baseY - 39)
+            ctx.lineTo(baseX + 28, baseY)
+            ctx.moveTo(baseX, baseY - 71)
+            ctx.lineTo(baseX, baseY - 88)
+            ctx.stroke()
+
+            ctx.fillStyle = "#8E6A42"
+            ctx.fillRect(baseX - 52, baseY - 4, 104, 4)
+        }
     }
 
     TopBar {
@@ -138,95 +205,98 @@ ApplicationWindow {
     }
 
     ColumnLayout {
-        anchors.top: topBar.bottom
+        visible: !root.startOpen && !root.appManagerOpen
         anchors.left: parent.left
-        anchors.leftMargin: 38
-        anchors.topMargin: 38
-        spacing: 12
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 28
+        anchors.bottomMargin: 34
+        spacing: 3
 
-        Label { text: "MurSchol OS"; color: "white"; font.pixelSize: 32; font.bold: true }
-        Label { text: "Aprender. Crear. Sin límites."; color: "#a9bdc6"; font.pixelSize: 15 }
-        Rectangle { width: 66; height: 3; radius: 2; color: systemBackend.accentColor }
         Label {
-            width: 420
-            wrapMode: Text.WordWrap
-            text: "“Concédeme agudeza para entender y facilidad para aprender.”\n— Santo Tomás de Aquino"
-            color: "#d2e5eb"
-            opacity: 0.78
-            font.pixelSize: 13
-            font.italic: true
+            text: "MURSCHOL OS"
+            color: "#F0E9DD"
+            font.pixelSize: 12
+            font.bold: true
+            font.letterSpacing: 2
         }
-
-        RowLayout {
-            spacing: 8
-            Rectangle {
-                width: activeSpace.implicitWidth + 22
-                height: 28
-                radius: 14
-                color: "#153442"
-                border.color: "#2b5969"
-                Label {
-                    id: activeSpace
-                    anchors.centerIn: parent
-                    text: "Espacio: " + systemBackend.workspace
-                    color: systemBackend.accentColor
-                    font.pixelSize: 9
-                    font.bold: true
-                }
-            }
-            Rectangle {
-                width: profileText.implicitWidth + 22
-                height: 28
-                radius: 14
-                color: "#142d3a"
-                border.color: "#294b5a"
-                Label {
-                    id: profileText
-                    anchors.centerIn: parent
-                    text: "Modo: " + systemBackend.profile
-                    color: "#aec5ce"
-                    font.pixelSize: 9
-                }
-            }
+        Label {
+            text: "Scientia ad Sanctitatem"
+            color: systemBackend.accentColor
+            opacity: 0.86
+            font.pixelSize: 10
+            font.family: "Noto Serif"
         }
     }
 
-    WorkspacePanel {
-        visible: root.width >= 1200 && !root.startOpen && !root.systemOpen && !root.appManagerOpen
-        anchors.left: parent.left
+    ColumnLayout {
+        visible: root.width > 1100 && !root.startOpen && !root.appManagerOpen
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.leftMargin: 30
-        anchors.bottomMargin: 28
-        backend: systemBackend
+        anchors.rightMargin: 34
+        anchors.bottomMargin: 34
+        spacing: 3
+
+        Label {
+            Layout.alignment: Qt.AlignRight
+            text: "“Tú buscas, Él te encuentra.”"
+            color: "#E3D8C7"
+            font.pixelSize: 11
+            font.italic: true
+            font.family: "Noto Serif"
+        }
+        Label {
+            Layout.alignment: Qt.AlignRight
+            text: "— San Agustín"
+            color: "#A98D6B"
+            font.pixelSize: 9
+            font.family: "Noto Serif"
+        }
     }
 
     Rectangle {
-        visible: root.width >= 1180 && !root.startOpen && !root.systemOpen && !root.appManagerOpen
-        width: 300
-        height: 78
-        radius: 20
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.rightMargin: 30
-        anchors.bottomMargin: 28
-        color: "#b5102531"
-        border.color: "#315666"
+        id: workspaceStrip
+        visible: root.width >= 1080 && !root.startOpen && !root.appManagerOpen
+        z: 12
+        width: workspaceRow.implicitWidth + 22
+        height: 38
+        radius: 19
+        anchors.top: topBar.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 16
+        color: "#D915181D"
+        border.width: 1
+        border.color: "#51463B32"
+
         RowLayout {
-            anchors.fill: parent
-            anchors.margins: 13
-            spacing: 10
-            Rectangle {
-                width: 42
-                height: 42
-                radius: 13
-                color: "#173e4e"
-                Label { anchors.centerIn: parent; text: "⇄"; color: systemBackend.accentColor; font.pixelSize: 20; font.bold: true }
-            }
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 1
-                Label { text: "Multitarea"; color: "white"; font.bold: true; font.pixelSize: 12 }
-                Label { text: "Alt+Tab · Super+←/→ · Super+D escritorio"; color: "#839da8"; font.pixelSize: 8 }
+            id: workspaceRow
+            anchors.centerIn: parent
+            spacing: 4
+
+            Repeater {
+                model: ["Estudio", "Biblioteca", "Ministerium", "Personal"]
+                delegate: Button {
+                    required property string modelData
+                    implicitWidth: label.implicitWidth + 24
+                    implicitHeight: 28
+                    onClicked: systemBackend.setWorkspace(modelData)
+                    background: Rectangle {
+                        radius: 14
+                        color: systemBackend.workspace === modelData
+                               ? "#49352B2A"
+                               : (parent.hovered ? "#28221D22" : "transparent")
+                        border.width: systemBackend.workspace === modelData ? 1 : 0
+                        border.color: systemBackend.accentColor
+                    }
+                    contentItem: Label {
+                        id: label
+                        text: modelData
+                        color: systemBackend.workspace === modelData ? "#F6E8D4" : "#B9B2A8"
+                        font.pixelSize: 9
+                        font.bold: systemBackend.workspace === modelData
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
             }
         }
     }
@@ -235,14 +305,14 @@ ApplicationWindow {
         id: dockRevealHandle
         visible: !systemBackend.externalPanel && systemBackend.dockAutoHide
         z: 79
-        width: 76
-        height: 7
-        radius: 4
+        width: 64
+        height: 5
+        radius: 3
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 2
-        color: root.dockRaised ? systemBackend.accentColor : "#456b7c"
-        opacity: root.dockRaised ? 0.75 : 0.48
+        color: root.dockRaised ? systemBackend.accentColor : "#6D6257"
+        opacity: root.dockRaised ? 0.72 : 0.42
     }
 
     MouseArea {
@@ -265,7 +335,7 @@ ApplicationWindow {
         magnifyOnHover: systemBackend.dockMagnify && systemBackend.animationMode !== "Desactivadas"
         accentColor: systemBackend.accentColor
         x: (root.width - width) / 2
-        y: root.dockRaised ? root.height - height - 14 : root.height - 5
+        y: root.dockRaised ? root.height - height - 12 : root.height - 5
         opacity: root.dockRaised ? 1 : 0.15
 
         Behavior on y {
@@ -315,7 +385,7 @@ ApplicationWindow {
         visible: !systemBackend.externalPanel && root.startOpen
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dock.height + 28
+        anchors.bottomMargin: dock.height + 26
         appModel: appModel
         searchModel: universalSearch
         backend: systemBackend
@@ -325,8 +395,6 @@ ApplicationWindow {
         }
     }
 
-    // Conservamos el componente durante la migración por compatibilidad interna,
-    // pero el acceso visible de configuración abre MurSchol Settings.
     SystemCenter {
         id: systemCenter
         z: 55
@@ -342,7 +410,7 @@ ApplicationWindow {
         z: 40
         visible: !systemBackend.externalPanel && root.appManagerOpen
         anchors.fill: parent
-        color: "#7a02070c"
+        color: "#88080A0D"
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -365,11 +433,11 @@ ApplicationWindow {
 
     Label {
         anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.leftMargin: 22
-        anchors.bottomMargin: 8
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: dock.height + 22
+        visible: systemBackend.statusText !== "MurSchol listo"
         text: systemBackend.statusText
-        color: "#647f8c"
+        color: "#9D9388"
         font.pixelSize: 9
     }
 }
