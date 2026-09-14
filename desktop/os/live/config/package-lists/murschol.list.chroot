@@ -11,6 +11,9 @@ ca-certificates
 curl
 xdg-utils
 xdg-user-dirs
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+xdg-desktop-portal-wlr
 dbus-user-session
 util-linux
 lightdm
@@ -45,11 +48,13 @@ gammastep
 bluez
 blueman
 polkitd
+lxqt-policykit
 udisks2
 grim
 slurp
 wl-clipboard
 libnotify-bin
+swaylock
 thunar
 gvfs
 foot
