@@ -5,12 +5,108 @@ import QtQuick.Layouts
 Rectangle {
     id: root
     property var backend
+    property string pendingPowerAction: ""
     width: 470
     height: 680
     radius: 26
     color: "#F016191E"
     border.width: 1
     border.color: "#5E50443A"
+
+    function requestPowerAction(action) {
+        pendingPowerAction = action
+        powerConfirm.open()
+    }
+
+    Popup {
+        id: powerConfirm
+        x: Math.round((root.width - width) / 2)
+        y: Math.round((root.height - height) / 2)
+        width: 340
+        height: 182
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        padding: 0
+
+        background: Rectangle {
+            radius: 20
+            color: "#F51A1D22"
+            border.width: 1
+            border.color: root.pendingPowerAction === "poweroff" ? "#A55D5047" : root.backend.accentColor
+        }
+
+        contentItem: ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 18
+            spacing: 10
+
+            Label {
+                Layout.fillWidth: true
+                text: root.pendingPowerAction === "poweroff" ? "Apagar MurSchol OS" : "Reiniciar MurSchol OS"
+                color: "#F3EEE5"
+                font.pixelSize: 17
+                font.bold: true
+            }
+            Label {
+                Layout.fillWidth: true
+                text: root.pendingPowerAction === "poweroff"
+                      ? "Guarda tus documentos antes de apagar el equipo."
+                      : "Guarda tus documentos antes de reiniciar el equipo."
+                color: "#A79E94"
+                font.pixelSize: 10
+                wrapMode: Text.WordWrap
+            }
+            Item { Layout.fillHeight: true }
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                Item { Layout.fillWidth: true }
+                Button {
+                    text: "Cancelar"
+                    onClicked: powerConfirm.close()
+                    background: Rectangle {
+                        radius: 11
+                        color: parent.hovered ? "#302C28" : "#24211D"
+                        border.width: 1
+                        border.color: "#51463B"
+                    }
+                    contentItem: Label {
+                        text: parent.text
+                        color: "#D7CFC5"
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 9
+                    }
+                }
+                Button {
+                    text: root.pendingPowerAction === "poweroff" ? "Apagar" : "Reiniciar"
+                    onClicked: {
+                        const action = root.pendingPowerAction
+                        powerConfirm.close()
+                        if (action === "poweroff")
+                            root.backend.powerOff()
+                        else if (action === "reboot")
+                            root.backend.reboot()
+                    }
+                    background: Rectangle {
+                        radius: 11
+                        color: parent.hovered ? "#E3BB78" : root.backend.accentColor
+                    }
+                    contentItem: Label {
+                        text: parent.text
+                        color: "#15120F"
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 9
+                    }
+                }
+            }
+        }
+
+        onClosed: root.pendingPowerAction = ""
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -175,19 +271,19 @@ Rectangle {
         Item { Layout.fillHeight: true }
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: 7
 
             Label {
                 text: root.backend.statusText
                 color: "#857C73"
-                font.pixelSize: 9
+                font.pixelSize: 8
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
 
             Button {
                 visible: root.backend.profile !== root.backend.recommendedProfile
-                text: "Usar recomendado"
+                text: "Recomendado"
                 onClicked: root.backend.applyRecommendedProfile()
                 background: Rectangle {
                     radius: 11
@@ -198,24 +294,65 @@ Rectangle {
                 contentItem: Label {
                     text: parent.text
                     color: "#D7CFC5"
-                    font.pixelSize: 9
+                    font.pixelSize: 8
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
             }
 
             Button {
-                text: "Abrir Configuración"
+                text: "Configuración"
                 onClicked: root.backend.openSettings("appearance")
                 background: Rectangle {
                     radius: 11
-                    color: parent.hovered ? "#E3BB78" : "#D6A85F"
+                    color: parent.hovered ? "#3B332C" : "#25211D"
+                    border.width: 1
+                    border.color: "#675A4B"
                 }
                 contentItem: Label {
                     text: parent.text
-                    color: "#15120F"
-                    font.pixelSize: 9
-                    font.bold: true
+                    color: "#D7CFC5"
+                    font.pixelSize: 8
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+
+            Button {
+                text: "↻"
+                ToolTip.visible: hovered
+                ToolTip.text: "Reiniciar"
+                onClicked: root.requestPowerAction("reboot")
+                background: Rectangle {
+                    radius: 11
+                    color: parent.hovered ? "#3B332C" : "#25211D"
+                    border.width: 1
+                    border.color: "#675A4B"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#E3BB78"
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+
+            Button {
+                text: "⏻"
+                ToolTip.visible: hovered
+                ToolTip.text: "Apagar"
+                onClicked: root.requestPowerAction("poweroff")
+                background: Rectangle {
+                    radius: 11
+                    color: parent.hovered ? "#50352F" : "#2A211F"
+                    border.width: 1
+                    border.color: "#76544A"
+                }
+                contentItem: Label {
+                    text: parent.text
+                    color: "#E8A18E"
+                    font.pixelSize: 14
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
