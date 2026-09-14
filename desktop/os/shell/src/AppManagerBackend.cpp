@@ -66,7 +66,7 @@ void AppManagerBackend::inspectSelection()
         const bool wine = commandAvailable(QStringLiteral("wine"));
         const bool bottles = commandAvailable(QStringLiteral("bottles")) || flatpakBottlesAvailable();
         m_canInstall = wine || bottles;
-        m_readiness = m_canInstall ? QStringLiteral("Compatible · se abrirá un entorno aislado")
+        m_readiness = m_canInstall ? QStringLiteral("Requiere compatibilidad · se abrirá Wine o Bottles")
                                    : QStringLiteral("Falta instalar Wine o Bottles");
     } else if (lower.endsWith(QStringLiteral(".deb"))) {
         m_ecosystem = QStringLiteral("Linux");
@@ -102,14 +102,27 @@ bool AppManagerBackend::installSelected()
     }
 
     const QString lower = m_fileName.toLower();
+    // Package managers need a terminal for questions and actionable diagnostics.
+    // Starting their process alone does not prove that installation succeeded.
+    if (lower.endsWith(QStringLiteral(".deb"))
+        || lower.endsWith(QStringLiteral(".flatpakref"))
+        || lower.endsWith(QStringLiteral(".apk"))) {
+        const QString terminal = QStandardPaths::findExecutable(QStringLiteral("foot"));
+        const QString installer = QStandardPaths::findExecutable(QStringLiteral("murschol-install-package"));
+        if (terminal.isEmpty() || installer.isEmpty()) {
+            updateStatus(QStringLiteral("Falta el instalador de paquetes de MurSchol o la terminal"));
+            return false;
+        }
+        const bool opened = QProcess::startDetached(terminal,
+            {QStringLiteral("-T"), QStringLiteral("Instalar aplicación — MurSchol"),
+             installer, m_selectedFile});
+        updateStatus(opened ? QStringLiteral("Instalador abierto. Revisa y confirma los pasos en la ventana de instalación")
+                            : QStringLiteral("No se pudo abrir el instalador"));
+        return opened;
+    }
     bool started = false;
 
-    if (lower.endsWith(QStringLiteral(".apk"))) {
-        started = QProcess::startDetached(QStringLiteral("waydroid"),
-                                          {QStringLiteral("app"), QStringLiteral("install"), m_selectedFile});
-        if (started)
-            updateStatus(QStringLiteral("Instalando APK mediante Waydroid…"));
-    } else if (lower.endsWith(QStringLiteral(".exe")) || lower.endsWith(QStringLiteral(".msi"))) {
+    if (lower.endsWith(QStringLiteral(".exe")) || lower.endsWith(QStringLiteral(".msi"))) {
         if (commandAvailable(QStringLiteral("wine"))) {
             QStringList args;
             if (lower.endsWith(QStringLiteral(".msi")))
@@ -125,11 +138,6 @@ bool AppManagerBackend::installSelected()
         }
         if (started)
             updateStatus(QStringLiteral("Abriendo instalador Windows en la capa compatible…"));
-    } else if (lower.endsWith(QStringLiteral(".deb"))) {
-        started = QProcess::startDetached(QStringLiteral("pkexec"),
-                                          {QStringLiteral("apt"), QStringLiteral("install"), QStringLiteral("-y"), m_selectedFile});
-        if (started)
-            updateStatus(QStringLiteral("Solicitando autorización para instalar el paquete Debian…"));
     } else if (lower.endsWith(QStringLiteral(".appimage"))) {
         QFile file(m_selectedFile);
         const auto permissions = file.permissions()
@@ -143,11 +151,6 @@ bool AppManagerBackend::installSelected()
         started = QProcess::startDetached(m_selectedFile, {});
         if (started)
             updateStatus(QStringLiteral("AppImage iniciada"));
-    } else if (lower.endsWith(QStringLiteral(".flatpakref"))) {
-        started = QProcess::startDetached(QStringLiteral("flatpak"),
-                                          {QStringLiteral("install"), QStringLiteral("--user"), QStringLiteral("--noninteractive"), m_selectedFile});
-        if (started)
-            updateStatus(QStringLiteral("Instalando aplicación Flatpak…"));
     }
 
     if (!started)

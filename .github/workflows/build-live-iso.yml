@@ -59,6 +59,7 @@ jobs:
 
       - name: Validar scripts y configuración
         run: |
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-install-package
           sh -n desktop/os/live/smoke-apps.sh
           sh -n desktop/os/live/config/hooks/live/060-runtime-smoke.hook.chroot
           bash -n desktop/os/live/build-live.sh

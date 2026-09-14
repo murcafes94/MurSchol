@@ -75,10 +75,10 @@ bool startDetachedFirst(const QStringList &programs)
 QuickControlsBackend::QuickControlsBackend(QObject *parent)
     : QObject(parent)
 {
-    refresh();
     m_refreshTimer.setInterval(2500);
+    m_refreshTimer.setSingleShot(true);
     connect(&m_refreshTimer, &QTimer::timeout, this, &QuickControlsBackend::refresh);
-    m_refreshTimer.start();
+    refresh();
 }
 
 void QuickControlsBackend::refresh()
@@ -87,10 +87,13 @@ void QuickControlsBackend::refresh()
     if (m_refreshing)
         return;
     m_refreshing = true;
+    m_refreshTimer.stop();
     auto pending = std::make_shared<int>(3);
     auto finished = [this, pending] {
-        if (--*pending == 0)
+        if (--*pending == 0) {
             m_refreshing = false;
+            m_refreshTimer.start();
+        }
     };
 
     readCommand(this, QStringLiteral("nmcli"),

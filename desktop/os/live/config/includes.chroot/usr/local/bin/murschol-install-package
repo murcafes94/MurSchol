@@ -1,0 +1,41 @@
+#!/bin/sh
+# Invoked in foot so installation questions, errors and completion stay visible.
+set -u
+[ "$#" -eq 1 ] || exit 2
+file="$1"
+if [ ! -f "$file" ]; then
+  printf 'No existe el instalador seleccionado.\n' >&2
+  exit 2
+fi
+case "$file" in
+  /*) ;;
+  *) printf 'Se requiere una ruta absoluta.\n' >&2; exit 2 ;;
+esac
+extension="$(printf '%s' "$file" | tr '[:upper:]' '[:lower:]')"
+printf 'Instalador seleccionado: %s\n\n' "$file"
+result=0
+case "$extension" in
+  *.deb)
+    # APT shows the proposed dependency changes and requests confirmation.
+    pkexec /usr/bin/apt-get install -- "$file" || result=$?
+    ;;
+  *.flatpakref)
+    # Ask before adding the origin/runtime referenced by the file.
+    flatpak install --user -- "$file" || result=$?
+    ;;
+  *.apk)
+    waydroid app install "$file" || result=$?
+    ;;
+  *)
+    printf 'Formato de instalación no compatible.\n' >&2
+    result=2
+    ;;
+esac
+if [ "$result" -eq 0 ]; then
+  printf '\nEl gestor terminó sin errores. Si cancelaste, no se instaló la aplicación.\n'
+else
+  printf '\nLa instalación no terminó correctamente (código %s). Revisa el mensaje anterior.\n' "$result"
+fi
+printf '\nPulsa Enter para cerrar.\n'
+IFS= read -r answer || true
+exit "$result"
