@@ -16,6 +16,7 @@ xdg-desktop-portal-gtk
 xdg-desktop-portal-wlr
 dbus-user-session
 util-linux
+procps
 lightdm
 lightdm-gtk-greeter
 xserver-xorg
