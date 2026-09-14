@@ -1,6 +1,7 @@
 #!/bin/sh
 
-# Propaga el entorno de la sesión a servicios iniciados por systemd/dbus.
+# Propaga el entorno Wayland a servicios activados por systemd/dbus, incluidos
+# los portales XDG usados por navegador, capturas, compartir pantalla y diálogos.
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
 
 # Fuerza el orden de controles también en aplicaciones GTK con decoración de cliente.
@@ -9,14 +10,35 @@ if command -v gsettings >/dev/null 2>&1; then
   gsettings set org.gnome.desktop.wm.preferences button-layout ':minimize,maximize,close' 2>/dev/null || true
 fi
 
-DESKTOP_LOG="$HOME/murschol-desktop.log"
-PANEL_LOG="$HOME/murschol-panel.log"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/murschol"
+mkdir -p "$STATE_DIR"
+DESKTOP_LOG="$STATE_DIR/desktop.log"
+PANEL_LOG="$STATE_DIR/panel.log"
+POLKIT_LOG="$STATE_DIR/polkit.log"
 PANEL_PID=""
+PANEL_READY=0
 
-# Solo desactivamos el dock integrado cuando el panel global realmente existe.
-# Así una compilación sin LayerShellQt sigue siendo completamente utilizable.
+# Un agente PolicyKit visible es imprescindible para operaciones administrativas
+# disparadas desde aplicaciones gráficas. No iniciamos una segunda instancia.
+if command -v lxqt-policykit-agent >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -x lxqt-policykit-agent >/dev/null 2>&1; then
+    lxqt-policykit-agent >> "$POLKIT_LOG" 2>&1 &
+  fi
+fi
+
+# El dock global se prueba antes de arrancar el escritorio. Solo anunciamos
+# MURSCHOL_EXTERNAL_PANEL si el proceso sobrevivió su inicialización; de lo
+# contrario MurSchol Desktop conserva inmediatamente su dock integrado.
 if [ -x /usr/local/bin/murschol-panel ]; then
-  export MURSCHOL_EXTERNAL_PANEL=1
+  /usr/local/bin/murschol-panel >> "$PANEL_LOG" 2>&1 &
+  PANEL_PID=$!
+  sleep 1
+  if kill -0 "$PANEL_PID" 2>/dev/null; then
+    PANEL_READY=1
+    export MURSCHOL_EXTERNAL_PANEL=1
+  else
+    unset MURSCHOL_EXTERNAL_PANEL 2>/dev/null || true
+  fi
 else
   unset MURSCHOL_EXTERNAL_PANEL 2>/dev/null || true
 fi
@@ -24,17 +46,29 @@ fi
 /usr/local/bin/murschol-desktop >> "$DESKTOP_LOG" 2>&1 &
 MURSCHOL_PID=$!
 
-if [ -x /usr/local/bin/murschol-panel ]; then
-  /usr/local/bin/murschol-panel >> "$PANEL_LOG" 2>&1 &
-  PANEL_PID=$!
+# Si una pieza crítica muere durante el arranque, mantener una ruta de rescate.
+sleep 3
+if ! kill -0 "$MURSCHOL_PID" 2>/dev/null; then
+  foot -T "MurSchol OS - diagnóstico" sh -c 'LOG="${XDG_STATE_HOME:-$HOME/.local/state}/murschol/desktop.log"; echo "MurSchol Desktop no pudo iniciar."; echo; cat "$LOG" 2>/dev/null || true; echo; echo "Pulsa Enter para abrir una consola."; read _; exec sh' &
+elif [ -x /usr/local/bin/murschol-panel ] && [ "$PANEL_READY" -eq 0 ]; then
+  notify-send "MurSchol OS" "El panel externo no pudo iniciar. Se activó el dock integrado de respaldo." 2>/dev/null || true
 fi
 
-# Si una pieza crítica muere al iniciar, muestra automáticamente el error.
-sleep 4
-if ! kill -0 "$MURSCHOL_PID" 2>/dev/null; then
-  foot -T "MurSchol OS - diagnóstico" sh -c 'echo "MurSchol Desktop no pudo iniciar."; echo; cat "$HOME/murschol-desktop.log" 2>/dev/null || true; echo; echo "Pulsa Enter para abrir una consola."; read _; exec sh' &
-elif [ -n "$PANEL_PID" ] && ! kill -0 "$PANEL_PID" 2>/dev/null; then
-  # El shell principal ya se inició con panel externo. Dejamos constancia clara
-  # del fallo para esta alpha y mantenemos disponibles Alt+Tab y Super+D.
-  foot -T "MurSchol Panel - diagnóstico" sh -c 'echo "El dock global de MurSchol no pudo iniciar."; echo; cat "$HOME/murschol-panel.log" 2>/dev/null || true; echo; echo "Puedes seguir usando Alt+Tab y Super+D. Reinicia la sesión para recuperar el dock integrado."; echo; echo "Pulsa Enter para abrir una consola."; read _; exec sh' &
+# Si el panel externo se cae más tarde, no dejamos al usuario sin navegación.
+# Reiniciamos únicamente el shell de escritorio con su dock integrado; las
+# ventanas de aplicaciones permanecen abiertas bajo labwc.
+if [ "$PANEL_READY" -eq 1 ] && [ -n "$PANEL_PID" ]; then
+  (
+    while kill -0 "$PANEL_PID" 2>/dev/null; do
+      sleep 3
+    done
+
+    if kill -0 "$MURSCHOL_PID" 2>/dev/null && pgrep -x labwc >/dev/null 2>&1; then
+      notify-send "MurSchol OS" "El panel dejó de responder. Recuperando el dock integrado…" 2>/dev/null || true
+      kill "$MURSCHOL_PID" 2>/dev/null || true
+      sleep 1
+      unset MURSCHOL_EXTERNAL_PANEL 2>/dev/null || true
+      /usr/local/bin/murschol-desktop >> "$DESKTOP_LOG" 2>&1 &
+    fi
+  ) &
 fi
