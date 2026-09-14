@@ -89,7 +89,7 @@ jobs:
           grep -q 'key="XF86Sleep"' "$RC"
 
           grep -q '/run/live/medium' "$UPDATE"
-          grep -q 'pkexec /usr/local/lib/murschol/update-system-root' "$UPDATE"
+          grep -q '^if pkexec /usr/local/lib/murschol/update-system-root; then$' "$UPDATE"
           grep -q 'apt-get -y --with-new-pkgs upgrade' "$ROOT_UPDATE"
           if grep -Eq '^[[:space:]]*apt-get[[:space:]].*autoremove' "$ROOT_UPDATE"; then
             echo 'No se permite autoremove automático en MurSchol Update.' >&2

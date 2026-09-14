@@ -40,7 +40,9 @@ if ! command -v pkexec >/dev/null 2>&1; then
 fi
 
 printf 'Buscando e instalando actualizaciones de Debian/MurSchol…\n'
-if ! pkexec /usr/local/lib/murschol/update-system-root; then
+if pkexec /usr/local/lib/murschol/update-system-root; then
+    :
+else
     rc=$?
     printf '\nLa actualización del sistema no terminó correctamente (código %s).\n' "$rc"
     printf 'No se ejecutará ninguna limpieza automática.\n'
