@@ -89,6 +89,26 @@ jobs:
           grep -q '^qml6-module-qtquick-dialogs$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^calamares$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^calamares-settings-debian$' desktop/os/live/config/package-lists/murschol.list.chroot
+
+          # Una sesión usable necesita portales, autenticación gráfica y una
+          # ruta de recuperación incluso si el panel externo falla.
+          grep -q '^xdg-desktop-portal$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^xdg-desktop-portal-gtk$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^xdg-desktop-portal-wlr$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^lxqt-policykit$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^procps$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^swaylock$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q 'lxqt-policykit-agent' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          grep -q 'PANEL_READY' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          grep -q 'ToggleShowDesktop' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          grep -q 'wpctl set-volume' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+
+          PORTALS=desktop/os/live/config/includes.chroot/usr/share/xdg-desktop-portal/murschol-portals.conf
+          test -f "$PORTALS"
+          grep -q '^default=gtk$' "$PORTALS"
+          grep -q '^org.freedesktop.impl.portal.Screenshot=wlr$' "$PORTALS"
+          grep -q '^org.freedesktop.impl.portal.ScreenCast=wlr$' "$PORTALS"
+
           grep -q 'Name=Instalar MurSchol OS' desktop/os/live/config/hooks/live/030-installer.hook.chroot
           grep -q 'Exec=/usr/bin/calamares-install-debian' desktop/os/live/config/hooks/live/030-installer.hook.chroot
           grep -q 'branding: murschol' desktop/os/live/config/hooks/live/030-installer.hook.chroot
