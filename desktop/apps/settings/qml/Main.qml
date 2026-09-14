@@ -14,8 +14,8 @@ ApplicationWindow {
     color: backgroundColor
 
     property string currentPage: "appearance"
-    property bool lightTheme: backend.theme === "Claro"
-    property color accent: backend.accentColor
+    property bool lightTheme: settingsController.theme === "Claro"
+    property color accent: settingsController.accentColor
 
     readonly property color backgroundColor: lightTheme ? "#F7F2E8" : "#0B0E12"
     readonly property color surfaceColor: lightTheme ? "#FFFFFF" : "#11151C"
@@ -44,11 +44,11 @@ ApplicationWindow {
         { key: "about", title: "Acerca de", group: "MurSchol OS", symbol: "i", keywords: "versión acerca licencia sistema" }
     ]
 
-    SettingsBackend { id: backend }
+    SettingsBackend { id: settingsController }
     NetworkBackend { id: networkBackend }
     SoundBackend { id: soundBackend }
     BluetoothBackend { id: bluetoothBackend }
-    PowerBackend { id: powerBackend }
+    PowerBackend { id: powerController }
     DisplayBackend { id: displayBackend }
     AppsBackend { id: appsBackend }
     StorageBackend { id: storageBackend }
@@ -102,10 +102,10 @@ ApplicationWindow {
         if (key === "network") networkBackend.refresh()
         if (key === "sound") soundBackend.refresh()
         if (key === "bluetooth") bluetoothBackend.refresh()
-        if (key === "power") powerBackend.refresh()
+        if (key === "power") powerController.refresh()
         if (key === "display") {
             displayBackend.refresh()
-            powerBackend.refresh()
+            powerController.refresh()
         }
         if (key === "storage") storageBackend.refresh()
         if (key === "apps" || key === "compatibility") appsBackend.refresh()
@@ -115,11 +115,11 @@ ApplicationWindow {
         if (currentPage === "network") return networkBackend.statusText
         if (currentPage === "sound") return soundBackend.statusText
         if (currentPage === "bluetooth") return bluetoothBackend.statusText
-        if (currentPage === "power") return powerBackend.statusText
+        if (currentPage === "power") return powerController.statusText
         if (currentPage === "display") return displayBackend.statusText
         if (currentPage === "storage") return storageBackend.statusText
         if (currentPage === "apps" || currentPage === "compatibility") return appsBackend.statusText
-        return backend.statusText
+        return settingsController.statusText
     }
 
     function statusIsDanger() {
@@ -367,7 +367,7 @@ ApplicationWindow {
                             Label {
                                 id: activeBadge
                                 anchors.centerIn: parent
-                                text: root.currentPage === "workspaces" ? root.backend.workspace : root.backend.profile
+                                text: root.currentPage === "workspaces" ? settingsController.workspace : settingsController.profile
                                 color: root.textSecondary
                                 font.pixelSize: 9
                                 font.bold: true
@@ -381,42 +381,42 @@ ApplicationWindow {
                         visible: root.currentPage === "display"
                         Layout.fillWidth: true
                         backend: displayBackend
-                        powerBackend: powerBackend
+                        powerBackend: powerController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     AppearancePage {
                         visible: root.currentPage === "appearance"
                         Layout.fillWidth: true
-                        backend: backend
+                        backend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     DockPage {
                         visible: root.currentPage === "dock"
                         Layout.fillWidth: true
-                        backend: backend
+                        backend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     WorkspacesPage {
                         visible: root.currentPage === "workspaces"
                         Layout.fillWidth: true
-                        backend: backend
+                        backend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     PerformancePage {
                         visible: root.currentPage === "performance"
                         Layout.fillWidth: true
-                        backend: backend
+                        backend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     SystemPage {
                         visible: root.currentPage === "system" || root.currentPage === "about"
                         Layout.fillWidth: true
-                        backend: backend
+                        backend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                         showAbout: root.currentPage === "about"
@@ -425,7 +425,7 @@ ApplicationWindow {
                         visible: root.currentPage === "network"
                         Layout.fillWidth: true
                         backend: networkBackend
-                        settingsBackend: backend
+                        settingsBackend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
@@ -433,7 +433,7 @@ ApplicationWindow {
                         visible: root.currentPage === "sound"
                         Layout.fillWidth: true
                         backend: soundBackend
-                        settingsBackend: backend
+                        settingsBackend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
@@ -441,15 +441,15 @@ ApplicationWindow {
                         visible: root.currentPage === "bluetooth"
                         Layout.fillWidth: true
                         backend: bluetoothBackend
-                        settingsBackend: backend
+                        settingsBackend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }
                     PowerPage {
                         visible: root.currentPage === "power"
                         Layout.fillWidth: true
-                        backend: powerBackend
-                        settingsBackend: backend
+                        backend: powerController
+                        settingsBackend: settingsController
                         lightTheme: root.lightTheme
                         accent: root.accent
                     }

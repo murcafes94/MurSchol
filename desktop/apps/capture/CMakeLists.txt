@@ -17,6 +17,7 @@ qt_add_executable(murschol-capture
 qt_add_qml_module(murschol-capture
     URI MurScholCapture
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
         qml/Main.qml
 )

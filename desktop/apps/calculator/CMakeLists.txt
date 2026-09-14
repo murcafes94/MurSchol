@@ -19,6 +19,7 @@ qt_add_executable(murschol-calculator
 qt_add_qml_module(murschol-calculator
     URI MurScholCalculator
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
         qml/Main.qml
 )

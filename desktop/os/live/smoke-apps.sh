@@ -13,6 +13,7 @@ export XDG_CONFIG_HOME="$TEST_DIR/config"
 export XDG_DATA_HOME="$TEST_DIR/data"
 export XDG_CACHE_HOME="$TEST_DIR/cache"
 export MURSCHOL_SMOKE_DIR="$TEST_DIR"
+export LC_ALL=C.UTF-8
 export WLR_BACKENDS=headless WLR_RENDERER=pixman WLR_LIBINPUT_NO_DEVICES=1
 export QT_QPA_PLATFORM=wayland QT_QUICK_BACKEND=software
 export XDG_CURRENT_DESKTOP=MurSchol XDG_SESSION_TYPE=wayland

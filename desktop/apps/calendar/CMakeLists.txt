@@ -17,6 +17,7 @@ qt_add_executable(murschol-calendar
 qt_add_qml_module(murschol-calendar
     URI MurScholCalendar
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
         qml/Main.qml
 )

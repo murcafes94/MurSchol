@@ -178,6 +178,7 @@ Rectangle {
 
     Dialog {
         id: resetDialog
+        width: Math.min(420, root.width - 32)
         anchors.centerIn: parent
         modal: true
         title: "Restablecer apariencia"
@@ -193,7 +194,6 @@ Rectangle {
         }
 
         contentItem: Label {
-            width: 360
             text: "MurSchol volverá a la apariencia oficial oscura con acento dorado y dock visible. Tus archivos, aplicaciones y conexiones permanecerán intactos."
             color: root.lightTheme ? "#0B0D12" : "#F8FAFC"
             wrapMode: Text.WordWrap

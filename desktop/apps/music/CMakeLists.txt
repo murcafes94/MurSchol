@@ -22,6 +22,7 @@ qt_add_executable(murschol-music
 qt_add_qml_module(murschol-music
     URI MurScholMusic
     VERSION 1.0
+    RESOURCE_PREFIX /qt/qml
     QML_FILES
         qml/Main.qml
 )
