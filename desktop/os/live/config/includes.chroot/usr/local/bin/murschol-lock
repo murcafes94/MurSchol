@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+# El usuario Live puede no tener una contraseña utilizable para PAM. Bloquearlo
+# allí podría dejar la prueba de MurSchol inaccesible hasta reiniciar.
+if [ -e /run/live/medium ] || [ -e /run/live/overlay ]; then
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "MurSchol OS" "El bloqueo de sesión se habilita después de instalar MurSchol OS." 2>/dev/null || true
+  fi
+  exit 0
+fi
+
+if ! command -v swaylock >/dev/null 2>&1; then
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "MurSchol OS" "No se encontró el bloqueador de sesión." 2>/dev/null || true
+  fi
+  exit 127
+fi
+
+# Fondo coherente con MurSchol. swaylock usa PAM para desbloquear la sesión.
+exec swaylock -f -c 15191e
