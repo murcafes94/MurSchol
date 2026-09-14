@@ -24,7 +24,7 @@ jobs:
       - name: Install Qt 6 build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window libxkbcommon-dev qml6-module-qtquick-dialogs
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml libxkbcommon-dev qml6-module-qtquick-dialogs
 
       - name: Configure
         run: cmake -S desktop/os/shell -B build/desktop -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -63,7 +63,7 @@ jobs:
       - name: Instalar dependencias Qt 6
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml
 
       - name: Validar QML y compilar Reader
         run: |
@@ -90,7 +90,7 @@ jobs:
       - name: Instalar dependencias Qt 6
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml
 
       - name: Validar QML y compilar Photos
         run: |
@@ -111,7 +111,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             cmake ninja-build g++ pkg-config \
-            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window \
+            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml \
             libmpv-dev libgl1-mesa-dev
 
       - name: Validar QML y compilar Media
@@ -141,7 +141,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             cmake ninja-build g++ pkg-config \
-            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window \
+            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml \
             libtag1-dev
 
       - name: Validar QML y compilar Music
@@ -169,7 +169,7 @@ jobs:
       - name: Instalar dependencias Qt 6 y SQLite
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window libqt6sql6-sqlite
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml libqt6sql6-sqlite
 
       - name: Validar QML y compilar Calendar
         run: |
@@ -196,7 +196,7 @@ jobs:
       - name: Instalar dependencias Qt 6
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml
 
       - name: Validar QML y compilar Capture
         run: |
@@ -225,7 +225,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             cmake ninja-build g++ pkg-config \
-            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window \
+            qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml \
             libqalculate-dev
 
       - name: Validar QML y compilar Calculator
@@ -253,7 +253,7 @@ jobs:
       - name: Instalar dependencias Qt 6
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window
+          sudo apt-get install -y cmake ninja-build g++ qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml
 
       - name: Validar QML y compilar Settings
         run: |
@@ -280,7 +280,7 @@ jobs:
               apt-get update
               apt-get install -y --no-install-recommends \
                 ca-certificates cmake ninja-build g++ \
-                qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window \
+                qt6-base-dev qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qtquick-window qml6-module-qtquick-templates qml6-module-qtqml \
                 liblayershellqtinterface-dev layer-shell-qt
 
               # qmlformat analiza el archivo antes de compilar. No escribimos el
