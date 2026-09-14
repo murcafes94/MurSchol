@@ -15,10 +15,42 @@ ApplicationWindow {
 
     property bool gridMode: false
     property string errorText: ""
+    property int selectedIndex: -1
+    property string selectedName: ""
+
+    function clearSelection() {
+        selectedIndex = -1
+        selectedName = ""
+    }
+
+    function selectEntry(index, name) {
+        selectedIndex = index
+        selectedName = name
+    }
+
+    function beginRename() {
+        if (selectedIndex < 0)
+            return
+        renameField.text = selectedName
+        renameDialog.open()
+    }
+
+    function beginTrash() {
+        if (selectedIndex < 0)
+            return
+        trashDialog.open()
+    }
 
     FileListModel {
         id: files
-        onCurrentPathChanged: addressField.text = currentPath
+        onCurrentPathChanged: {
+            addressField.text = currentPath
+            root.clearSelection()
+        }
+        onCountChanged: {
+            if (root.selectedIndex >= count)
+                root.clearSelection()
+        }
         onErrorOccurred: function(message) {
             root.errorText = message
             errorTimer.restart()
@@ -30,6 +62,120 @@ ApplicationWindow {
         interval: 3500
         repeat: false
         onTriggered: root.errorText = ""
+    }
+
+    Shortcut {
+        sequence: StandardKey.Find
+        onActivated: {
+            searchField.forceActiveFocus()
+            searchField.selectAll()
+        }
+    }
+    Shortcut {
+        sequence: "Ctrl+L"
+        onActivated: {
+            addressField.forceActiveFocus()
+            addressField.selectAll()
+        }
+    }
+    Shortcut {
+        sequence: "Ctrl+N"
+        onActivated: newFolderDialog.open()
+    }
+    Shortcut {
+        sequence: "Ctrl+R"
+        onActivated: {
+            files.refresh()
+            root.clearSelection()
+        }
+    }
+    Shortcut {
+        sequence: "F2"
+        enabled: root.selectedIndex >= 0
+        onActivated: root.beginRename()
+    }
+    Shortcut {
+        sequence: "Delete"
+        enabled: root.selectedIndex >= 0
+        onActivated: root.beginTrash()
+    }
+    Shortcut {
+        sequence: "Backspace"
+        enabled: files.canGoUp && !addressField.activeFocus && !searchField.activeFocus
+        onActivated: files.goUp()
+    }
+
+    Dialog {
+        id: newFolderDialog
+        modal: true
+        title: "Nueva carpeta"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        anchors.centerIn: Overlay.overlay
+        onOpened: {
+            folderNameField.text = "Nueva carpeta"
+            folderNameField.forceActiveFocus()
+            folderNameField.selectAll()
+        }
+        onAccepted: {
+            if (files.createFolderNamed(folderNameField.text))
+                root.clearSelection()
+        }
+        contentItem: ColumnLayout {
+            spacing: 10
+            Label { text: "Nombre de la carpeta"; color: "#dce8ed" }
+            TextField {
+                id: folderNameField
+                Layout.preferredWidth: 360
+                selectByMouse: true
+                onAccepted: newFolderDialog.accept()
+            }
+        }
+    }
+
+    Dialog {
+        id: renameDialog
+        modal: true
+        title: "Renombrar"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        anchors.centerIn: Overlay.overlay
+        onOpened: {
+            renameField.forceActiveFocus()
+            renameField.selectAll()
+        }
+        onAccepted: {
+            if (files.renameEntry(root.selectedIndex, renameField.text))
+                root.clearSelection()
+        }
+        contentItem: ColumnLayout {
+            spacing: 10
+            Label { text: "Nuevo nombre"; color: "#dce8ed" }
+            TextField {
+                id: renameField
+                Layout.preferredWidth: 360
+                selectByMouse: true
+                onAccepted: renameDialog.accept()
+            }
+        }
+    }
+
+    Dialog {
+        id: trashDialog
+        modal: true
+        title: "Mover a la papelera"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        anchors.centerIn: Overlay.overlay
+        onAccepted: {
+            if (files.moveToTrash(root.selectedIndex))
+                root.clearSelection()
+        }
+        contentItem: Label {
+            width: 380
+            wrapMode: Text.WordWrap
+            color: "#dce8ed"
+            text: root.selectedName.length > 0
+                  ? "¿Mover “" + root.selectedName + "” a la papelera? Podrás recuperarlo después."
+                  : "¿Mover el elemento seleccionado a la papelera?"
+        }
     }
 
     Rectangle {
@@ -146,22 +292,31 @@ ApplicationWindow {
                     color: "#1f3b49"
                 }
 
-                RowLayout {
+                Button {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 42
-                    spacing: 8
-                    Image {
-                        source: "image://theme/drive-harddisk"
-                        width: 20
-                        height: 20
-                        sourceSize.width: 22
-                        sourceSize.height: 22
+                    Layout.preferredHeight: 48
+                    onClicked: files.goComputer()
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Abrir la raíz del sistema y dispositivos montados"
+                    background: Rectangle {
+                        radius: 12
+                        color: parent.hovered ? "#18394a" : "transparent"
                     }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 0
-                        Label { text: "Este equipo"; color: "#cbd9df"; font.pixelSize: 9; font.bold: true }
-                        Label { text: "Almacenamiento local"; color: "#67838f"; font.pixelSize: 8 }
+                    contentItem: RowLayout {
+                        spacing: 8
+                        Image {
+                            source: "image://theme/drive-harddisk"
+                            width: 20
+                            height: 20
+                            sourceSize.width: 22
+                            sourceSize.height: 22
+                        }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 0
+                            Label { text: "Este equipo"; color: "#cbd9df"; font.pixelSize: 9; font.bold: true }
+                            Label { text: "Sistema y unidades"; color: "#67838f"; font.pixelSize: 8 }
+                        }
                     }
                 }
             }
@@ -218,7 +373,10 @@ ApplicationWindow {
                             border.width: addressField.activeFocus ? 2 : 1
                             border.color: addressField.activeFocus ? "#2bd6d1" : "#294756"
                         }
-                        onAccepted: files.setPath(text)
+                        onAccepted: {
+                            files.setPath(text)
+                            root.clearSelection()
+                        }
                     }
 
                     TextField {
@@ -237,7 +395,10 @@ ApplicationWindow {
                             border.width: searchField.activeFocus ? 2 : 1
                             border.color: searchField.activeFocus ? "#2bd6d1" : "#294756"
                         }
-                        onTextChanged: files.filter = text
+                        onTextChanged: {
+                            files.filter = text
+                            root.clearSelection()
+                        }
                     }
                 }
             }
@@ -255,7 +416,7 @@ ApplicationWindow {
 
                     Button {
                         text: "+ Nueva carpeta"
-                        onClicked: files.createFolder()
+                        onClicked: newFolderDialog.open()
                         background: Rectangle { radius: 11; color: parent.hovered ? "#245667" : "#194353" }
                         contentItem: Label {
                             text: parent.text
@@ -268,10 +429,53 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: "↻"
-                        onClicked: files.refresh()
+                        id: renameButton
+                        text: "Renombrar"
+                        enabled: root.selectedIndex >= 0
+                        onClicked: root.beginRename()
                         ToolTip.visible: hovered
-                        ToolTip.text: "Actualizar"
+                        ToolTip.text: "Renombrar (F2)"
+                        background: Rectangle {
+                            radius: 10
+                            color: renameButton.enabled && renameButton.hovered ? "#1f4251" : "transparent"
+                        }
+                        contentItem: Label {
+                            text: renameButton.text
+                            color: renameButton.enabled ? "#c9d9df" : "#536b76"
+                            font.pixelSize: 9
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    Button {
+                        id: trashButton
+                        text: "Papelera"
+                        enabled: root.selectedIndex >= 0
+                        onClicked: root.beginTrash()
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Mover a la papelera (Supr)"
+                        background: Rectangle {
+                            radius: 10
+                            color: trashButton.enabled && trashButton.hovered ? "#492c32" : "transparent"
+                        }
+                        contentItem: Label {
+                            text: trashButton.text
+                            color: trashButton.enabled ? "#e6c8cd" : "#536b76"
+                            font.pixelSize: 9
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+                    Button {
+                        text: "↻"
+                        onClicked: {
+                            files.refresh()
+                            root.clearSelection()
+                        }
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Actualizar (Ctrl+R)"
                         background: Rectangle { radius: 10; color: parent.hovered ? "#1f4251" : "transparent" }
                         contentItem: Label {
                             text: parent.text
@@ -285,6 +489,15 @@ ApplicationWindow {
                     Item { Layout.fillWidth: true }
 
                     Label {
+                        visible: root.selectedIndex >= 0
+                        text: root.selectedName
+                        color: "#a9c0c9"
+                        font.pixelSize: 8
+                        elide: Text.ElideMiddle
+                        Layout.maximumWidth: 180
+                    }
+
+                    Label {
                         text: files.count + (files.count === 1 ? " elemento" : " elementos")
                         color: "#748f9a"
                         font.pixelSize: 9
@@ -292,7 +505,10 @@ ApplicationWindow {
 
                     Button {
                         text: root.gridMode ? "☷" : "▦"
-                        onClicked: root.gridMode = !root.gridMode
+                        onClicked: {
+                            root.gridMode = !root.gridMode
+                            root.clearSelection()
+                        }
                         ToolTip.visible: hovered
                         ToolTip.text: root.gridMode ? "Vista de lista" : "Vista de cuadrícula"
                         background: Rectangle { radius: 10; color: parent.hovered ? "#1f4251" : "#132b36" }
@@ -346,9 +562,11 @@ ApplicationWindow {
                         width: listView.width
                         height: 48
                         radius: 12
-                        color: mouse.containsMouse ? "#193747" : "#101f29"
-                        border.width: mouse.containsMouse ? 1 : 0
-                        border.color: "#315667"
+                        color: root.selectedIndex === fileRow.index
+                               ? "#23546a"
+                               : (mouse.containsMouse ? "#193747" : "#101f29")
+                        border.width: root.selectedIndex === fileRow.index || mouse.containsMouse ? 1 : 0
+                        border.color: root.selectedIndex === fileRow.index ? "#2bd6d1" : "#315667"
 
                         RowLayout {
                             anchors.fill: parent
@@ -388,7 +606,16 @@ ApplicationWindow {
                             id: mouse
                             anchors.fill: parent
                             hoverEnabled: true
-                            onDoubleClicked: files.activate(fileRow.index)
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: function(event) {
+                                root.selectEntry(fileRow.index, fileRow.fileName)
+                                if (event.button === Qt.RightButton)
+                                    fileMenu.popup()
+                            }
+                            onDoubleClicked: {
+                                files.activate(fileRow.index)
+                                root.clearSelection()
+                            }
                         }
                     }
                 }
@@ -413,9 +640,11 @@ ApplicationWindow {
                         width: 120
                         height: 104
                         radius: 16
-                        color: tileMouse.containsMouse ? "#1a3d4e" : "#102632"
-                        border.width: tileMouse.containsMouse ? 1 : 0
-                        border.color: "#356174"
+                        color: root.selectedIndex === fileTile.index
+                               ? "#23546a"
+                               : (tileMouse.containsMouse ? "#1a3d4e" : "#102632")
+                        border.width: root.selectedIndex === fileTile.index || tileMouse.containsMouse ? 1 : 0
+                        border.color: root.selectedIndex === fileTile.index ? "#2bd6d1" : "#356174"
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -454,7 +683,16 @@ ApplicationWindow {
                             id: tileMouse
                             anchors.fill: parent
                             hoverEnabled: true
-                            onDoubleClicked: files.activate(fileTile.index)
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onClicked: function(event) {
+                                root.selectEntry(fileTile.index, fileTile.fileName)
+                                if (event.button === Qt.RightButton)
+                                    fileMenu.popup()
+                            }
+                            onDoubleClicked: {
+                                files.activate(fileTile.index)
+                                root.clearSelection()
+                            }
                         }
                     }
                 }
@@ -480,6 +718,29 @@ ApplicationWindow {
                     font.pixelSize: 9
                 }
             }
+        }
+    }
+
+    Menu {
+        id: fileMenu
+        MenuItem {
+            text: "Abrir"
+            enabled: root.selectedIndex >= 0
+            onTriggered: {
+                files.activate(root.selectedIndex)
+                root.clearSelection()
+            }
+        }
+        MenuSeparator { }
+        MenuItem {
+            text: "Renombrar"
+            enabled: root.selectedIndex >= 0
+            onTriggered: root.beginRename()
+        }
+        MenuItem {
+            text: "Mover a la papelera"
+            enabled: root.selectedIndex >= 0
+            onTriggered: root.beginTrash()
         }
     }
 }
