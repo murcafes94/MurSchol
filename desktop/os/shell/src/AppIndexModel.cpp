@@ -5,12 +5,44 @@
 
 #include <QDateTime>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QLocale>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSettings>
 #include <QStandardPaths>
+
+namespace {
+bool containsDesktopName(const QString &list, const QString &name)
+{
+    const QStringList values = list.split(';', Qt::SkipEmptyParts);
+    for (const QString &value : values) {
+        if (value.trimmed().compare(name, Qt::CaseInsensitive) == 0)
+            return true;
+    }
+    return false;
+}
+
+bool localeMatches(const QString &desktopLocale)
+{
+    QString candidate = desktopLocale.trimmed();
+    candidate.replace('_', '-');
+    candidate = candidate.toLower();
+
+    for (QString language : QLocale::system().uiLanguages()) {
+        language.replace('_', '-');
+        language = language.toLower();
+        if (candidate == language
+            || language.startsWith(candidate + '-')
+            || candidate.startsWith(language + '-')) {
+            return true;
+        }
+    }
+    return false;
+}
+}
 
 AppIndexModel::AppIndexModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -172,17 +204,19 @@ void AppIndexModel::recordRecent(const QString &id)
     emit stateChanged();
 }
 
-MurScholAppEntry AppIndexModel::parseDesktopFile(const QString &path)
+MurScholAppEntry AppIndexModel::parseDesktopFile(const QString &path, const QString &id)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return {};
 
     MurScholAppEntry entry;
-    entry.id = QFileInfo(path).fileName();
+    entry.id = id;
     bool inDesktopEntry = false;
     bool applicationType = false;
-    bool hidden = false;
+    bool noDisplay = false;
+    QString genericName;
+    QString localizedName;
 
     while (!file.atEnd()) {
         const QString line = QString::fromUtf8(file.readLine()).trimmed();
@@ -192,33 +226,93 @@ MurScholAppEntry AppIndexModel::parseDesktopFile(const QString &path)
         }
         if (!inDesktopEntry || line.startsWith('#'))
             continue;
+
         const int equal = line.indexOf('=');
         if (equal < 1)
             continue;
         const QString key = line.left(equal);
         const QString value = line.mid(equal + 1);
-        if (key == QStringLiteral("Name") && entry.name.isEmpty()) entry.name = value;
-        else if (key == QStringLiteral("Exec")) entry.exec = value;
-        else if (key == QStringLiteral("Icon")) entry.icon = value;
-        else if (key == QStringLiteral("Categories")) entry.categories = value;
-        else if (key == QStringLiteral("Type")) applicationType = (value == QStringLiteral("Application"));
-        else if ((key == QStringLiteral("NoDisplay") || key == QStringLiteral("Hidden"))
-                 && value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0) hidden = true;
+
+        if (key == QStringLiteral("Name")) {
+            genericName = value;
+        } else if (key.startsWith(QStringLiteral("Name[")) && key.endsWith(']')) {
+            const QString locale = key.mid(5, key.size() - 6);
+            if (localeMatches(locale))
+                localizedName = value;
+        } else if (key == QStringLiteral("Exec")) {
+            entry.exec = value;
+        } else if (key == QStringLiteral("TryExec")) {
+            entry.tryExec = value.trimmed();
+        } else if (key == QStringLiteral("Icon")) {
+            entry.icon = value;
+        } else if (key == QStringLiteral("Categories")) {
+            entry.categories = value;
+        } else if (key == QStringLiteral("OnlyShowIn")) {
+            entry.onlyShowIn = value;
+        } else if (key == QStringLiteral("NotShowIn")) {
+            entry.notShowIn = value;
+        } else if (key == QStringLiteral("Type")) {
+            applicationType = (value == QStringLiteral("Application"));
+        } else if (key == QStringLiteral("Terminal")) {
+            entry.terminal = value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0;
+        } else if (key == QStringLiteral("Hidden")) {
+            entry.hidden = value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0;
+        } else if (key == QStringLiteral("NoDisplay")) {
+            noDisplay = value.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0;
+        }
     }
 
-    if (!applicationType || hidden || entry.name.isEmpty() || entry.exec.isEmpty())
-        return {};
+    entry.hidden = entry.hidden || noDisplay;
+    entry.valid = applicationType || entry.hidden;
+    entry.name = localizedName.isEmpty() ? genericName : localizedName;
+
+    if (!entry.valid)
+        return entry;
+    if (!entry.hidden && (entry.name.isEmpty() || entry.exec.isEmpty())) {
+        entry.valid = false;
+        return entry;
+    }
 
     entry.exec = cleanExec(entry.exec);
-    entry.source = path.startsWith(QDir::homePath()) ? QStringLiteral("Usuario") : QStringLiteral("Linux");
+    if (path.contains(QStringLiteral("/flatpak/")))
+        entry.source = QStringLiteral("Flatpak");
+    else if (path.startsWith(QDir::homePath()))
+        entry.source = QStringLiteral("Usuario");
+    else
+        entry.source = QStringLiteral("Linux");
     return entry;
 }
 
 QString AppIndexModel::cleanExec(QString command)
 {
+    // Los códigos de campo se expanden cuando una aplicación se abre con un
+    // archivo/URL. Desde Inicio no existe ese argumento, por lo que se eliminan.
     command.remove(QRegularExpression(QStringLiteral("\\s+%[fFuUdDnNickvm]")));
     command.remove(QRegularExpression(QStringLiteral("%[fFuUdDnNickvm]")));
     return command.trimmed();
+}
+
+bool AppIndexModel::entryVisibleForMurSchol(const MurScholAppEntry &entry)
+{
+    if (!entry.valid || entry.hidden)
+        return false;
+    if (!entry.onlyShowIn.trimmed().isEmpty()
+        && !containsDesktopName(entry.onlyShowIn, QStringLiteral("MurSchol"))) {
+        return false;
+    }
+    if (containsDesktopName(entry.notShowIn, QStringLiteral("MurSchol")))
+        return false;
+    return true;
+}
+
+bool AppIndexModel::tryExecAvailable(const QString &tryExec)
+{
+    const QString command = tryExec.trimmed();
+    if (command.isEmpty())
+        return true;
+    if (QFileInfo(command).isAbsolute())
+        return QFileInfo(command).isExecutable();
+    return !QStandardPaths::findExecutable(command).isEmpty();
 }
 
 bool AppIndexModel::matchesCategory(const MurScholAppEntry &app, const QString &category)
@@ -260,24 +354,61 @@ bool AppIndexModel::matchesCategory(const MurScholAppEntry &app, const QString &
 void AppIndexModel::refresh()
 {
     QList<MurScholAppEntry> discovered;
-    QSet<QString> names;
-    const QStringList roots = {
-        QStringLiteral("/usr/share/applications"),
-        QStringLiteral("/usr/local/share/applications"),
-        QDir::homePath() + QStringLiteral("/.local/share/applications")
-    };
+    QSet<QString> claimedIds;
+    QSet<QString> visibleNames;
+    QStringList roots;
 
-    for (const QString &root : roots) {
-        QDir dir(root);
-        const QStringList files = dir.entryList({QStringLiteral("*.desktop")}, QDir::Files);
-        for (const QString &fileName : files) {
-            auto entry = parseDesktopFile(dir.absoluteFilePath(fileName));
-            if (!entry.name.isEmpty() && !names.contains(entry.name.toLower())) {
-                names.insert(entry.name.toLower());
-                entry.pinned = m_pinnedIds.contains(entry.id);
-                entry.lastUsed = m_lastUsed.value(entry.id, 0);
-                discovered.append(entry);
-            }
+    const QString userData = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    if (!userData.isEmpty())
+        roots << QDir(userData).filePath(QStringLiteral("applications"));
+
+    // Flatpak no siempre aparece en XDG_DATA_DIRS al arrancar una sesión mínima.
+    roots << QDir::homePath() + QStringLiteral("/.local/share/flatpak/exports/share/applications");
+
+    QString dataDirs = qEnvironmentVariable("XDG_DATA_DIRS");
+    if (dataDirs.trimmed().isEmpty())
+        dataDirs = QStringLiteral("/usr/local/share:/usr/share");
+    for (const QString &dataDir : dataDirs.split(':', Qt::SkipEmptyParts))
+        roots << QDir(dataDir).filePath(QStringLiteral("applications"));
+
+    roots << QStringLiteral("/var/lib/flatpak/exports/share/applications");
+    roots.removeDuplicates();
+
+    // XDG da prioridad al primer directorio de datos. Un desktop Hidden/NoDisplay
+    // de usuario debe poder ocultar la copia del sistema con el mismo ID.
+    for (const QString &root : std::as_const(roots)) {
+        QDir rootDir(root);
+        if (!rootDir.exists())
+            continue;
+
+        QDirIterator it(root, {QStringLiteral("*.desktop")}, QDir::Files,
+                        QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            const QString path = it.next();
+            QString relative = rootDir.relativeFilePath(path);
+            relative.replace('/', '-');
+            const QString id = relative;
+            if (id.isEmpty() || claimedIds.contains(id))
+                continue;
+
+            auto entry = parseDesktopFile(path, id);
+            if (!entry.valid)
+                continue;
+
+            claimedIds.insert(id);
+            if (!entryVisibleForMurSchol(entry) || !tryExecAvailable(entry.tryExec))
+                continue;
+
+            // Evita tarjetas duplicadas con el mismo nombre visible, conservando
+            // la entrada de mayor prioridad XDG.
+            const QString normalizedName = entry.name.toCaseFolded();
+            if (visibleNames.contains(normalizedName))
+                continue;
+            visibleNames.insert(normalizedName);
+
+            entry.pinned = m_pinnedIds.contains(entry.id);
+            entry.lastUsed = m_lastUsed.value(entry.id, 0);
+            discovered.append(entry);
         }
     }
 
@@ -296,7 +427,8 @@ void AppIndexModel::rebuildVisible()
     m_visible.clear();
 
     for (const auto &app : std::as_const(m_all)) {
-        const bool textMatch = m_filter.isEmpty() || app.name.contains(m_filter, Qt::CaseInsensitive);
+        const bool textMatch = m_filter.isEmpty()
+                               || app.name.contains(m_filter, Qt::CaseInsensitive);
         if (!textMatch)
             continue;
 
@@ -337,9 +469,29 @@ bool AppIndexModel::launch(int row)
         return false;
 
     QStringList args = parts;
-    const QString program = args.takeFirst();
-    bool started = false;
+    QString program = args.takeFirst();
 
+    // Las aplicaciones con Terminal=true no deben lanzarse sin una ventana
+    // visible. Foot es la terminal nativa de MurSchol; xterm queda de respaldo.
+    if (entry.terminal) {
+        QString terminal = QStandardPaths::findExecutable(QStringLiteral("foot"));
+        if (!terminal.isEmpty()) {
+            QStringList terminalArgs { QStringLiteral("--"), program };
+            terminalArgs.append(args);
+            program = terminal;
+            args = terminalArgs;
+        } else {
+            terminal = QStandardPaths::findExecutable(QStringLiteral("xterm"));
+            if (terminal.isEmpty())
+                return false;
+            QStringList terminalArgs { QStringLiteral("-e"), program };
+            terminalArgs.append(args);
+            program = terminal;
+            args = terminalArgs;
+        }
+    }
+
+    bool started = false;
     const QString diagnosticLauncher = QStandardPaths::findExecutable(QStringLiteral("murschol-launch"));
     if (!diagnosticLauncher.isEmpty()) {
         QStringList launchArgs;
