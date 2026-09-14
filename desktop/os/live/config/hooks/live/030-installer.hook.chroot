@@ -2,7 +2,7 @@
 set -eu
 
 # Calamares viene de Debian Trixie con una configuración probada para medios
-# Live. MurSchol conserva ese backend y cambia únicamente su identidad visual.
+# Live. MurSchol conserva ese backend y cambia su identidad e integración.
 if [ ! -x /usr/bin/calamares-install-debian ]; then
     echo "MurSchol installer: falta /usr/bin/calamares-install-debian" >&2
     exit 1
@@ -18,13 +18,28 @@ if [ ! -f /etc/calamares/branding/murschol/branding.desc ]; then
     exit 1
 fi
 
-# Mantiene los módulos, particionado, EFI, cifrado y secuencia de instalación
-# suministrados por Debian, pero selecciona la marca propia de MurSchol.
+# Mantiene particionado, EFI, cifrado y secuencia de instalación suministrados
+# por Debian, pero selecciona la marca propia de MurSchol.
 if grep -q '^[[:space:]]*branding:' /etc/calamares/settings.conf; then
     sed -i 's/^[[:space:]]*branding:.*/branding: murschol/' /etc/calamares/settings.conf
 else
     printf '\nbranding: murschol\n' >> /etc/calamares/settings.conf
 fi
+
+# Calamares puede detectar más de una sesión porque labwc también instala su
+# propio .desktop. Forzamos MurSchol como entorno objetivo para que LightDM no
+# termine iniciando un compositor vacío después de instalar el sistema.
+mkdir -p /etc/calamares/modules
+cat > /etc/calamares/modules/displaymanager.conf <<'EOF'
+---
+displaymanagers:
+  - lightdm
+defaultDesktopEnvironment:
+  executable: "/usr/local/bin/murschol-session"
+  desktopFile: "murschol"
+basicSetup: false
+sysconfigSetup: false
+EOF
 
 # Evita que la configuración Debian intente crear un icono genérico en un
 # escritorio tradicional. MurSchol publica el instalador mediante Inicio.
@@ -61,5 +76,6 @@ EOF
 chmod 0644 /usr/share/applications/murschol-installer.desktop
 
 grep -q '^branding: murschol$' /etc/calamares/settings.conf
+grep -q 'desktopFile: "murschol"' /etc/calamares/modules/displaymanager.conf
 
-echo "MurSchol installer: Calamares registrado y branding MurSchol activado"
+echo "MurSchol installer: Calamares registrado, branding y sesión MurSchol activados"
