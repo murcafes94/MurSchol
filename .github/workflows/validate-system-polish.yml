@@ -1,0 +1,65 @@
+name: Validate MurSchol System Polish
+
+on:
+  push:
+    paths:
+      - 'desktop/os/live/**'
+      - '.github/workflows/validate-system-polish.yml'
+  pull_request:
+    paths:
+      - 'desktop/os/live/**'
+      - '.github/workflows/validate-system-polish.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate startup scripts
+        run: |
+          sh -n desktop/os/live/config/hooks/live/040-plymouth.hook.chroot
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-power-profile
+          sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          bash -n desktop/os/live/build-live.sh
+
+      - name: Validate MurSchol boot splash
+        run: |
+          THEME=desktop/os/live/config/includes.chroot/usr/share/plymouth/themes/murschol
+          test -s "$THEME/murschol-splash.png"
+          test -s "$THEME/murschol.plymouth"
+          test -s "$THEME/murschol.script"
+          grep -q '^ModuleName=script$' "$THEME/murschol.plymouth"
+          grep -q 'murschol-splash.png' "$THEME/murschol.script"
+          grep -q '^plymouth$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^plymouth-themes$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q 'quiet splash' desktop/os/live/build-live.sh
+          grep -q 'quiet splash' desktop/os/live/config/includes.chroot/etc/default/grub.d/50-murschol.cfg
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          p = Path('desktop/os/live/config/includes.chroot/usr/share/plymouth/themes/murschol/murschol-splash.png')
+          data = p.read_bytes()
+          assert data[:8] == b'\x89PNG\r\n\x1a\n', 'splash no es PNG'
+          width, height = struct.unpack('>II', data[16:24])
+          assert width >= 1280 and height >= 720, (width, height)
+          print(f'MurSchol splash: {width}x{height}')
+          PY
+
+      - name: Validate installed session safety
+        run: |
+          LIGHTDM=desktop/os/live/config/includes.chroot/etc/lightdm/lightdm.conf.d/50-murschol.conf
+          grep -q '^user-session=murschol$' "$LIGHTDM"
+          ! grep -q '^autologin-user=user$' "$LIGHTDM"
+          grep -q '^PRETTY_NAME="MurSchol OS 0.1"$' desktop/os/live/config/includes.chroot/etc/os-release
+          grep -q '^power-profiles-daemon$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^flatpak$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^gvfs-backends$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^thunar-volman$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^ntfs-3g$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^exfatprogs$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q 'murschol-power-profile.path' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          grep -q 'PathChanged=%h/.config/murschol/settings.ini' desktop/os/live/config/includes.chroot/usr/lib/systemd/user/murschol-power-profile.path

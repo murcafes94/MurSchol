@@ -1,0 +1,7 @@
+[Unit]
+Description=Aplicar perfil energético de MurSchol OS
+After=graphical-session-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/murschol-power-profile

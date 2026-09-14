@@ -19,6 +19,20 @@ NOTIFY_LOG="$STATE_DIR/notifications.log"
 PANEL_PID=""
 PANEL_READY=0
 
+# Evita que una sesión de uso prolongado acumule logs de diagnóstico sin límite.
+trim_log() {
+  log="$1"
+  [ -f "$log" ] || return 0
+  size="$(wc -c < "$log" 2>/dev/null || echo 0)"
+  if [ "$size" -gt 1048576 ]; then
+    tail -c 262144 "$log" > "$log.tmp" 2>/dev/null || true
+    mv -f "$log.tmp" "$log" 2>/dev/null || true
+  fi
+}
+for log in "$DESKTOP_LOG" "$PANEL_LOG" "$POLKIT_LOG" "$NOTIFY_LOG"; do
+  trim_log "$log"
+done
+
 # Las aplicaciones MurSchol y la ruta de recuperación usan notificaciones.
 # Mako es nativo de Wayland/layer-shell y evita que notify-send quede sin receptor.
 if command -v mako >/dev/null 2>&1; then
@@ -32,6 +46,15 @@ fi
 if command -v lxqt-policykit-agent >/dev/null 2>&1; then
   if ! pgrep -u "$(id -u)" -x lxqt-policykit-agent >/dev/null 2>&1; then
     lxqt-policykit-agent >> "$POLKIT_LOG" 2>&1 &
+  fi
+fi
+
+# El perfil Ligero/Normal/Rendimiento debe afectar también al sistema real.
+# systemd --user vigila settings.ini y ejecuta el helper solo cuando cambia.
+if command -v powerprofilesctl >/dev/null 2>&1; then
+  /usr/local/bin/murschol-power-profile >/dev/null 2>&1 || true
+  if command -v systemctl >/dev/null 2>&1 && [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+    systemctl --user start murschol-power-profile.path >/dev/null 2>&1 || true
   fi
 fi
 

@@ -1,0 +1,104 @@
+# MurSchol OS Plymouth theme
+# La imagen principal es el splash aprobado para el sistema.
+
+Window.SetBackgroundTopColor(0.02, 0.015, 0.01);
+Window.SetBackgroundBottomColor(0.005, 0.005, 0.005);
+
+background.original = Image("murschol-splash.png");
+background.sprite = Sprite();
+prompt.sprite = Sprite();
+answer.sprite = Sprite();
+message.sprite = Sprite();
+shutdown.sprite = Sprite();
+
+fun place_background() {
+    screen.w = Window.GetWidth();
+    screen.h = Window.GetHeight();
+    background.image = background.original.Scale(screen.w, screen.h);
+    background.sprite.SetImage(background.image);
+    background.sprite.SetPosition(Window.GetX(), Window.GetY(), 0);
+}
+
+place_background();
+
+fun hide_dialog() {
+    prompt.sprite.SetOpacity(0);
+    answer.sprite.SetOpacity(0);
+}
+
+fun display_normal_callback() {
+    hide_dialog();
+}
+
+fun display_password_callback(text, bullets) {
+    prompt.image = Image.Text(text, 0.96, 0.90, 0.80);
+    prompt.sprite.SetImage(prompt.image);
+    prompt.sprite.SetPosition((Window.GetWidth() - prompt.image.GetWidth()) / 2,
+                              Window.GetHeight() * 0.80,
+                              100);
+    prompt.sprite.SetOpacity(1);
+
+    answer.text = "";
+    for (i = 0; i < bullets; i++)
+        answer.text = answer.text + "*";
+    if (bullets == 0)
+        answer.text = "_";
+
+    answer.image = Image.Text(answer.text, 0.84, 0.66, 0.37);
+    answer.sprite.SetImage(answer.image);
+    answer.sprite.SetPosition((Window.GetWidth() - answer.image.GetWidth()) / 2,
+                              Window.GetHeight() * 0.84,
+                              101);
+    answer.sprite.SetOpacity(1);
+}
+
+fun display_question_callback(text, entry) {
+    prompt.image = Image.Text(text, 0.96, 0.90, 0.80);
+    prompt.sprite.SetImage(prompt.image);
+    prompt.sprite.SetPosition((Window.GetWidth() - prompt.image.GetWidth()) / 2,
+                              Window.GetHeight() * 0.80,
+                              100);
+    prompt.sprite.SetOpacity(1);
+
+    answer.image = Image.Text(entry, 0.84, 0.66, 0.37);
+    answer.sprite.SetImage(answer.image);
+    answer.sprite.SetPosition((Window.GetWidth() - answer.image.GetWidth()) / 2,
+                              Window.GetHeight() * 0.84,
+                              101);
+    answer.sprite.SetOpacity(1);
+}
+
+fun message_callback(text) {
+    message.image = Image.Text(text, 0.78, 0.74, 0.69);
+    message.sprite.SetImage(message.image);
+    message.sprite.SetPosition((Window.GetWidth() - message.image.GetWidth()) / 2,
+                               Window.GetHeight() * 0.93,
+                               110);
+}
+
+fun refresh_callback() {
+    # Plymouth puede cambiar de resolución al tomar DRM/KMS. Reajustamos solo
+    # cuando el tamaño visible cambia para conservar el splash a pantalla completa.
+    if (screen.w != Window.GetWidth() || screen.h != Window.GetHeight())
+        place_background();
+
+    mode = Plymouth.GetMode();
+    if (mode == "shutdown" || mode == "suspend") {
+        background.sprite.SetOpacity(0);
+        shutdown.image = Image.Text("MurSchol OS  ·  Cerrando sistema…", 0.84, 0.66, 0.37);
+        shutdown.sprite.SetImage(shutdown.image);
+        shutdown.sprite.SetPosition((Window.GetWidth() - shutdown.image.GetWidth()) / 2,
+                                    (Window.GetHeight() - shutdown.image.GetHeight()) / 2,
+                                    20);
+        shutdown.sprite.SetOpacity(1);
+    } else {
+        background.sprite.SetOpacity(1);
+        shutdown.sprite.SetOpacity(0);
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayQuestionFunction(display_question_callback);
+Plymouth.SetMessageFunction(message_callback);

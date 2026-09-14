@@ -53,7 +53,7 @@ lb config \
   --iso-application "MurSchol OS 0.1 Live" \
   --iso-publisher "MurSchol" \
   --iso-volume "MURSCHOL_0_1" \
-  --bootappend-live "boot=live components username=user hostname=murschol locales=es_EC.UTF-8 keyboard-layouts=latam timezone=America/Guayaquil quiet"
+  --bootappend-live "boot=live components username=user hostname=murschol locales=es_EC.UTF-8 keyboard-layouts=latam timezone=America/Guayaquil quiet splash loglevel=3 systemd.show_status=auto vt.global_cursor_default=0 plymouth.ignore-serial-consoles"
 
 lb build
 

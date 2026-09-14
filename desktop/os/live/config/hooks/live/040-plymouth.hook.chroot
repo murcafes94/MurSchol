@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+THEME="murschol"
+THEME_DIR="/usr/share/plymouth/themes/$THEME"
+
+for required in "$THEME_DIR/murschol.plymouth" "$THEME_DIR/murschol.script" "$THEME_DIR/murschol-splash.png"; do
+    if [ ! -s "$required" ]; then
+        echo "MurSchol Plymouth: falta $required" >&2
+        exit 1
+    fi
+done
+
+if ! command -v plymouth-set-default-theme >/dev/null 2>&1; then
+    echo "MurSchol Plymouth: plymouth-set-default-theme no está disponible" >&2
+    exit 1
+fi
+
+install -d /etc/plymouth
+cat > /etc/plymouth/plymouthd.conf <<'EOF'
+[Daemon]
+Theme=murschol
+ShowDelay=0
+DeviceTimeout=8
+EOF
+
+plymouth-set-default-theme "$THEME"
+
+# El splash debe vivir dentro del initramfs para aparecer desde las primeras
+# etapas del arranque, también cuando existe cifrado de disco.
+if command -v update-initramfs >/dev/null 2>&1; then
+    update-initramfs -u -k all
+fi
+
+# Evita que el cursor de consola parpadee encima de Plymouth al cambiar de VT.
+install -d /etc/sysctl.d
+cat > /etc/sysctl.d/99-murschol-console.conf <<'EOF'
+# MurSchol mantiene el arranque gráfico limpio; el modo texto sigue accesible
+# retirando quiet/splash desde el cargador de arranque.
+kernel.printk = 3 4 1 3
+EOF
+
+echo "MurSchol Plymouth: tema $THEME instalado y añadido al initramfs"

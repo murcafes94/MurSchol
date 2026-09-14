@@ -1,0 +1,9 @@
+[Unit]
+Description=Vigilar cambios del perfil energético de MurSchol OS
+
+[Path]
+PathChanged=%h/.config/murschol/settings.ini
+Unit=murschol-power-profile.service
+
+[Install]
+WantedBy=default.target

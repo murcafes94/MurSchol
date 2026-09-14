@@ -1,0 +1,45 @@
+#!/bin/sh
+set -eu
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/murschol/settings.ini"
+LOG_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/murschol"
+LOG="$LOG_DIR/power-profile.log"
+mkdir -p "$LOG_DIR"
+
+if ! command -v powerprofilesctl >/dev/null 2>&1; then
+    exit 0
+fi
+
+PROFILE="Normal"
+if [ -r "$CONFIG" ]; then
+    SAVED="$(awk -F= '
+        /^\[performance\]$/ { section=1; next }
+        /^\[/ { section=0 }
+        section && $1 == "profile" { print $2; exit }
+    ' "$CONFIG" 2>/dev/null || true)"
+    [ -n "$SAVED" ] && PROFILE="$SAVED"
+fi
+
+case "$PROFILE" in
+    Ligero) TARGET="power-saver" ;;
+    Rendimiento) TARGET="performance" ;;
+    *) TARGET="balanced" ;;
+esac
+
+CURRENT="$(powerprofilesctl get 2>/dev/null || true)"
+if [ "$CURRENT" = "$TARGET" ]; then
+    exit 0
+fi
+
+if powerprofilesctl set "$TARGET" >> "$LOG" 2>&1; then
+    printf '%s -> %s\n' "$PROFILE" "$TARGET" >> "$LOG"
+    exit 0
+fi
+
+# Algunos equipos no exponen el perfil performance. MurSchol conserva el modo
+# de interfaz solicitado, pero evita dejar un error permanente y vuelve al perfil balanceado.
+if [ "$TARGET" = "performance" ]; then
+    powerprofilesctl set balanced >> "$LOG" 2>&1 || true
+fi
+
+exit 0

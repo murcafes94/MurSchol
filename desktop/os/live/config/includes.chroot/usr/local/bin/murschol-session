@@ -4,22 +4,25 @@ set -eu
 export XDG_SESSION_TYPE=wayland
 export XDG_CURRENT_DESKTOP=MurSchol
 export XDG_SESSION_DESKTOP=MurSchol
+export XDG_SESSION_CLASS=user
 export QT_QPA_PLATFORM=wayland
+export QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
+export GDK_BACKEND=wayland,x11
+export GTK_USE_PORTAL=1
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 
 # Las aplicaciones normales deben conservar las decoraciones de labwc para
 # minimizar, maximizar y cerrar. El shell y el panel declaran por sí mismos
-# cuándo necesitan una superficie sin marco, así que no desactivamos las
-# decoraciones de Qt de forma global.
+# cuándo necesitan una superficie sin marco.
 unset QT_WAYLAND_DISABLE_WINDOWDECORATION 2>/dev/null || true
 
-# Firefox ESR se ejecuta directamente sobre Wayland para no depender de
-# XWayland como ruta principal del navegador dentro de la sesión MurSchol.
+# Navegadores Gecko y aplicaciones Chromium/Electron modernas priorizan Wayland,
+# conservando XWayland como respaldo para software antiguo.
 export MOZ_ENABLE_WAYLAND=1
+export ELECTRON_OZONE_PLATFORM_HINT=auto
 
-# La alpha actual usa interfaz en español. Inicializamos las carpetas XDG
-# antes de arrancar Qt para que MurSchol Files, Capture y el resto de apps
-# compartan exactamente las mismas rutas.
+# La interfaz base usa español de Ecuador. Inicializamos las carpetas XDG antes
+# de arrancar Qt para que Files, Capture y las demás apps compartan las rutas.
 mkdir -p "$HOME/.config"
 if [ ! -f "$HOME/.config/user-dirs.dirs" ]; then
   cat > "$HOME/.config/user-dirs.dirs" <<'EOF'
@@ -58,9 +61,8 @@ mkdir -p "$STATE_DIR"
 SESSION_LOG="$STATE_DIR/session.log"
 
 # Debian con dbus-user-session mantiene un único bus compartido por el usuario.
-# LightDM puede entregarnos ya ese bus; crear otro con dbus-run-session aislaría
-# portales, servicios systemd --user y aplicaciones activadas por D-Bus.
-# Solo creamos un bus privado cuando el gestor de sesión realmente no proporcionó uno.
+# LightDM puede entregarnos ya ese bus; crear otro aislaría portales y servicios
+# systemd --user. Solo creamos un bus privado cuando no existe uno disponible.
 if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
   exec labwc >> "$SESSION_LOG" 2>&1
 fi

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=MurSchol OS
+Description=Pantalla de inicio oficial de MurSchol OS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/murschol
+ScriptFile=/usr/share/plymouth/themes/murschol/murschol.script
