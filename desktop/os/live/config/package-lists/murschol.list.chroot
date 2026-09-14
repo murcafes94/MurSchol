@@ -19,6 +19,8 @@ xdg-desktop-portal-wlr
 dbus-user-session
 util-linux
 procps
+systemd-timesyncd
+systemd-zram-generator
 lightdm
 lightdm-gtk-greeter
 xserver-xorg
@@ -61,6 +63,7 @@ wl-clipboard
 cliphist
 wofi
 swayidle
+wlopm
 libnotify-bin
 mako-notifier
 swaylock

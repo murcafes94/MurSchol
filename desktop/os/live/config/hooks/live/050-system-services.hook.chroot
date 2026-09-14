@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+# MurSchol is built with --apt-recommends=false, so time synchronization must
+# be requested explicitly. Enable it in both the Live image and installed OS.
+systemctl enable systemd-timesyncd.service >/dev/null
+
+# Periodic discard is the safest default for SSD/NVMe storage. Only enable the
+# timer when the Debian util-linux package actually provides the unit.
+if [ -f /usr/lib/systemd/system/fstrim.timer ] || [ -f /lib/systemd/system/fstrim.timer ]; then
+    systemctl enable fstrim.timer >/dev/null
+fi
+
+echo "MurSchol system services: time sync and storage maintenance configured"

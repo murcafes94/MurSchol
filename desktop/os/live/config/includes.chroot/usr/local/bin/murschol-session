@@ -40,6 +40,8 @@ fi
 mkdir -p \
   "$HOME/Escritorio" \
   "$HOME/Descargas" \
+  "$HOME/Plantillas" \
+  "$HOME/Público" \
   "$HOME/Documentos" \
   "$HOME/Imágenes" \
   "$HOME/Música" \

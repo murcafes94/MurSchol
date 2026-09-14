@@ -21,6 +21,7 @@ jobs:
       - name: Validate startup scripts
         run: |
           sh -n desktop/os/live/config/hooks/live/040-plymouth.hook.chroot
+          sh -n desktop/os/live/config/hooks/live/050-system-services.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-power-profile
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-clipboard
@@ -80,7 +81,6 @@ jobs:
           grep -q '^cliphist$' "$PACKAGES"
           grep -q '^wofi$' "$PACKAGES"
           grep -q '^pkexec$' "$PACKAGES"
-
           grep -q 'cliphist wipe' "$AUTOSTART"
           grep -q 'wl-paste --type text --watch cliphist store' "$AUTOSTART"
           grep -q "before-sleep '/usr/local/bin/murschol-lock'" "$AUTOSTART"
@@ -99,3 +99,26 @@ jobs:
           test -f desktop/os/live/config/includes.chroot/usr/share/applications/murschol-update.desktop
           grep -q '^Exec=/usr/local/bin/murschol-update$' desktop/os/live/config/includes.chroot/usr/share/applications/murschol-update.desktop
           test -f desktop/os/live/config/includes.chroot/etc/skel/.config/wofi/style.css
+
+      - name: Validate memory power and time polish
+        run: |
+          PACKAGES=desktop/os/live/config/package-lists/murschol.list.chroot
+          AUTOSTART=desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          SESSION=desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
+          SERVICES=desktop/os/live/config/hooks/live/050-system-services.hook.chroot
+          ZRAM=desktop/os/live/config/includes.chroot/etc/systemd/zram-generator.conf
+          GREETER=desktop/os/live/config/includes.chroot/etc/lightdm/lightdm-gtk-greeter.conf.d/50-murschol.conf
+
+          grep -q '^systemd-timesyncd$' "$PACKAGES"
+          grep -q '^systemd-zram-generator$' "$PACKAGES"
+          grep -q '^wlopm$' "$PACKAGES"
+          grep -q 'systemctl enable systemd-timesyncd.service' "$SERVICES"
+          grep -q 'systemctl enable fstrim.timer' "$SERVICES"
+          grep -q '^\[zram0\]$' "$ZRAM"
+          grep -q '^zram-size = min(ram / 2, 4096)$' "$ZRAM"
+          grep -q "timeout 300 'wlopm --off \\\*'" "$AUTOSTART"
+          grep -q "after-resume 'wlopm --on \\\*'" "$AUTOSTART"
+          grep -q '"$HOME/Plantillas"' "$SESSION"
+          grep -q '"$HOME/Público"' "$SESSION"
+          grep -q '^background=#15191e$' "$GREETER"
+          grep -q '^theme-name=Adwaita-dark$' "$GREETER"
