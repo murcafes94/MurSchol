@@ -16,6 +16,7 @@ DESKTOP_LOG="$STATE_DIR/desktop.log"
 PANEL_LOG="$STATE_DIR/panel.log"
 POLKIT_LOG="$STATE_DIR/polkit.log"
 NOTIFY_LOG="$STATE_DIR/notifications.log"
+IDLE_LOG="$STATE_DIR/idle.log"
 PANEL_PID=""
 PANEL_READY=0
 
@@ -29,7 +30,7 @@ trim_log() {
     mv -f "$log.tmp" "$log" 2>/dev/null || true
   fi
 }
-for log in "$DESKTOP_LOG" "$PANEL_LOG" "$POLKIT_LOG" "$NOTIFY_LOG"; do
+for log in "$DESKTOP_LOG" "$PANEL_LOG" "$POLKIT_LOG" "$NOTIFY_LOG" "$IDLE_LOG"; do
   trim_log "$log"
 done
 
@@ -46,6 +47,31 @@ fi
 if command -v lxqt-policykit-agent >/dev/null 2>&1; then
   if ! pgrep -u "$(id -u)" -x lxqt-policykit-agent >/dev/null 2>&1; then
     lxqt-policykit-agent >> "$POLKIT_LOG" 2>&1 &
+  fi
+fi
+
+# Historial del portapapeles de la sesión. Se limpia al iniciar para no conservar
+# contraseñas u otros datos sensibles entre reinicios. Super+V abre el selector.
+if command -v cliphist >/dev/null 2>&1 && command -v wl-paste >/dev/null 2>&1; then
+  cliphist wipe >/dev/null 2>&1 || true
+  wl-paste --type text --watch cliphist store >/dev/null 2>&1 &
+  wl-paste --type image --watch cliphist store >/dev/null 2>&1 &
+fi
+
+# Mantiene el monitor de volúmenes de Thunar disponible para memorias USB y
+# otros medios extraíbles aunque el usuario utilice MurSchol Files.
+if command -v thunar >/dev/null 2>&1; then
+  thunar --daemon >/dev/null 2>&1 &
+fi
+
+# En el sistema instalado, bloquear por inactividad y siempre antes de dormir.
+# La sesión Live no tiene una contraseña PAM utilizable y se excluye a propósito.
+if [ ! -e /run/live/medium ] && [ ! -e /run/live/overlay ] && command -v swayidle >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -x swayidle >/dev/null 2>&1; then
+    swayidle -w \
+      timeout 600 '/usr/local/bin/murschol-lock' \
+      before-sleep '/usr/local/bin/murschol-lock' \
+      >> "$IDLE_LOG" 2>&1 &
   fi
 fi
 

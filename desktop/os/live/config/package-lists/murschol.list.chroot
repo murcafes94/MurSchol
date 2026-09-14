@@ -52,11 +52,15 @@ gammastep
 bluez
 blueman
 polkitd
+pkexec
 lxqt-policykit
 udisks2
 grim
 slurp
 wl-clipboard
+cliphist
+wofi
+swayidle
 libnotify-bin
 mako-notifier
 swaylock

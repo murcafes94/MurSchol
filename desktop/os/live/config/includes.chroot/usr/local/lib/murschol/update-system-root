@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "MurSchol Update: este helper debe ejecutarse como root." >&2
+    exit 126
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
+logger -t murschol-update "Inicio de actualización del sistema"
+
+# Repara una configuración interrumpida antes de consultar repositorios. No se
+# ejecuta autoremove para evitar eliminar paquetes que el usuario todavía use.
+dpkg --configure -a
+apt-get update
+apt-get -y --with-new-pkgs upgrade
+
+logger -t murschol-update "Actualización del sistema completada"

@@ -1,0 +1,40 @@
+window {
+  margin: 0;
+  border: 1px solid #6a5a493c;
+  border-radius: 18px;
+  background-color: #191c21;
+  color: #f5f1e8;
+  font-family: "Noto Sans";
+  font-size: 13px;
+}
+
+#outer-box {
+  margin: 12px;
+}
+
+#input {
+  margin: 0 0 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #51463b;
+  border-radius: 12px;
+  background-color: #111419;
+  color: #f5f1e8;
+}
+
+#inner-box {
+  background-color: transparent;
+}
+
+#entry {
+  padding: 9px 10px;
+  border-radius: 10px;
+}
+
+#entry:selected {
+  background-color: #3c2d24;
+  color: #f7ead7;
+}
+
+#text {
+  margin-left: 6px;
+}

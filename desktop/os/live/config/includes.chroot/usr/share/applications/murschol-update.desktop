@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Actualizaciones de MurSchol OS
+GenericName=Actualizador del sistema
+Comment=Busca e instala actualizaciones del sistema y aplicaciones Flatpak
+Exec=/usr/local/bin/murschol-update
+Icon=system-software-update
+Terminal=false
+Categories=System;Settings;
+Keywords=MurSchol;actualizar;actualizaciones;update;upgrade;sistema;
+StartupNotify=true

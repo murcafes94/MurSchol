@@ -23,8 +23,12 @@ jobs:
           sh -n desktop/os/live/config/hooks/live/040-plymouth.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-power-profile
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-clipboard
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-update
+          sh -n desktop/os/live/config/includes.chroot/usr/local/lib/murschol/update-system-root
           sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           bash -n desktop/os/live/build-live.sh
+          xmllint --noout desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
 
       - name: Validate MurSchol boot splash
         run: |
@@ -63,3 +67,34 @@ jobs:
           grep -q '^exfatprogs$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q 'murschol-power-profile.path' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           grep -q 'PathChanged=%h/.config/murschol/settings.ini' desktop/os/live/config/includes.chroot/usr/lib/systemd/user/murschol-power-profile.path
+
+      - name: Validate suspend clipboard and updates
+        run: |
+          PACKAGES=desktop/os/live/config/package-lists/murschol.list.chroot
+          AUTOSTART=desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
+          RC=desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          UPDATE=desktop/os/live/config/includes.chroot/usr/local/bin/murschol-update
+          ROOT_UPDATE=desktop/os/live/config/includes.chroot/usr/local/lib/murschol/update-system-root
+
+          grep -q '^swayidle$' "$PACKAGES"
+          grep -q '^cliphist$' "$PACKAGES"
+          grep -q '^wofi$' "$PACKAGES"
+          grep -q '^pkexec$' "$PACKAGES"
+
+          grep -q 'cliphist wipe' "$AUTOSTART"
+          grep -q 'wl-paste --type text --watch cliphist store' "$AUTOSTART"
+          grep -q "before-sleep '/usr/local/bin/murschol-lock'" "$AUTOSTART"
+          grep -q 'thunar --daemon' "$AUTOSTART"
+          grep -q 'key="W-v"' "$RC"
+          grep -q 'key="XF86Sleep"' "$RC"
+
+          grep -q '/run/live/medium' "$UPDATE"
+          grep -q 'pkexec /usr/local/lib/murschol/update-system-root' "$UPDATE"
+          grep -q 'apt-get -y --with-new-pkgs upgrade' "$ROOT_UPDATE"
+          if grep -Eq '^[[:space:]]*apt-get[[:space:]].*autoremove' "$ROOT_UPDATE"; then
+            echo 'No se permite autoremove automático en MurSchol Update.' >&2
+            exit 1
+          fi
+          test -f desktop/os/live/config/includes.chroot/usr/share/applications/murschol-update.desktop
+          grep -q '^Exec=/usr/local/bin/murschol-update$' desktop/os/live/config/includes.chroot/usr/share/applications/murschol-update.desktop
+          test -f desktop/os/live/config/includes.chroot/etc/skel/.config/wofi/style.css

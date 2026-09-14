@@ -1,0 +1,62 @@
+#!/bin/sh
+set -eu
+
+is_live_session() {
+    [ -e /run/live/medium ] || [ -e /run/live/overlay ]
+}
+
+if is_live_session; then
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send "MurSchol OS" "Las actualizaciones persistentes se habilitan después de instalar el sistema." 2>/dev/null || true
+    fi
+    exit 0
+fi
+
+if [ "${1:-}" != "--run" ]; then
+    if command -v foot >/dev/null 2>&1; then
+        exec foot -T "Actualizaciones de MurSchol OS" /usr/local/bin/murschol-update --run
+    fi
+    exec /usr/local/bin/murschol-update --run
+fi
+
+printf '\nMurSchol OS · Actualizaciones\n'
+printf '%s\n\n' '--------------------------------'
+
+if command -v nm-online >/dev/null 2>&1; then
+    printf 'Comprobando conexión…\n'
+    if ! nm-online -q --timeout=12; then
+        printf '\nNo hay una conexión de red utilizable. No se realizaron cambios.\n'
+        printf 'Pulsa Enter para cerrar.'
+        read _ || true
+        exit 2
+    fi
+fi
+
+if ! command -v pkexec >/dev/null 2>&1; then
+    printf 'Falta pkexec; no es posible solicitar autorización administrativa.\n'
+    printf 'Pulsa Enter para cerrar.'
+    read _ || true
+    exit 127
+fi
+
+printf 'Buscando e instalando actualizaciones de Debian/MurSchol…\n'
+if ! pkexec /usr/local/lib/murschol/update-system-root; then
+    rc=$?
+    printf '\nLa actualización del sistema no terminó correctamente (código %s).\n' "$rc"
+    printf 'No se ejecutará ninguna limpieza automática.\n'
+    printf 'Pulsa Enter para cerrar.'
+    read _ || true
+    exit "$rc"
+fi
+
+if command -v flatpak >/dev/null 2>&1; then
+    printf '\nActualizando aplicaciones Flatpak…\n'
+    flatpak update -y || printf 'Aviso: algunas aplicaciones Flatpak no pudieron actualizarse.\n'
+fi
+
+printf '\nActualización finalizada.\n'
+if [ -e /run/reboot-required ]; then
+    printf 'Se recomienda reiniciar MurSchol OS para completar las actualizaciones.\n'
+fi
+printf '\nPulsa Enter para cerrar.'
+read _ || true
