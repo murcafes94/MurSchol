@@ -1,0 +1,68 @@
+name: Validate MurSchol Daily Integration
+
+on:
+  push:
+    paths:
+      - 'desktop/os/shell/src/FileListModel.*'
+      - 'desktop/os/shell/qml/Files.qml'
+      - 'desktop/os/live/config/hooks/live/015-desktop-integration.hook.chroot'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session-menu'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-session-menu.desktop'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml'
+      - '.github/workflows/validate-daily-integration.yml'
+  pull_request:
+    paths:
+      - 'desktop/os/shell/src/FileListModel.*'
+      - 'desktop/os/shell/qml/Files.qml'
+      - 'desktop/os/live/config/hooks/live/015-desktop-integration.hook.chroot'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session-menu'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-session-menu.desktop'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml'
+      - '.github/workflows/validate-daily-integration.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build g++ \
+            qt6-base-dev qt6-declarative-dev \
+            qml6-module-qtquick-dialogs
+
+      - name: Validate scripts and session bindings
+        run: |
+          set -eu
+          sh -n desktop/os/live/config/hooks/live/015-desktop-integration.hook.chroot
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session-menu
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          ET.parse('desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml')
+          PY
+          RC=desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          SESSION=desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session-menu
+          READER_FIX=desktop/os/live/config/hooks/live/015-desktop-integration.hook.chroot
+          grep -q 'key="W-Escape"' "$RC"
+          grep -q 'murschol-session-menu' "$RC"
+          grep -q "'Cerrar sesión'" "$SESSION"
+          grep -q 'loginctl terminate-session' "$SESSION"
+          grep -q 'systemctl suspend' "$SESSION"
+          grep -q '^Exec=/usr/local/bin/murschol-reader %f$' "$READER_FIX"
+          grep -q '^MimeType=application/pdf;$' "$READER_FIX"
+
+      - name: Validate and build MurSchol Files
+        run: |
+          set -eu
+          /usr/lib/qt6/bin/qmlformat desktop/os/shell/qml/Files.qml >/dev/null
+          cmake -S desktop/os/shell -B build/files -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/files --parallel
+          test -x build/files/murschol-files
+          grep -q 'Q_PROPERTY(QVariantList volumes' desktop/os/shell/src/FileListModel.h
+          grep -q 'Q_INVOKABLE bool pasteClipboard' desktop/os/shell/src/FileListModel.h
+          grep -q 'udisksctl' desktop/os/shell/src/FileListModel.cpp
+          grep -q 'x-special/gnome-copied-files' desktop/os/shell/src/FileListModel.cpp

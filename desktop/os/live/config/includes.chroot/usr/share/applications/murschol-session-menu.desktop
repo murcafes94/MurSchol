@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Sesión y energía
+GenericName=Sesión de MurSchol OS
+Comment=Bloquea, suspende, cierra la sesión, reinicia o apaga el equipo
+Exec=/usr/local/bin/murschol-session-menu
+Icon=system-shutdown
+Terminal=false
+Categories=System;Settings;
+Keywords=sesion;bloquear;suspender;reiniciar;apagar;logout;power;
+StartupNotify=false

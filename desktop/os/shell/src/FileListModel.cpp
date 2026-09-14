@@ -3,18 +3,35 @@
 #include <algorithm>
 #include <utility>
 
+#include <QClipboard>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QStandardPaths>
+#include <QGuiApplication>
+#include <QMimeData>
+#include <QProcess>
+#include <QStorageInfo>
 #include <QUrl>
+#include <QVariantMap>
 
 FileListModel::FileListModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     goHome();
+    refreshVolumes();
+    refreshClipboardState();
+
+    if (QClipboard *clipboard = QGuiApplication::clipboard()) {
+        connect(clipboard, &QClipboard::dataChanged,
+                this, &FileListModel::refreshClipboardState);
+    }
+
+    m_volumeTimer.setInterval(2500);
+    connect(&m_volumeTimer, &QTimer::timeout,
+            this, &FileListModel::refreshVolumes);
+    m_volumeTimer.start();
 }
 
 int FileListModel::rowCount(const QModelIndex &parent) const
@@ -203,6 +220,7 @@ bool FileListModel::createFolderNamed(const QString &name)
         return false;
     }
 
+    setStatus(QStringLiteral("Carpeta creada"));
     refresh();
     return true;
 }
@@ -240,6 +258,7 @@ bool FileListModel::renameEntry(int row, const QString &newName)
         return false;
     }
 
+    setStatus(QStringLiteral("Elemento renombrado"));
     refresh();
     return true;
 }
@@ -256,7 +275,359 @@ bool FileListModel::moveToTrash(int row)
         return false;
     }
 
+    setStatus(QStringLiteral("Movido a la papelera"));
     refresh();
+    return true;
+}
+
+bool FileListModel::copyEntry(int row)
+{
+    return putEntryOnClipboard(row, false);
+}
+
+bool FileListModel::cutEntry(int row)
+{
+    return putEntryOnClipboard(row, true);
+}
+
+bool FileListModel::putEntryOnClipboard(int row, bool move)
+{
+    if (row < 0 || row >= m_visible.size())
+        return false;
+
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    if (!clipboard) {
+        emit errorOccurred(QStringLiteral("El portapapeles no está disponible"));
+        return false;
+    }
+
+    const QUrl url = QUrl::fromLocalFile(m_visible.at(row).path);
+    auto *mime = new QMimeData;
+    mime->setUrls({url});
+    mime->setText(m_visible.at(row).path);
+
+    QByteArray gnomeMarker = move ? QByteArrayLiteral("cut\n") : QByteArrayLiteral("copy\n");
+    gnomeMarker.append(url.toEncoded());
+    mime->setData(QByteArrayLiteral("x-special/gnome-copied-files"), gnomeMarker);
+    mime->setData(QByteArrayLiteral("application/x-kde-cutselection"),
+                  move ? QByteArrayLiteral("1") : QByteArrayLiteral("0"));
+
+    clipboard->setMimeData(mime, QClipboard::Clipboard);
+    setStatus(move ? QStringLiteral("Listo para mover")
+                   : QStringLiteral("Copiado al portapapeles"));
+    return true;
+}
+
+void FileListModel::refreshClipboardState()
+{
+    bool available = false;
+    if (const QClipboard *clipboard = QGuiApplication::clipboard()) {
+        const QMimeData *mime = clipboard->mimeData(QClipboard::Clipboard);
+        if (mime && mime->hasUrls()) {
+            for (const QUrl &url : mime->urls()) {
+                if (url.isLocalFile()) {
+                    available = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (available == m_canPaste)
+        return;
+    m_canPaste = available;
+    emit clipboardStateChanged();
+}
+
+QString FileListModel::uniqueDestinationPath(const QString &sourcePath) const
+{
+    const QFileInfo sourceInfo(sourcePath);
+    QDir destination(m_currentPath);
+    QString candidate = destination.filePath(sourceInfo.fileName());
+    if (!QFileInfo::exists(candidate))
+        return candidate;
+
+    const QString suffix = sourceInfo.isDir() ? QString() : sourceInfo.completeSuffix();
+    QString stem;
+    if (sourceInfo.isDir() || suffix.isEmpty())
+        stem = sourceInfo.fileName();
+    else
+        stem = sourceInfo.fileName().left(sourceInfo.fileName().size() - suffix.size() - 1);
+
+    for (int number = 2; number < 10000; ++number) {
+        const QString fileName = suffix.isEmpty()
+            ? QStringLiteral("%1 (%2)").arg(stem).arg(number)
+            : QStringLiteral("%1 (%2).%3").arg(stem).arg(number).arg(suffix);
+        candidate = destination.filePath(fileName);
+        if (!QFileInfo::exists(candidate))
+            return candidate;
+    }
+
+    return {};
+}
+
+bool FileListModel::pasteClipboard()
+{
+    if (m_fileOperationBusy) {
+        emit errorOccurred(QStringLiteral("Ya hay una operación de archivos en curso"));
+        return false;
+    }
+
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    const QMimeData *mime = clipboard ? clipboard->mimeData(QClipboard::Clipboard) : nullptr;
+    if (!mime || !mime->hasUrls()) {
+        emit errorOccurred(QStringLiteral("No hay archivos para pegar"));
+        return false;
+    }
+
+    QList<QUrl> localUrls;
+    for (const QUrl &url : mime->urls()) {
+        if (url.isLocalFile())
+            localUrls.append(url);
+    }
+
+    if (localUrls.isEmpty()) {
+        emit errorOccurred(QStringLiteral("El portapapeles no contiene archivos locales"));
+        return false;
+    }
+    if (localUrls.size() > 1) {
+        emit errorOccurred(QStringLiteral("Por seguridad, MurSchol Files pega un elemento por operación"));
+        return false;
+    }
+
+    const QString sourcePath = QFileInfo(localUrls.constFirst().toLocalFile()).absoluteFilePath();
+    const QFileInfo sourceInfo(sourcePath);
+    if (!sourceInfo.exists()) {
+        emit errorOccurred(QStringLiteral("El elemento del portapapeles ya no existe"));
+        return false;
+    }
+
+    bool move = mime->data(QByteArrayLiteral("x-special/gnome-copied-files"))
+                    .startsWith(QByteArrayLiteral("cut\n"));
+    if (!move) {
+        move = mime->data(QByteArrayLiteral("application/x-kde-cutselection")).trimmed()
+               == QByteArrayLiteral("1");
+    }
+
+    const QString currentCanonical = QFileInfo(m_currentPath).canonicalFilePath();
+    const QString sourceParentCanonical = sourceInfo.dir().canonicalPath();
+    if (move && !currentCanonical.isEmpty() && currentCanonical == sourceParentCanonical) {
+        setStatus(QStringLiteral("El elemento ya está en esta carpeta"));
+        return true;
+    }
+
+    if (sourceInfo.isDir()) {
+        const QString sourceCanonical = sourceInfo.canonicalFilePath();
+        if (!sourceCanonical.isEmpty()
+            && (currentCanonical == sourceCanonical
+                || currentCanonical.startsWith(sourceCanonical + QLatin1Char('/')))) {
+            emit errorOccurred(QStringLiteral("No se puede copiar una carpeta dentro de sí misma"));
+            return false;
+        }
+    }
+
+    const QString destinationPath = uniqueDestinationPath(sourcePath);
+    if (destinationPath.isEmpty()) {
+        emit errorOccurred(QStringLiteral("No se pudo elegir un nombre de destino seguro"));
+        return false;
+    }
+
+    const QString command = move ? QStringLiteral("mv") : QStringLiteral("cp");
+    const QString executable = QStandardPaths::findExecutable(command);
+    if (executable.isEmpty()) {
+        emit errorOccurred(QStringLiteral("Falta la herramienta del sistema para %1 archivos")
+                               .arg(move ? QStringLiteral("mover") : QStringLiteral("copiar")));
+        return false;
+    }
+
+    QStringList arguments;
+    if (move) {
+        arguments << QStringLiteral("--") << sourcePath << destinationPath;
+        setStatus(QStringLiteral("Moviendo…"));
+    } else {
+        arguments << QStringLiteral("-a") << QStringLiteral("--reflink=auto")
+                  << QStringLiteral("--") << sourcePath << destinationPath;
+        setStatus(QStringLiteral("Copiando…"));
+    }
+
+    return startFileOperation(executable, arguments,
+                              move ? QStringLiteral("Elemento movido")
+                                   : QStringLiteral("Copia completada"),
+                              move);
+}
+
+bool FileListModel::startFileOperation(const QString &program,
+                                       const QStringList &arguments,
+                                       const QString &successMessage,
+                                       bool clearClipboardOnSuccess)
+{
+    if (m_fileOperationBusy)
+        return false;
+
+    m_fileOperationBusy = true;
+    emit fileOperationBusyChanged();
+
+    auto *process = new QProcess(this);
+    connect(process, &QProcess::finished, this,
+            [this, process, successMessage, clearClipboardOnSuccess]
+            (int exitCode, QProcess::ExitStatus exitStatus) {
+        m_fileOperationBusy = false;
+        emit fileOperationBusyChanged();
+
+        if (exitStatus == QProcess::NormalExit && exitCode == 0) {
+            if (clearClipboardOnSuccess) {
+                if (QClipboard *clipboard = QGuiApplication::clipboard())
+                    clipboard->clear(QClipboard::Clipboard);
+            }
+            setStatus(successMessage);
+            refresh();
+            refreshClipboardState();
+        } else {
+            QString error = QString::fromUtf8(process->readAllStandardError()).trimmed();
+            if (error.isEmpty())
+                error = QStringLiteral("La operación de archivos no pudo completarse");
+            emit errorOccurred(error.left(260));
+        }
+        process->deleteLater();
+    });
+
+    connect(process, &QProcess::errorOccurred, this,
+            [this, process](QProcess::ProcessError error) {
+        if (error != QProcess::FailedToStart)
+            return;
+        m_fileOperationBusy = false;
+        emit fileOperationBusyChanged();
+        emit errorOccurred(QStringLiteral("No se pudo iniciar la operación de archivos"));
+        process->deleteLater();
+    });
+
+    process->start(program, arguments);
+    return true;
+}
+
+void FileListModel::refreshVolumes()
+{
+    QVariantList result;
+
+    const auto mounted = QStorageInfo::mountedVolumes();
+    for (const QStorageInfo &storage : mounted) {
+        if (!storage.isValid() || !storage.isReady())
+            continue;
+
+        const QString rootPath = QDir::cleanPath(storage.rootPath());
+        if (rootPath.isEmpty() || rootPath == QStringLiteral("/"))
+            continue;
+
+        const bool userMount = rootPath.startsWith(QStringLiteral("/media/"))
+                               || rootPath.startsWith(QStringLiteral("/run/media/"))
+                               || rootPath.startsWith(QStringLiteral("/mnt/"))
+                               || rootPath.contains(QStringLiteral("/gvfs/"));
+        if (!userMount)
+            continue;
+
+        const QByteArray fileSystem = storage.fileSystemType().toLower();
+        if (fileSystem == QByteArrayLiteral("tmpfs")
+            || fileSystem == QByteArrayLiteral("devtmpfs")
+            || fileSystem == QByteArrayLiteral("proc")
+            || fileSystem == QByteArrayLiteral("sysfs")
+            || fileSystem == QByteArrayLiteral("overlay")
+            || fileSystem == QByteArrayLiteral("squashfs")) {
+            continue;
+        }
+
+        const QString device = QString::fromLocal8Bit(storage.device());
+        QString name = storage.displayName().trimmed();
+        if (name.isEmpty())
+            name = QFileInfo(rootPath).fileName();
+        if (name.isEmpty())
+            name = device.isEmpty() ? QStringLiteral("Unidad") : QFileInfo(device).fileName();
+
+        QVariantMap item;
+        item.insert(QStringLiteral("name"), name);
+        item.insert(QStringLiteral("path"), rootPath);
+        item.insert(QStringLiteral("device"), device);
+        item.insert(QStringLiteral("fileSystem"), QString::fromLocal8Bit(fileSystem));
+        item.insert(QStringLiteral("sizeText"),
+                    storage.bytesAvailable() >= 0
+                        ? QStringLiteral("%1 libres").arg(formatBytes(storage.bytesAvailable()))
+                        : QStringLiteral("Unidad montada"));
+        item.insert(QStringLiteral("canUnmount"),
+                    device.startsWith(QStringLiteral("/dev/"))
+                        && (rootPath.startsWith(QStringLiteral("/media/"))
+                            || rootPath.startsWith(QStringLiteral("/run/media/"))
+                            || rootPath.startsWith(QStringLiteral("/mnt/"))));
+        result.append(item);
+    }
+
+    std::sort(result.begin(), result.end(), [](const QVariant &left, const QVariant &right) {
+        return left.toMap().value(QStringLiteral("name")).toString()
+                   .localeAwareCompare(right.toMap().value(QStringLiteral("name")).toString()) < 0;
+    });
+
+    if (result == m_volumes)
+        return;
+    m_volumes = result;
+    emit volumesChanged();
+}
+
+bool FileListModel::openVolume(int index)
+{
+    if (index < 0 || index >= m_volumes.size())
+        return false;
+
+    const QString path = m_volumes.at(index).toMap().value(QStringLiteral("path")).toString();
+    if (path.isEmpty())
+        return false;
+    setPath(path);
+    return m_currentPath == QFileInfo(path).canonicalFilePath();
+}
+
+bool FileListModel::unmountVolume(int index)
+{
+    if (index < 0 || index >= m_volumes.size())
+        return false;
+
+    const QVariantMap volume = m_volumes.at(index).toMap();
+    if (!volume.value(QStringLiteral("canUnmount")).toBool()) {
+        emit errorOccurred(QStringLiteral("Esta unidad no se puede desmontar desde MurSchol Files"));
+        return false;
+    }
+
+    const QString device = volume.value(QStringLiteral("device")).toString();
+    const QString mountPath = volume.value(QStringLiteral("path")).toString();
+    const QString executable = QStandardPaths::findExecutable(QStringLiteral("udisksctl"));
+    if (device.isEmpty() || executable.isEmpty()) {
+        emit errorOccurred(QStringLiteral("UDisks no está disponible para desmontar la unidad"));
+        return false;
+    }
+
+    if (m_currentPath == mountPath || m_currentPath.startsWith(mountPath + QLatin1Char('/')))
+        goHome();
+
+    setStatus(QStringLiteral("Desmontando unidad…"));
+    auto *process = new QProcess(this);
+    connect(process, &QProcess::finished, this,
+            [this, process](int exitCode, QProcess::ExitStatus exitStatus) {
+        if (exitStatus == QProcess::NormalExit && exitCode == 0) {
+            setStatus(QStringLiteral("Unidad desmontada de forma segura"));
+            QTimer::singleShot(250, this, &FileListModel::refreshVolumes);
+        } else {
+            QString error = QString::fromUtf8(process->readAllStandardError()).trimmed();
+            if (error.isEmpty())
+                error = QStringLiteral("No se pudo desmontar la unidad");
+            emit errorOccurred(error.left(260));
+        }
+        process->deleteLater();
+    });
+    connect(process, &QProcess::errorOccurred, this,
+            [this, process](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart) {
+            emit errorOccurred(QStringLiteral("No se pudo iniciar UDisks"));
+            process->deleteLater();
+        }
+    });
+    process->start(executable,
+                   {QStringLiteral("unmount"), QStringLiteral("-b"), device});
     return true;
 }
 
@@ -302,6 +673,12 @@ void FileListModel::refresh()
 {
     QList<MurScholFileEntry> entries;
     QDir dir(m_currentPath);
+    if (!dir.exists()) {
+        if (m_currentPath != QDir::homePath())
+            goHome();
+        return;
+    }
+
     dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Readable);
     dir.setSorting(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name);
 
@@ -332,4 +709,12 @@ void FileListModel::rebuildVisible()
     }
     endResetModel();
     emit countChanged();
+}
+
+void FileListModel::setStatus(const QString &text)
+{
+    if (m_statusText == text)
+        return;
+    m_statusText = text;
+    emit statusChanged();
 }

@@ -1,0 +1,39 @@
+#!/bin/sh
+set -eu
+
+if ! command -v wofi >/dev/null 2>&1; then
+    notify-send "MurSchol OS" "No se encontró el menú de sesión." 2>/dev/null || true
+    exit 1
+fi
+
+choice="$(printf '%s\n' \
+    'Bloquear' \
+    'Suspender' \
+    'Cerrar sesión' \
+    'Reiniciar' \
+    'Apagar' \
+    | wofi --dmenu --prompt 'Sesión y energía' --width 360 --height 320 2>/dev/null || true)"
+
+case "$choice" in
+    Bloquear)
+        exec /usr/local/bin/murschol-lock
+        ;;
+    Suspender)
+        exec systemctl suspend
+        ;;
+    'Cerrar sesión')
+        if [ -n "${XDG_SESSION_ID:-}" ]; then
+            exec loginctl terminate-session "$XDG_SESSION_ID"
+        fi
+        exec loginctl terminate-user "${USER:-$(id -un)}"
+        ;;
+    Reiniciar)
+        exec systemctl reboot
+        ;;
+    Apagar)
+        exec systemctl poweroff
+        ;;
+    *)
+        exit 0
+        ;;
+esac

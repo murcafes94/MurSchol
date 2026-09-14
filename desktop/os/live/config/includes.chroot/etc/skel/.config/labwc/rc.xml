@@ -77,6 +77,9 @@
     <keybind key="W-S-u">
       <action name="Execute" command="/usr/local/bin/murschol-update" />
     </keybind>
+    <keybind key="W-Escape">
+      <action name="Execute" command="/usr/local/bin/murschol-session-menu" />
+    </keybind>
     <keybind key="XF86Sleep">
       <action name="Execute" command="systemctl suspend" />
     </keybind>
