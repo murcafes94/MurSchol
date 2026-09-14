@@ -15,8 +15,17 @@ mkdir -p "$STATE_DIR"
 DESKTOP_LOG="$STATE_DIR/desktop.log"
 PANEL_LOG="$STATE_DIR/panel.log"
 POLKIT_LOG="$STATE_DIR/polkit.log"
+NOTIFY_LOG="$STATE_DIR/notifications.log"
 PANEL_PID=""
 PANEL_READY=0
+
+# Las aplicaciones MurSchol y la ruta de recuperación usan notificaciones.
+# Mako es nativo de Wayland/layer-shell y evita que notify-send quede sin receptor.
+if command -v mako >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -x mako >/dev/null 2>&1; then
+    mako >> "$NOTIFY_LOG" 2>&1 &
+  fi
+fi
 
 # Un agente PolicyKit visible es imprescindible para operaciones administrativas
 # disparadas desde aplicaciones gráficas. No iniciamos una segunda instancia.
