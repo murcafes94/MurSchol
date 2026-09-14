@@ -53,4 +53,16 @@ case "$PRODUCT_NAME" in
     ;;
 esac
 
-exec dbus-run-session labwc >> /tmp/murschol-session.log 2>&1
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/murschol"
+mkdir -p "$STATE_DIR"
+SESSION_LOG="$STATE_DIR/session.log"
+
+# Debian con dbus-user-session mantiene un único bus compartido por el usuario.
+# LightDM puede entregarnos ya ese bus; crear otro con dbus-run-session aislaría
+# portales, servicios systemd --user y aplicaciones activadas por D-Bus.
+# Solo creamos un bus privado cuando el gestor de sesión realmente no proporcionó uno.
+if [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+  exec labwc >> "$SESSION_LOG" 2>&1
+fi
+
+exec dbus-run-session -- labwc >> "$SESSION_LOG" 2>&1
