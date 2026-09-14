@@ -1,0 +1,6 @@
+# MurSchol OS clipboard history limits: enough for daily use without allowing
+# a long multimedia session to grow the cache without bounds.
+max-items 200
+max-dedupe-search 100
+max-store-size 2MB
+preview-width 120
