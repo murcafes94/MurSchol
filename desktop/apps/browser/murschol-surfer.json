@@ -3,17 +3,10 @@
   "vendor": "MurSchol",
   "appId": "org.murschol.browser",
   "binaryName": "murschol-browser",
-  "version": {
-    "product": "firefox",
-    "version": "155.0.1",
-    "candidate": "155.0.1",
-    "candidateBuild": 1
-  },
   "buildOptions": {
     "generateBranding": true,
     "windowsUseSymbolicLinks": false
   },
-  "addons": {},
   "brands": {
     "release": {
       "backgroundColor": "#282A33",
