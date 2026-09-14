@@ -66,6 +66,7 @@ jobs:
           test -x desktop/os/live/config/hooks/live/030-installer.hook.chroot
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-lock
           sh -n desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           test ! -e desktop/os/live/config/includes.chroot/usr/local/bin/murschol-edge
           test ! -e desktop/os/live/config/includes.chroot/usr/local/lib/murschol/install-edge-root
@@ -91,15 +92,36 @@ jobs:
           grep -q '^xdg-desktop-portal$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^xdg-desktop-portal-gtk$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^xdg-desktop-portal-wlr$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^dbus-user-session$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^lxqt-policykit$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^procps$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^mako-notifier$' desktop/os/live/config/package-lists/murschol.list.chroot
           grep -q '^swaylock$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q 'DBUS_SESSION_BUS_ADDRESS' desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
+          grep -q 'dbus-run-session -- labwc' desktop/os/live/config/includes.chroot/usr/local/bin/murschol-session
           grep -q 'lxqt-policykit-agent' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           grep -q 'command -v mako' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           grep -q 'PANEL_READY' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/autostart
           grep -q 'ToggleShowDesktop' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
           grep -q 'wpctl set-volume' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          grep -q 'murschol-lock' desktop/os/live/config/includes.chroot/etc/skel/.config/labwc/rc.xml
+          grep -q '/run/live/medium' desktop/os/live/config/includes.chroot/usr/local/bin/murschol-lock
+
+          # Operaciones diarias: editar texto, abrir archivos comprimidos,
+          # ejecutar AppImage y configurar impresión/escaneo sin terminal.
+          grep -q '^featherpad$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^file-roller$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^libfuse2t64$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^cups$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^cups-pk-helper$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^system-config-printer$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^system-config-printer-udev$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^printer-driver-brlaser$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^simple-scan$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^sane-airscan$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^ipp-usb$' desktop/os/live/config/package-lists/murschol.list.chroot
+          grep -q '^text/plain=featherpad.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
+          grep -q '^application/zip=org.gnome.FileRoller.desktop;' desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
 
           MAKO=desktop/os/live/config/includes.chroot/etc/skel/.config/mako/config
           test -f "$MAKO"
