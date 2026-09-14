@@ -13,6 +13,7 @@ REPO_DIR="$(cd "${OS_DIR}/../.." && pwd)"
 WORK_DIR="${SCRIPT_DIR}/work"
 OUTPUT_ISO="${SCRIPT_DIR}/MurSchol-OS-0.1-Live-amd64.iso"
 OUTPUT_SHA="${OUTPUT_ISO}.sha256"
+VERIFY_SCRIPT="${SCRIPT_DIR}/verify-live-image.sh"
 
 rm -rf "${WORK_DIR}"
 rm -f "${OUTPUT_ISO}" "${OUTPUT_SHA}"
@@ -64,8 +65,18 @@ if [[ -z "${ISO_PATH}" ]]; then
 fi
 
 mv "${ISO_PATH}" "${OUTPUT_ISO}"
+
+# No declaramos válida una ISO solo porque live-build haya terminado. Se abre el
+# SquashFS que está realmente dentro de la imagen y se auditan binarios,
+# asociaciones MIME y paquetes esenciales antes de generar el checksum final.
+if [[ ! -x "${VERIFY_SCRIPT}" ]]; then
+  echo "Falta el verificador de la imagen final: ${VERIFY_SCRIPT}" >&2
+  exit 3
+fi
+"${VERIFY_SCRIPT}" "${OUTPUT_ISO}"
+
 sha256sum "${OUTPUT_ISO}" > "${OUTPUT_SHA}"
 
-printf '\nMurSchol OS Live generado correctamente:\n'
+printf '\nMurSchol OS Live generado y verificado correctamente:\n'
 ls -lh "${OUTPUT_ISO}" "${OUTPUT_SHA}"
 cat "${OUTPUT_SHA}"

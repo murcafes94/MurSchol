@@ -19,8 +19,6 @@ xdg-desktop-portal-wlr
 dbus-user-session
 util-linux
 procps
-systemd-timesyncd
-systemd-zram-generator
 lightdm
 lightdm-gtk-greeter
 xserver-xorg
@@ -63,7 +61,6 @@ wl-clipboard
 cliphist
 wofi
 swayidle
-wlopm
 libnotify-bin
 mako-notifier
 swaylock
@@ -77,6 +74,12 @@ exfatprogs
 foot
 featherpad
 featherpad-l10n
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-gtk3
+libreoffice-l10n-es
+hunspell-es
 file-roller
 zip
 unzip
@@ -113,3 +116,6 @@ firmware-iwlwifi
 firmware-realtek
 firmware-atheros
 firmware-brcm80211
+systemd-timesyncd
+systemd-zram-generator
+wlopm

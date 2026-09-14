@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Papelera
+GenericName=Papelera de archivos
+Comment=Recupera o vacía archivos eliminados
+Exec=/usr/local/bin/murschol-trash
+Icon=user-trash
+Terminal=false
+TryExec=thunar
+Categories=System;FileTools;Utility;
+Keywords=papelera;recuperar;restaurar;eliminados;trash;
+StartupNotify=true

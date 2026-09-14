@@ -1,0 +1,54 @@
+name: Validate MurSchol Workstation
+
+on:
+  push:
+    paths:
+      - 'desktop/os/live/build-live.sh'
+      - 'desktop/os/live/verify-live-image.sh'
+      - 'desktop/os/live/config/package-lists/murschol.list.chroot'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-trash'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-trash.desktop'
+      - '.github/workflows/validate-workstation.yml'
+  pull_request:
+    paths:
+      - 'desktop/os/live/build-live.sh'
+      - 'desktop/os/live/verify-live-image.sh'
+      - 'desktop/os/live/config/package-lists/murschol.list.chroot'
+      - 'desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list'
+      - 'desktop/os/live/config/includes.chroot/usr/local/bin/murschol-trash'
+      - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-trash.desktop'
+      - '.github/workflows/validate-workstation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate workstation integration
+        run: |
+          set -eu
+          bash -n desktop/os/live/build-live.sh
+          sh -n desktop/os/live/verify-live-image.sh
+          sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-trash
+
+          PACKAGES=desktop/os/live/config/package-lists/murschol.list.chroot
+          MIME=desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list
+          VERIFY=desktop/os/live/verify-live-image.sh
+
+          for package in \
+            libreoffice-writer libreoffice-calc libreoffice-impress \
+            libreoffice-gtk3 libreoffice-l10n-es hunspell-es; do
+            grep -qx "$package" "$PACKAGES"
+          done
+
+          grep -q '^application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-writer.desktop;$' "$MIME"
+          grep -q '^application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice-calc.desktop;$' "$MIME"
+          grep -q '^application/vnd.openxmlformats-officedocument.presentationml.presentation=libreoffice-impress.desktop;$' "$MIME"
+          grep -q 'murschol-reader %f' "$VERIFY"
+          grep -q 'Paquete crítico ausente de la ISO' "$VERIFY"
+          grep -q 'verify-live-image.sh' desktop/os/live/build-live.sh
+          grep -q "thunar 'trash:///'" desktop/os/live/config/includes.chroot/usr/local/bin/murschol-trash
+          grep -q '^Name=Papelera$' desktop/os/live/config/includes.chroot/usr/share/applications/murschol-trash.desktop

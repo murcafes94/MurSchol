@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+# MurSchol Files ya mueve a la papelera con la API de Qt. Para recuperar o
+# vaciar elementos usamos el backend trash:// de GVFS/Thunar, que ya forma
+# parte del sistema y conserva metadatos de restauración.
+if command -v thunar >/dev/null 2>&1; then
+    exec thunar 'trash:///'
+fi
+
+if command -v gio >/dev/null 2>&1; then
+    exec gio open 'trash:///'
+fi
+
+MESSAGE="No se encontró un gestor compatible para abrir la papelera."
+printf '%s\n' "$MESSAGE" >&2
+notify-send "Papelera" "$MESSAGE" 2>/dev/null || true
+exit 127
