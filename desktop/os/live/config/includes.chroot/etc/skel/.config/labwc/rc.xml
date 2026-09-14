@@ -42,8 +42,8 @@
   <keyboard>
     <default />
 
-    <!-- Atajos críticos declarados también de forma explícita para que la
-         alpha siga siendo operable aunque cambien defaults entre versiones. -->
+    <!-- Atajos de recuperación declarados de forma explícita. Aunque el shell
+         o el panel tengan un problema, el usuario conserva navegación básica. -->
     <keybind key="A-F4">
       <action name="Close" />
     </keybind>
@@ -52,6 +52,42 @@
     </keybind>
     <keybind key="A-S-Tab">
       <action name="PreviousWindow" />
+    </keybind>
+    <keybind key="W-Return">
+      <action name="Execute" command="foot" />
+    </keybind>
+    <keybind key="W-d">
+      <action name="ToggleShowDesktop" />
+    </keybind>
+    <keybind key="W-e">
+      <action name="Execute" command="murschol-files" />
+    </keybind>
+    <keybind key="W-b">
+      <action name="Execute" command="murschol-browser" />
+    </keybind>
+    <keybind key="W-i">
+      <action name="Execute" command="murschol-settings" />
+    </keybind>
+
+    <!-- PipeWire/WirePlumber: no dependemos de pactl, que no forma parte de la
+         instalación mínima. wpctl viene con WirePlumber y controla el grafo real. -->
+    <keybind key="XF86AudioLowerVolume">
+      <action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-" />
+    </keybind>
+    <keybind key="XF86AudioRaiseVolume">
+      <action name="Execute" command="wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+" />
+    </keybind>
+    <keybind key="XF86AudioMute">
+      <action name="Execute" command="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" />
+    </keybind>
+    <keybind key="XF86AudioMicMute">
+      <action name="Execute" command="wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle" />
+    </keybind>
+    <keybind key="XF86MonBrightnessUp">
+      <action name="Execute" command="brightnessctl set +10%" />
+    </keybind>
+    <keybind key="XF86MonBrightnessDown">
+      <action name="Execute" command="brightnessctl set 10%-" />
     </keybind>
 
     <!-- Captura estilo Windows: región con Super+Shift+S y pantalla completa con Print. -->
