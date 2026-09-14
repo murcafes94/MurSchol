@@ -15,11 +15,14 @@ on:
       - 'desktop/os/live/config/includes.chroot/usr/share/applications/murschol-browser.desktop'
       - 'desktop/os/live/config/includes.chroot/etc/skel/.config/mimeapps.list'
       - '.github/workflows/validate-browser.yml'
+  schedule:
+    - cron: '17 6 * * *'
   workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,12 +32,49 @@ jobs:
           bash -n desktop/apps/browser/prepare-zen.sh
           sh -n desktop/os/live/config/includes.chroot/usr/local/bin/murschol-browser
 
-      - name: Validate Surfer configuration
+      - name: Validate MurSchol branding overlay
         run: |
           jq -e '.name == "MurSchol Browser"' desktop/apps/browser/murschol-surfer.json
+          jq -e '.vendor == "MurSchol"' desktop/apps/browser/murschol-surfer.json
+          jq -e '.appId == "org.murschol.browser"' desktop/apps/browser/murschol-surfer.json
           jq -e '.binaryName == "murschol-browser"' desktop/apps/browser/murschol-surfer.json
-          jq -e '.version.product == "firefox"' desktop/apps/browser/murschol-surfer.json
           jq -e '.license.licenseType == "MPL-2.0"' desktop/apps/browser/murschol-surfer.json
+          jq -e 'has("version") | not' desktop/apps/browser/murschol-surfer.json
+          jq -e 'has("updateHostname") | not' desktop/apps/browser/murschol-surfer.json
+
+      - name: Prepare current Zen stable source
+        run: |
+          desktop/apps/browser/prepare-zen.sh "$RUNNER_TEMP/murschol-zen"
+
+      - name: Validate prepared Surfer configuration
+        run: |
+          CONFIG="$RUNNER_TEMP/murschol-zen/surfer.json"
+          PACKAGE="$RUNNER_TEMP/murschol-zen/package.json"
+          LOCK="$RUNNER_TEMP/murschol-zen/package-lock.json"
+          MARKER="$RUNNER_TEMP/murschol-zen/MURSCHOL_UPSTREAM.md"
+
+          jq -e '.name == "MurSchol Browser"' "$CONFIG"
+          jq -e '.vendor == "MurSchol"' "$CONFIG"
+          jq -e '.appId == "org.murschol.browser"' "$CONFIG"
+          jq -e '.binaryName == "murschol-browser"' "$CONFIG"
+          jq -e '.version.product == "firefox"' "$CONFIG"
+          jq -e '.version.version | type == "string" and length > 0' "$CONFIG"
+          jq -e '.brands | keys == ["release"]' "$CONFIG"
+          jq -e '.brands.release.brandFullName == "MurSchol Browser"' "$CONFIG"
+          jq -e '.brands.release.release.github.repo == "murcafes94/MurSchol"' "$CONFIG"
+          jq -e 'has("updateHostname") | not' "$CONFIG"
+          jq -e '.license.licenseType == "MPL-2.0"' "$CONFIG"
+          jq -e '.name == "murschol-browser"' "$PACKAGE"
+          jq -e '.name == "murschol-browser"' "$LOCK"
+          jq -e '.packages[""].name == "murschol-browser"' "$LOCK"
+          grep -q 'Commit:' "$MARKER"
+          grep -q 'Firefox engine:' "$MARKER"
+          ! grep -q 'updates.zen-browser.app' "$CONFIG"
+          ! grep -q 'Zen Twilight' "$CONFIG"
+
+      - name: Validate npm dependency lock
+        working-directory: ${{ runner.temp }}/murschol-zen
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Validate desktop integration
         run: |
