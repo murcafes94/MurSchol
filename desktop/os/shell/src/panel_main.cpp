@@ -8,6 +8,7 @@
 #include <LayerShellQt/Window>
 
 #include "SystemBackend.h"
+#include "QuickControlsBackend.h"
 #include "AppIndexModel.h"
 #include "UniversalSearchModel.h"
 #include "AppManagerBackend.h"
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
     QQuickWindow::setDefaultAlphaBuffer(true);
 
     qmlRegisterType<SystemBackend>("MurScholShell", 1, 0, "SystemBackend");
+    qmlRegisterType<QuickControlsBackend>("MurScholShell", 1, 0, "QuickControlsBackend");
     qmlRegisterType<AppIndexModel>("MurScholShell", 1, 0, "AppIndexModel");
     qmlRegisterType<UniversalSearchModel>("MurScholShell", 1, 0, "UniversalSearchModel");
     qmlRegisterType<AppManagerBackend>("MurScholShell", 1, 0, "AppManagerBackend");
