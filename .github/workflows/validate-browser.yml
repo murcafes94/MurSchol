@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare current Zen stable source
         run: |
-          desktop/apps/browser/prepare-zen.sh "$RUNNER_TEMP/murschol-zen"
+          bash desktop/apps/browser/prepare-zen.sh "$RUNNER_TEMP/murschol-zen"
 
       - name: Validate prepared Surfer configuration
         run: |
