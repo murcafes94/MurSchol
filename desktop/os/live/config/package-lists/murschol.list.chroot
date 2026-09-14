@@ -55,6 +55,7 @@ grim
 slurp
 wl-clipboard
 libnotify-bin
+mako-notifier
 swaylock
 thunar
 gvfs
