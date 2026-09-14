@@ -51,9 +51,14 @@ public:
     Q_INVOKABLE void goPictures();
     Q_INVOKABLE void goMusic();
     Q_INVOKABLE void goVideos();
+    Q_INVOKABLE void goComputer();
     Q_INVOKABLE void goUp();
     Q_INVOKABLE bool activate(int row);
     Q_INVOKABLE bool createFolder();
+    Q_INVOKABLE bool createFolderNamed(const QString &name);
+    Q_INVOKABLE bool renameEntry(int row, const QString &newName);
+    Q_INVOKABLE bool moveToTrash(int row);
+    Q_INVOKABLE QString entryName(int row) const;
     Q_INVOKABLE void refresh();
 
 signals:
@@ -64,6 +69,7 @@ signals:
 
 private:
     void rebuildVisible();
+    bool validName(const QString &name) const;
     static QString formatBytes(qint64 bytes);
     static QString iconForFile(const QString &path, bool directory);
     static QString standardLocation(QStandardPaths::StandardLocation location);
