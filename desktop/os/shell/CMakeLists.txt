@@ -12,6 +12,8 @@ qt_standard_project_setup(REQUIRES 6.4)
 set(MURSCHOL_COMMON_SOURCES
     src/SystemBackend.cpp
     src/SystemBackend.h
+    src/QuickControlsBackend.cpp
+    src/QuickControlsBackend.h
     src/AppIndexModel.cpp
     src/AppIndexModel.h
     src/UniversalSearchModel.cpp
