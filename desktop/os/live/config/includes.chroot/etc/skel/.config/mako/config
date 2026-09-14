@@ -1,0 +1,12 @@
+font=Noto Sans 10
+background-color=#15191eff
+text-color=#f3eee5ff
+border-color=#d6a85fff
+border-size=1
+border-radius=10
+width=360
+height=120
+margin=14
+padding=12
+default-timeout=6000
+anchor=top-right
