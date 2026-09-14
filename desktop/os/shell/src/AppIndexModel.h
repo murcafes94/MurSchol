@@ -11,6 +11,12 @@ struct MurScholAppEntry {
     QString icon;
     QString source;
     QString categories;
+    QString tryExec;
+    QString onlyShowIn;
+    QString notShowIn;
+    bool terminal = false;
+    bool hidden = false;
+    bool valid = false;
     bool pinned = false;
     qint64 lastUsed = 0;
 };
@@ -67,8 +73,10 @@ private:
     void savePinnedState() const;
     void recordRecent(const QString &id);
     QString stateFilePath() const;
-    static MurScholAppEntry parseDesktopFile(const QString &path);
+    static MurScholAppEntry parseDesktopFile(const QString &path, const QString &id);
     static QString cleanExec(QString command);
+    static bool entryVisibleForMurSchol(const MurScholAppEntry &entry);
+    static bool tryExecAvailable(const QString &tryExec);
     static bool matchesCategory(const MurScholAppEntry &app, const QString &category);
 
     QList<MurScholAppEntry> m_all;
