@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QUrl>
@@ -128,6 +129,11 @@ void FileListModel::goVideos()
     setPath(standardLocation(QStandardPaths::MoviesLocation));
 }
 
+void FileListModel::goComputer()
+{
+    setPath(QStringLiteral("/"));
+}
+
 void FileListModel::goUp()
 {
     QDir dir(m_currentPath);
@@ -152,6 +158,15 @@ bool FileListModel::activate(int row)
     return ok;
 }
 
+bool FileListModel::validName(const QString &name) const
+{
+    const QString trimmed = name.trimmed();
+    return !trimmed.isEmpty()
+           && trimmed != QStringLiteral(".")
+           && trimmed != QStringLiteral("..")
+           && !trimmed.contains('/');
+}
+
 bool FileListModel::createFolder()
 {
     QDir dir(m_currentPath);
@@ -163,9 +178,81 @@ bool FileListModel::createFolder()
     int suffix = 2;
     while (dir.exists(candidate))
         candidate = base + QStringLiteral(" %1").arg(suffix++);
+    return createFolderNamed(candidate);
+}
 
-    if (!dir.mkdir(candidate)) {
+bool FileListModel::createFolderNamed(const QString &name)
+{
+    const QString cleanName = name.trimmed();
+    if (!validName(cleanName)) {
+        emit errorOccurred(QStringLiteral("El nombre de la carpeta no es válido"));
+        return false;
+    }
+
+    QDir dir(m_currentPath);
+    if (!dir.exists()) {
+        emit errorOccurred(QStringLiteral("La carpeta actual ya no existe"));
+        return false;
+    }
+    if (dir.exists(cleanName)) {
+        emit errorOccurred(QStringLiteral("Ya existe un elemento llamado %1").arg(cleanName));
+        return false;
+    }
+    if (!dir.mkdir(cleanName)) {
         emit errorOccurred(QStringLiteral("No se pudo crear la carpeta"));
+        return false;
+    }
+
+    refresh();
+    return true;
+}
+
+QString FileListModel::entryName(int row) const
+{
+    if (row < 0 || row >= m_visible.size())
+        return {};
+    return m_visible.at(row).name;
+}
+
+bool FileListModel::renameEntry(int row, const QString &newName)
+{
+    if (row < 0 || row >= m_visible.size())
+        return false;
+
+    const QString cleanName = newName.trimmed();
+    if (!validName(cleanName)) {
+        emit errorOccurred(QStringLiteral("El nuevo nombre no es válido"));
+        return false;
+    }
+
+    const auto entry = m_visible.at(row);
+    if (entry.name == cleanName)
+        return true;
+
+    QDir dir(m_currentPath);
+    if (dir.exists(cleanName)) {
+        emit errorOccurred(QStringLiteral("Ya existe un elemento llamado %1").arg(cleanName));
+        return false;
+    }
+
+    if (!dir.rename(entry.name, cleanName)) {
+        emit errorOccurred(QStringLiteral("No se pudo renombrar %1").arg(entry.name));
+        return false;
+    }
+
+    refresh();
+    return true;
+}
+
+bool FileListModel::moveToTrash(int row)
+{
+    if (row < 0 || row >= m_visible.size())
+        return false;
+
+    const auto entry = m_visible.at(row);
+    QString pathInTrash;
+    if (!QFile::moveToTrash(entry.path, &pathInTrash)) {
+        emit errorOccurred(QStringLiteral("No se pudo mover %1 a la papelera").arg(entry.name));
         return false;
     }
 
