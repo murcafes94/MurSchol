@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE void requestScan();
     Q_INVOKABLE void disconnectWifi();
     Q_INVOKABLE bool connectSavedNetwork(const QString &ssid);
+    Q_INVOKABLE void connectAccessPoint(const QString &path);
     Q_INVOKABLE bool isSavedNetwork(const QString &ssid) const;
 
 signals:
@@ -60,6 +61,7 @@ private:
     bool m_wifiHardwareAvailable = false;
     bool m_wifiEnabled = false;
     bool m_scanning = false;
+    bool m_connecting = false;
     QString m_wifiDevicePath;
     QString m_activeAccessPointPath;
     QString m_activeSsid;

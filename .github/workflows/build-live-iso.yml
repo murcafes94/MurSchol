@@ -59,6 +59,8 @@ jobs:
 
       - name: Validar scripts y configuración
         run: |
+          sh -n desktop/os/live/smoke-apps.sh
+          sh -n desktop/os/live/config/hooks/live/060-runtime-smoke.hook.chroot
           bash -n desktop/os/live/build-live.sh
           sh -n desktop/os/live/config/hooks/live/010-build-murschol.hook.chroot
           sh -n desktop/os/live/config/hooks/live/020-reader-desktop.hook.chroot
@@ -168,6 +170,15 @@ jobs:
           ls -lh desktop/os/live/MurSchol-OS-0.1-Live-amd64.iso*
           cd desktop/os/live
           sha256sum -c MurSchol-OS-0.1-Live-amd64.iso.sha256
+
+      - name: Publicar diagnóstico de arranque
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MurSchol-startup-validation
+          path: desktop/os/live/work/chroot/usr/share/murschol/validation/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Publicar ISO de prueba
         uses: actions/upload-artifact@v4

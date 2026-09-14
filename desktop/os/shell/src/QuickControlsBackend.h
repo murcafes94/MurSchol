@@ -46,6 +46,7 @@ private:
     void setStatus(const QString &text);
 
     QTimer m_refreshTimer;
+    bool m_refreshing = false;
     bool m_networkAvailable = false;
     bool m_wifiEnabled = false;
     QString m_wifiStatus = QStringLiteral("No disponible");

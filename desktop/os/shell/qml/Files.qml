@@ -43,6 +43,10 @@ ApplicationWindow {
 
     FileListModel {
         id: files
+        Component.onCompleted: {
+            if (initialDirectory.length > 0)
+                setPath(initialDirectory)
+        }
         onCurrentPathChanged: {
             addressField.text = currentPath
             searchField.text = ""

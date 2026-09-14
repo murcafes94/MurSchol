@@ -32,6 +32,15 @@ jobs:
       - name: Build
         run: cmake --build build/desktop --parallel
 
+      - name: Test quick controls without hardware
+        run: |
+          /usr/lib/qt6/libexec/moc desktop/os/shell/src/QuickControlsBackend.h -o /tmp/moc-quick-controls.cpp
+          c++ -std=c++17 -fPIC -Idesktop/os/shell/src \
+            desktop/os/shell/tests/quick_controls.cpp \
+            desktop/os/shell/src/QuickControlsBackend.cpp /tmp/moc-quick-controls.cpp \
+            $(pkg-config --cflags --libs Qt6Core) -o /tmp/test-quick-controls
+          /tmp/test-quick-controls
+
       - name: Install staging tree
         run: cmake --install build/desktop --prefix dist/murschol-desktop
 

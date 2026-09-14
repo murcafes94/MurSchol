@@ -6,6 +6,8 @@
 #include <QDBusMessage>
 #include <QDBusMetaType>
 #include <QDBusObjectPath>
+#include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 #include <QDBusReply>
 #include <QDBusVariant>
 #include <QHostAddress>
@@ -41,8 +43,8 @@ QString ssidFromVariant(const QVariant &raw)
 {
     const QVariant value = unwrap(raw);
     if (value.canConvert<QByteArray>())
-        return QString::fromUtf8(value.toByteArray()).trimmed();
-    return value.toString().trimmed();
+        return QString::fromUtf8(value.toByteArray());
+    return value.toString();
 }
 
 QString objectPathFromVariant(const QVariant &raw)
@@ -265,6 +267,64 @@ void NetworkBackend::readSavedConnections()
         if (!ssid.isEmpty())
             m_savedConnections.insert(ssid, path.path());
     }
+}
+
+void NetworkBackend::connectAccessPoint(const QString &path)
+{
+    if (m_connecting) {
+        setStatus(QStringLiteral("Hay una solicitud de conexión en curso"));
+        return;
+    }
+    if (!m_managerAvailable || !m_wifiEnabled || m_wifiDevicePath.isEmpty()) {
+        setStatus(QStringLiteral("Activa Wi-Fi antes de conectarte"));
+        return;
+    }
+    QString ssid;
+    for (const QVariant &entry : m_accessPoints) {
+        const QVariantMap ap = entry.toMap();
+        if (ap.value(QStringLiteral("path")).toString() == path) {
+            ssid = ap.value(QStringLiteral("ssid")).toString();
+            break;
+        }
+    }
+    if (ssid.isEmpty()) {
+        setStatus(QStringLiteral("La red ya no está visible. Actualiza la búsqueda"));
+        return;
+    }
+
+    // Let NetworkManager infer security and SSID from the selected AP.
+    // nm-applet supplies its graphical secret agent; passwords never enter
+    // process arguments, our logs or application preferences.
+    const QString saved = m_savedConnections.value(ssid);
+    QDBusMessage request = QDBusMessage::createMethodCall(
+        QString::fromLatin1(kService), QString::fromLatin1(kManagerPath),
+        QString::fromLatin1(kManagerInterface),
+        saved.isEmpty() ? QStringLiteral("AddAndActivateConnection")
+                        : QStringLiteral("ActivateConnection"));
+    if (saved.isEmpty())
+        request << QVariant::fromValue(NmSettingsMap{});
+    else
+        request << QVariant::fromValue(QDBusObjectPath(saved));
+    request << QVariant::fromValue(QDBusObjectPath(m_wifiDevicePath))
+            << QVariant::fromValue(QDBusObjectPath(path));
+
+    m_connecting = true;
+    setStatus(QStringLiteral("Conectando a %1. Completa el diálogo de autenticación si aparece").arg(ssid));
+    auto *watcher = new QDBusPendingCallWatcher(
+        QDBusConnection::systemBus().asyncCall(request, 120000), this);
+    connect(watcher, &QDBusPendingCallWatcher::finished, this,
+            [this, ssid](QDBusPendingCallWatcher *finished) {
+        m_connecting = false;
+        const QDBusMessage reply = finished->reply();
+        finished->deleteLater();
+        if (reply.type() == QDBusMessage::ErrorMessage) {
+            setStatus(QStringLiteral("No se pudo iniciar la conexión a %1. Revisa la contraseña o abre Configuración avanzada").arg(ssid));
+            return;
+        }
+        // The method accepts activation; it does not prove connectivity.
+        setStatus(QStringLiteral("Solicitud aceptada para %1. Esperando conexión…").arg(ssid));
+        QTimer::singleShot(1200, this, &NetworkBackend::refresh);
+    });
 }
 
 void NetworkBackend::refreshAddress()

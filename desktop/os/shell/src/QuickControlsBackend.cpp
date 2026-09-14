@@ -1,24 +1,51 @@
 #include "QuickControlsBackend.h"
 
 #include <QProcess>
+#include <QProcessEnvironment>
+#include <functional>
+#include <memory>
 #include <QRegularExpression>
 #include <QStandardPaths>
 
 namespace {
-QString runOutput(const QString &program, const QStringList &arguments, int timeoutMs = 1400)
+// CLI output is a machine interface here, independent of the desktop language.
+// Each request has a deadline and runs without blocking the Qt GUI thread.
+void readCommand(QObject *owner, const QString &program, const QStringList &arguments,
+                 std::function<void(const QString &)> done)
 {
     const QString executable = QStandardPaths::findExecutable(program);
-    if (executable.isEmpty())
-        return {};
-
-    QProcess process;
-    process.start(executable, arguments);
-    if (!process.waitForFinished(timeoutMs)
-        || process.exitStatus() != QProcess::NormalExit
-        || process.exitCode() != 0) {
-        return {};
+    if (executable.isEmpty()) {
+        done({});
+        return;
     }
-    return QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+    auto *process = new QProcess(owner);
+    auto environment = QProcessEnvironment::systemEnvironment();
+    environment.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
+    process->setProcessEnvironment(environment);
+    auto completed = std::make_shared<bool>(false);
+    auto finish = [process, completed, done](const QString &output) {
+        if (*completed)
+            return;
+        *completed = true;
+        done(output);
+        process->deleteLater();
+    };
+    QObject::connect(process, &QProcess::finished, owner,
+                     [process, finish](int code, QProcess::ExitStatus status) {
+        finish(code == 0 && status == QProcess::NormalExit
+                   ? QString::fromUtf8(process->readAllStandardOutput()).trimmed()
+                   : QString());
+    });
+    QObject::connect(process, &QProcess::errorOccurred, owner,
+                     [finish](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart)
+            finish({});
+    });
+    QTimer::singleShot(2000, process, [process] {
+        if (process->state() != QProcess::NotRunning)
+            process->kill();
+    });
+    process->start(executable, arguments);
 }
 
 bool runCommand(const QString &program, const QStringList &arguments, int timeoutMs = 2200)
@@ -56,70 +83,60 @@ QuickControlsBackend::QuickControlsBackend(QObject *parent)
 
 void QuickControlsBackend::refresh()
 {
-    const bool oldNetworkAvailable = m_networkAvailable;
-    const bool oldWifiEnabled = m_wifiEnabled;
-    const QString oldWifiStatus = m_wifiStatus;
-    const bool oldAudioAvailable = m_audioAvailable;
-    const int oldVolume = m_volume;
-    const bool oldMuted = m_muted;
-    const bool oldBluetoothAvailable = m_bluetoothAvailable;
-    const bool oldBluetoothEnabled = m_bluetoothEnabled;
+    // Timer refreshes and action-triggered refreshes must not overlap.
+    if (m_refreshing)
+        return;
+    m_refreshing = true;
+    auto pending = std::make_shared<int>(3);
+    auto finished = [this, pending] {
+        if (--*pending == 0)
+            m_refreshing = false;
+    };
 
-    m_networkAvailable = !QStandardPaths::findExecutable(QStringLiteral("nmcli")).isEmpty();
-    if (m_networkAvailable) {
-        const QString wifiState = runOutput(QStringLiteral("nmcli"),
-                                            {QStringLiteral("-t"), QStringLiteral("-f"),
-                                             QStringLiteral("WIFI"), QStringLiteral("general")});
-        m_wifiEnabled = wifiState.compare(QStringLiteral("enabled"), Qt::CaseInsensitive) == 0;
-        m_wifiStatus = m_wifiEnabled ? QStringLiteral("Activado") : QStringLiteral("Desactivado");
-    } else {
-        m_wifiEnabled = false;
-        m_wifiStatus = QStringLiteral("No disponible");
-    }
-
-    m_audioAvailable = !QStandardPaths::findExecutable(QStringLiteral("wpctl")).isEmpty();
-    if (m_audioAvailable) {
-        const QString audio = runOutput(QStringLiteral("wpctl"),
-                                        {QStringLiteral("get-volume"),
-                                         QStringLiteral("@DEFAULT_AUDIO_SINK@")});
-        static const QRegularExpression volumePattern(QStringLiteral("Volume:\\s*([0-9.]+)"));
-        const QRegularExpressionMatch match = volumePattern.match(audio);
-        if (match.hasMatch()) {
-            bool ok = false;
-            const double raw = match.captured(1).toDouble(&ok);
-            if (ok)
-                m_volume = qBound(0, qRound(raw * 100.0), 100);
+    readCommand(this, QStringLiteral("nmcli"),
+                {QStringLiteral("-t"), QStringLiteral("-f"), QStringLiteral("WIFI"),
+                 QStringLiteral("general")}, [this, finished](const QString &state) {
+        const bool available = state == QStringLiteral("enabled") || state == QStringLiteral("disabled");
+        const bool enabled = state == QStringLiteral("enabled");
+        const QString status = !available ? QStringLiteral("No disponible")
+                                         : enabled ? QStringLiteral("Activado") : QStringLiteral("Desactivado");
+        if (m_networkAvailable != available || m_wifiEnabled != enabled || m_wifiStatus != status) {
+            m_networkAvailable = available;
+            m_wifiEnabled = enabled;
+            m_wifiStatus = status;
+            emit controlsChanged();
         }
-        m_muted = audio.contains(QStringLiteral("[MUTED]"), Qt::CaseInsensitive);
-    } else {
-        m_volume = 0;
-        m_muted = false;
-    }
-
-    const QString bluetoothctl = QStandardPaths::findExecutable(QStringLiteral("bluetoothctl"));
-    m_bluetoothAvailable = !bluetoothctl.isEmpty();
-    if (m_bluetoothAvailable) {
-        const QString show = runOutput(QStringLiteral("bluetoothctl"), {QStringLiteral("show")});
-        // bluetoothctl existe incluso en equipos sin adaptador. Solo exponemos
-        // el control si BlueZ devuelve realmente un controlador local.
-        m_bluetoothAvailable = show.contains(QStringLiteral("Controller "))
-                               || show.contains(QStringLiteral("Powered:"));
-        m_bluetoothEnabled = m_bluetoothAvailable
-                             && show.contains(QStringLiteral("Powered: yes"), Qt::CaseInsensitive);
-    } else {
-        m_bluetoothEnabled = false;
-    }
-
-    if (oldNetworkAvailable != m_networkAvailable
-        || oldWifiEnabled != m_wifiEnabled
-        || oldWifiStatus != m_wifiStatus
-        || oldAudioAvailable != m_audioAvailable
-        || oldVolume != m_volume
-        || oldMuted != m_muted
-        || oldBluetoothAvailable != m_bluetoothAvailable
-        || oldBluetoothEnabled != m_bluetoothEnabled) {
-        emit controlsChanged();
-    }
+        finished();
+    });
+    readCommand(this, QStringLiteral("wpctl"),
+                {QStringLiteral("get-volume"), QStringLiteral("@DEFAULT_AUDIO_SINK@")},
+                [this, finished](const QString &audio) {
+        static const QRegularExpression pattern(QStringLiteral("Volume:\\s*([0-9.]+)"));
+        const auto match = pattern.match(audio);
+        bool valid = false;
+        const double raw = match.captured(1).toDouble(&valid);
+        const bool available = match.hasMatch() && valid;
+        const int volume = available ? qBound(0, qRound(raw * 100.0), 100) : 0;
+        const bool muted = available && audio.contains(QStringLiteral("[MUTED]"));
+        if (m_audioAvailable != available || m_volume != volume || m_muted != muted) {
+            m_audioAvailable = available;
+            m_volume = volume;
+            m_muted = muted;
+            emit controlsChanged();
+        }
+        finished();
+    });
+    readCommand(this, QStringLiteral("bluetoothctl"), {QStringLiteral("show")},
+                [this, finished](const QString &output) {
+        const bool available = output.contains(QStringLiteral("Powered:"));
+        const bool enabled = available && output.contains(QStringLiteral("Powered: yes"));
+        if (m_bluetoothAvailable != available || m_bluetoothEnabled != enabled) {
+            m_bluetoothAvailable = available;
+            m_bluetoothEnabled = enabled;
+            emit controlsChanged();
+        }
+        finished();
+    });
 }
 
 bool QuickControlsBackend::setWifiEnabled(bool enabled)

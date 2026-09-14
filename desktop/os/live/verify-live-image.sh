@@ -35,6 +35,10 @@ require_path() {
 }
 
 for path in \
+    /usr/share/murschol/build-commit \
+    /usr/share/murschol/validation/startup.txt \
+    /usr/bin/nm-applet \
+    /usr/bin/blueman-applet \
     /usr/local/bin/murschol-desktop \
     /usr/local/bin/murschol-panel \
     /usr/local/bin/murschol-files \
@@ -81,7 +85,14 @@ for package in \
     libreoffice-writer \
     libreoffice-calc \
     libreoffice-impress; do
-    if ! grep -q "^Package: ${package}$" "$DPKG_STATUS"; then
+    if ! awk -v package="$package" 'BEGIN { RS=""; FS="\n"; found=0 }
+      { name=""; status=""; for (i=1; i<=NF; i++) {
+          if ($i ~ /^Package: /) name=substr($i,10);
+          if ($i ~ /^Status: /) status=substr($i,9);
+        }
+        if (name == package && status == "install ok installed") found=1;
+      }
+      END { exit !found }' "$DPKG_STATUS"; then
         echo "Paquete crítico ausente de la ISO: $package" >&2
         exit 11
     fi

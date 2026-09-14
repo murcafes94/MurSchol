@@ -218,9 +218,9 @@ Rectangle {
 
                         Button {
                             id: connectButton
-                            visible: !modelData.active && modelData.saved
+                            visible: !modelData.active
                             text: "Conectar"
-                            onClicked: root.backend.connectSavedNetwork(modelData.ssid)
+                            onClicked: root.backend.connectAccessPoint(modelData.path)
                             background: Rectangle {
                                 radius: 11
                                 color: connectButton.hovered ? (root.lightTheme ? "#EAF1FF" : "#123A7A") : root.raised
@@ -264,7 +264,7 @@ Rectangle {
                     font.bold: true
                 }
                 Label {
-                    text: "Para redes nuevas con contraseña, VPN, DNS manual y perfiles avanzados seguimos usando el editor de NetworkManager durante esta fase."
+                    text: "Selecciona Conectar en una red y completa el diálogo de contraseña. Usa el editor avanzado para redes ocultas, empresariales, VPN o DNS manual."
                     color: root.textSecondary
                     font.pixelSize: 8
                     wrapMode: Text.WordWrap

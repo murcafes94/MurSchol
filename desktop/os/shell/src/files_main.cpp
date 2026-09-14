@@ -1,5 +1,8 @@
 #include <QGuiApplication>
+#include <QDir>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include <QUrl>
 #include <QQuickStyle>
 #include <QQuickWindow>
 
@@ -18,6 +21,15 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.addImageProvider(QStringLiteral("theme"), new ThemeIconProvider);
+    const QStringList arguments = app.arguments();
+    QString initialPath;
+    if (arguments.size() > 1) {
+        const QUrl location = QUrl::fromUserInput(arguments.at(1), QDir::currentPath(),
+                                                QUrl::AssumeLocalFile);
+        if (location.isLocalFile())
+            initialPath = location.toLocalFile();
+    }
+    engine.rootContext()->setContextProperty(QStringLiteral("initialDirectory"), initialPath);
     engine.load(QUrl(QStringLiteral("qrc:/qml/Files.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;

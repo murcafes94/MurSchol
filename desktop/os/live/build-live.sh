@@ -39,6 +39,10 @@ copy_source "${REPO_DIR}/desktop/apps/calculator" "murschol-calculator"
 copy_source "${REPO_DIR}/desktop/apps/calendar" "murschol-calendar"
 copy_source "${REPO_DIR}/desktop/apps/reader" "murschol-reader"
 
+install -m 0755 "${SCRIPT_DIR}/smoke-apps.sh" "${WORK_DIR}/config/includes.chroot/usr/src/murschol-smoke-apps.sh"
+mkdir -p "${WORK_DIR}/config/includes.chroot/usr/share/murschol"
+git -C "${REPO_DIR}" rev-parse HEAD > "${WORK_DIR}/config/includes.chroot/usr/share/murschol/build-commit"
+
 cd "${WORK_DIR}"
 
 lb clean --purge || true
@@ -75,7 +79,7 @@ if [[ ! -x "${VERIFY_SCRIPT}" ]]; then
 fi
 "${VERIFY_SCRIPT}" "${OUTPUT_ISO}"
 
-sha256sum "${OUTPUT_ISO}" > "${OUTPUT_SHA}"
+(cd "${SCRIPT_DIR}" && sha256sum "$(basename "${OUTPUT_ISO}")") > "${OUTPUT_SHA}"
 
 printf '\nMurSchol OS Live generado y verificado correctamente:\n'
 ls -lh "${OUTPUT_ISO}" "${OUTPUT_SHA}"

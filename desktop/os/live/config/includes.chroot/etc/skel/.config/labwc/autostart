@@ -2,7 +2,7 @@
 
 # Propaga el entorno Wayland a servicios activados por systemd/dbus, incluidos
 # los portales XDG usados por navegador, capturas, compartir pantalla y diálogos.
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
+dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_DESKTOP 2>/dev/null || true
 
 # Fuerza el orden de controles también en aplicaciones GTK con decoración de cliente.
 # Labwc ya usa icon:iconify,max,close para las decoraciones de servidor.
@@ -43,8 +43,23 @@ fi
 
 # Agente PolicyKit para operaciones administrativas desde aplicaciones gráficas.
 if command -v lxqt-policykit-agent >/dev/null 2>&1; then
-  if ! pgrep -u "$(id -u)" -x lxqt-policykit-agent >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -f '^(/usr/bin/)?lxqt-policykit-agent( |$)' >/dev/null 2>&1; then
     lxqt-policykit-agent >> "$POLKIT_LOG" 2>&1 &
+  fi
+fi
+
+# labwc does not run XDG autostart entries. These agents provide the password
+# and pairing dialogs requested by NetworkManager and BlueZ.
+if command -v nm-applet >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -x nm-applet >/dev/null 2>&1; then
+    trim_log "$STATE_DIR/network-agent.log"
+    nm-applet --indicator >> "$STATE_DIR/network-agent.log" 2>&1 &
+  fi
+fi
+if command -v blueman-applet >/dev/null 2>&1; then
+  if ! pgrep -u "$(id -u)" -f '^(/usr/bin/python3 )?(/usr/bin/)?blueman-applet( |$)' >/dev/null 2>&1; then
+    trim_log "$STATE_DIR/bluetooth-agent.log"
+    blueman-applet >> "$STATE_DIR/bluetooth-agent.log" 2>&1 &
   fi
 fi
 
