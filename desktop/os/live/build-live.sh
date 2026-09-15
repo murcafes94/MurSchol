@@ -39,14 +39,15 @@ copy_source "${REPO_DIR}/desktop/apps/calculator" "murschol-calculator"
 copy_source "${REPO_DIR}/desktop/apps/calendar" "murschol-calendar"
 copy_source "${REPO_DIR}/desktop/apps/reader" "murschol-reader"
 
-# Qt 6.8/6.9 en Debian Trixie no expone lineHeight en Controls.TextArea.
-# Music fue escrito contra una API distinta y el QML engine aborta antes de
-# mostrar la ventana. Aplicamos la compatibilidad solo sobre la copia de build;
-# nunca modificamos silenciosamente el árbol fuente del checkout.
+# La versión de Qt usada por la imagen Live rechaza lineHeight en Controls.TextArea
+# y Music aborta al cargar el componente. La corrección se limita a la copia que
+# se compila dentro de la ISO hasta que la fuente de Music quede migrada y validada.
 MUSIC_QML="${WORK_DIR}/config/includes.chroot/usr/src/murschol-music/qml/Main.qml"
-if grep -q '^[[:space:]]*lineHeight:[[:space:]]*1\.35[[:space:]]*$' "${MUSIC_QML}"; then
-  sed -i '/^[[:space:]]*lineHeight:[[:space:]]*1\.35[[:space:]]*$/d' "${MUSIC_QML}"
+if [[ ! -f "${MUSIC_QML}" ]]; then
+  echo "No se encontró el QML de MurSchol Music en el árbol de construcción." >&2
+  exit 4
 fi
+sed -i '/^[[:space:]]*lineHeight:[[:space:]]*1\.35[[:space:]]*$/d' "${MUSIC_QML}"
 if grep -q '^[[:space:]]*lineHeight:' "${MUSIC_QML}"; then
   echo "MurSchol Music conserva una propiedad lineHeight incompatible con TextArea." >&2
   exit 4
