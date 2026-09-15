@@ -39,6 +39,19 @@ copy_source "${REPO_DIR}/desktop/apps/calculator" "murschol-calculator"
 copy_source "${REPO_DIR}/desktop/apps/calendar" "murschol-calendar"
 copy_source "${REPO_DIR}/desktop/apps/reader" "murschol-reader"
 
+# Qt 6.8/6.9 en Debian Trixie no expone lineHeight en Controls.TextArea.
+# Music fue escrito contra una API distinta y el QML engine aborta antes de
+# mostrar la ventana. Aplicamos la compatibilidad solo sobre la copia de build;
+# nunca modificamos silenciosamente el árbol fuente del checkout.
+MUSIC_QML="${WORK_DIR}/config/includes.chroot/usr/src/murschol-music/qml/Main.qml"
+if grep -q '^[[:space:]]*lineHeight:[[:space:]]*1\.35[[:space:]]*$' "${MUSIC_QML}"; then
+  sed -i '/^[[:space:]]*lineHeight:[[:space:]]*1\.35[[:space:]]*$/d' "${MUSIC_QML}"
+fi
+if grep -q '^[[:space:]]*lineHeight:' "${MUSIC_QML}"; then
+  echo "MurSchol Music conserva una propiedad lineHeight incompatible con TextArea." >&2
+  exit 4
+fi
+
 install -m 0755 "${SCRIPT_DIR}/smoke-apps.sh" "${WORK_DIR}/config/includes.chroot/usr/src/murschol-smoke-apps.sh"
 mkdir -p "${WORK_DIR}/config/includes.chroot/usr/share/murschol"
 git -C "${REPO_DIR}" rev-parse HEAD > "${WORK_DIR}/config/includes.chroot/usr/share/murschol/build-commit"
