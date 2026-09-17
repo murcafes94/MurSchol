@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=MurSchol Reader
+GenericName=Lector de documentos PDF
+Comment=Lee y estudia documentos PDF con MurSchol Reader
+Exec=murschol-reader %f
+Icon=application-pdf
+Terminal=false
+Categories=Office;Viewer;Education;
+MimeType=application/pdf;
+StartupNotify=true
+StartupWMClass=MurSchol Reader
+Keywords=PDF;Reader;Lector;Documentos;Estudio;
