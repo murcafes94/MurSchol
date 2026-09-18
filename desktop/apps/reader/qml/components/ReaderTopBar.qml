@@ -44,14 +44,14 @@ Rectangle {
         }
 
         ToolButton {
-            text: "＋"
+            text: "Abrir"
             ToolTip.visible: hovered
             ToolTip.text: "Abrir otro PDF"
             onClicked: root.openRequested()
         }
 
         ToolButton {
-            text: "☰"
+            text: "Índice"
             ToolTip.visible: hovered
             ToolTip.text: "Índice del documento"
             onClicked: root.contentsRequested()
@@ -95,7 +95,7 @@ Rectangle {
         }
 
         ToolButton {
-            text: "☆"
+            text: "Marcas"
             enabled: root.pageCount > 0
             onClicked: root.marksRequested()
             ToolTip.visible: hovered
@@ -103,7 +103,7 @@ Rectangle {
         }
 
         ToolButton {
-            text: "⌕"
+            text: "Buscar"
             ToolTip.visible: hovered
             ToolTip.text: "Buscar en el PDF"
             onClicked: root.searchRequested()
@@ -132,7 +132,7 @@ Rectangle {
         }
 
         ToolButton {
-            text: "⛶"
+            text: "F11"
             ToolTip.visible: hovered
             ToolTip.text: "Modo concentración (F11)"
             onClicked: root.focusModeRequested()
