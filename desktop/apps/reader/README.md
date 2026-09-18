@@ -7,7 +7,7 @@ Native Qt 6 / QML PDF reader. The Debian package targets **Linux Mint 22.x / Ubu
 Download the Reader artifact from a successful `Build MurSchol Desktop` run for the latest commit on `main`, extract it, and install the `.deb` from that directory:
 
 ```sh
-sudo apt install ./murschol-reader_1.0.0_amd64.deb
+sudo apt install ./murschol-reader_1.0.1_amd64.deb
 ```
 
 Open Reader from the application menu, choose **Open with → MurSchol Reader** on a PDF, drag a PDF into its window, or run `murschol-reader '/path/to/document.pdf'`. Local `file://` URLs and filenames containing spaces are supported. For paths beginning with `-`, use `murschol-reader -- './-document.pdf'`.
@@ -56,3 +56,5 @@ CI validates QML syntax, compiles C++ and QML, runs the PDF integration test, ch
 After CI passes, verify on a real desktop: file picker, opening through the file manager, drag and drop, large/scanned PDFs, nested outline, search and zoom, protected PDF retry/cancel, window resize/HiDPI, and reopening after exit to restore reading position and bookmarks. CI/offscreen success alone does not establish that these desktop interactions work on a particular machine.
 
 Qt PDF 6.4 can emit `QCoreApplication::postEvent: Unexpected null receiver` and `QFSFileEngine::open: No file name specified` while replacing or clearing its QML document source. The integration test records these Qt diagnostics; application QML errors and dialog binding loops fail the test. These diagnostics are not suppressed. They do not establish an interactive Mint test result.
+
+Version 1.0.1 fixes a Qt 6.4 AOT enum-name collision: `PdfDocument.Error` can compile into a comparison of the document status with itself. All status comparisons use the scoped `PdfDocument.Status` enum. Tests compile the same QML as the installed application and assert that loaded PDFs hide the error panel and invalid documents show it.

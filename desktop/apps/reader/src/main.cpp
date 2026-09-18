@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QGuiApplication::setApplicationName(QStringLiteral("MurSchol Reader"));
     QGuiApplication::setOrganizationName(QStringLiteral("MurSchol"));
-    QGuiApplication::setApplicationVersion(QStringLiteral("1.0.0"));
+    QGuiApplication::setApplicationVersion(QStringLiteral("1.0.1"));
     QGuiApplication::setDesktopFileName(QStringLiteral("murschol-reader"));
     QQuickStyle::setStyle(QStringLiteral("Basic"));
 

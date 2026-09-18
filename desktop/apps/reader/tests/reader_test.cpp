@@ -117,7 +117,7 @@ private slots:
         eval("passwordField.text = 'wrong'; passwordDialog.accept()");
         QTRY_VERIFY(eval("passwordDialog.visible").toBool());
         eval("passwordField.text = 'reader-test'; passwordDialog.accept()");
-        QTRY_VERIFY_WITH_TIMEOUT(eval("pdfDocument.status === PdfDocument.Ready").toBool(), 5000);
+        QTRY_VERIFY_WITH_TIMEOUT(eval("pdfDocument.status === PdfDocument.Status.Ready").toBool(), 5000);
         QTRY_VERIFY(!root->property("restoring").toBool());
         QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
         QCOMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
@@ -161,6 +161,19 @@ private slots:
         QVERIFY(eval("messageDialog.visible").toBool());
         QVERIFY(root->property("reading").toBool());
         eval("messageDialog.close(); window.closeDocument()");
+        // Invalid input must still show the real error; do not just hide the panel.
+        QFile invalid(dir.filePath("invalid.pdf"));
+        QVERIFY(invalid.open(QIODevice::WriteOnly));
+        invalid.write("This is not a PDF.");
+        invalid.close();
+        open(QUrl::fromLocalFile(invalid.fileName()));
+        QTRY_COMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Error));
+        QVERIFY(eval("documentErrorPanel.visible").toBool());
+        QVERIFY(eval("pdfDocument.error").toString() != "no error");
+        open(url);
+        QTRY_COMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
+        QVERIFY(!eval("documentErrorPanel.visible").toBool());
+        eval("window.closeDocument()");
         QVERIFY2(warnings.isEmpty(), qPrintable(warnings.join('\n')));
     }
 };

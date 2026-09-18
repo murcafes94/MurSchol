@@ -102,7 +102,7 @@ jobs:
       - name: Publicar MurSchol Reader para Mint
         uses: actions/upload-artifact@v4
         with:
-          name: MurSchol-Reader-1.0.0-Linux-Mint-amd64
+          name: MurSchol-Reader-1.0.1-Linux-Mint-amd64
           path: |
             build/reader/*.deb
             build/reader/SHA256SUMS

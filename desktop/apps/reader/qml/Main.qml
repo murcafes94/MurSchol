@@ -36,7 +36,7 @@ ApplicationWindow {
     property string messageText: ""
 
     function savePosition() {
-        if (!restoring && pdfDocument.status === PdfDocument.Ready && pdfView.currentPage >= 0)
+        if (!restoring && pdfDocument.status === PdfDocument.Status.Ready && pdfView.currentPage >= 0)
             readingStore.remember(activeSource, pdfView.currentPage, pdfView.renderScale)
     }
 
@@ -107,7 +107,7 @@ ApplicationWindow {
         id: restoreTimer
         interval: 100
         onTriggered: {
-            if (pdfDocument.status !== PdfDocument.Ready) return
+            if (pdfDocument.status !== PdfDocument.Status.Ready) return
             var state = readingStore.state(window.activeSource)
             pdfView.renderScale = state.zoom === undefined ? 1 : Math.max(0.4, Math.min(3, state.zoom))
             pdfView.goToPage(Math.max(0, Math.min(pdfDocument.pageCount - 1, Number(state.page) || 0)))
@@ -163,7 +163,7 @@ ApplicationWindow {
         id: pdfDocument
 
         onStatusChanged: function(status) {
-            if (status === PdfDocument.Ready) {
+            if (status === PdfDocument.Status.Ready) {
                 passwordDialog.close()
                 restoreTimer.restart()
             }
@@ -174,7 +174,7 @@ ApplicationWindow {
             // Qt PDF can emit this synchronously while Dialog.accept() closes.
             // Reopen on the next event turn so an incorrect password is retryable.
             Qt.callLater(function() {
-                if (window.reading && pdfDocument.status === PdfDocument.Error)
+                if (window.reading && pdfDocument.status === PdfDocument.Status.Error)
                     passwordDialog.open()
             })
         }
@@ -316,7 +316,7 @@ ApplicationWindow {
 
         BusyIndicator {
             anchors.centerIn: parent
-            running: pdfDocument.status === PdfDocument.Loading
+            running: pdfDocument.status === PdfDocument.Status.Loading
             visible: running
             z: 40
         }
@@ -324,7 +324,7 @@ ApplicationWindow {
         Rectangle {
             id: documentErrorPanel
             z: 40
-            visible: pdfDocument.status === PdfDocument.Error
+            visible: pdfDocument.status === PdfDocument.Status.Error
             width: Math.min(520, parent.width - 60)
             height: errorColumn.implicitHeight + 42
             radius: 20
@@ -407,7 +407,7 @@ ApplicationWindow {
         parent: window.contentItem
         marks: window.savedMarks
         currentPage: pdfView.currentPage
-        documentReady: pdfDocument.status === PdfDocument.Ready
+        documentReady: pdfDocument.status === PdfDocument.Status.Ready
         onToggleRequested: function(page) { readingStore.toggleBookmark(window.activeSource, page) }
         onPageRequested: function(page) { pdfView.goToPage(page) }
     }
@@ -440,7 +440,7 @@ ApplicationWindow {
             Qt.callLater(function() {
                 if (!window.reading) return
                 pdfDocument.password = enteredPassword
-                if (pdfDocument.status === PdfDocument.Error)
+                if (pdfDocument.status === PdfDocument.Status.Error)
                     passwordDialog.open()
             })
         }
