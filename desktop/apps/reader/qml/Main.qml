@@ -171,7 +171,12 @@ ApplicationWindow {
 
         onPasswordRequired: {
             passwordField.text = ""
-            passwordDialog.open()
+            // Qt PDF can emit this synchronously while Dialog.accept() closes.
+            // Reopen on the next event turn so an incorrect password is retryable.
+            Qt.callLater(function() {
+                if (window.reading && pdfDocument.status === PdfDocument.Error)
+                    passwordDialog.open()
+            })
         }
     }
 
@@ -429,8 +434,14 @@ ApplicationWindow {
         onRejected: window.closeDocument()
         onOpened: passwordField.forceActiveFocus()
         onAccepted: {
-            pdfDocument.password = passwordField.text
+            var enteredPassword = passwordField.text
             passwordField.text = ""
+            Qt.callLater(function() {
+                if (!window.reading) return
+                pdfDocument.password = enteredPassword
+                if (pdfDocument.status === PdfDocument.Error)
+                    passwordDialog.open()
+            })
         }
 
         contentItem: ColumnLayout {
