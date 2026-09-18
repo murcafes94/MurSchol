@@ -20,7 +20,7 @@ ApplicationWindow {
     property bool focusMode: false
     property bool searchOpen: false
     property string currentDocument: ""
-    property int zoomPercent: 100
+    property int zoomPercent: Math.round(pdfView.renderScale * 100)
 
     function displayName(sourceUrl) {
         var value = sourceUrl.toString()
@@ -29,28 +29,91 @@ ApplicationWindow {
         return decodeURIComponent(name)
     }
 
+    property url activeSource: ""
+    property bool restoring: false
+    property var savedMarks: []
+    property var recentDocuments: readingStore.recentDocuments
+    property string messageText: ""
+
+    function savePosition() {
+        if (!restoring && pdfDocument.status === PdfDocument.Ready && pdfView.currentPage >= 0)
+            readingStore.remember(activeSource, pdfView.currentPage, pdfView.renderScale)
+    }
+
     function openDocument(sourceUrl) {
-        var value = sourceUrl.toString()
-        if (!value.toLowerCase().endsWith(".pdf")) {
-            unsupportedDialog.open()
+        var local = readingStore.localDocument(sourceUrl)
+        if (local.toString().length === 0) {
+            messageText = "No se puede leer este archivo local. Puede haberse movido o eliminado."
+            messageDialog.open()
             return
         }
-
-        currentDocument = displayName(sourceUrl)
-        zoomPercent = 100
+        if (local.toString() === activeSource.toString()) {
+            reading = true
+            return
+        }
+        savePosition()
+        restoreTimer.stop()
+        passwordDialog.close()
+        contentsDrawer.close()
+        marksDrawer.close()
+        restoring = true
+        pdfDocument.source = ""
+        pdfDocument.password = ""
+        activeSource = local
+        currentDocument = displayName(local)
         searchOpen = false
         searchField.text = ""
-        pdfDocument.source = sourceUrl
+        savedMarks = readingStore.bookmarks(local)
         reading = true
+        pdfDocument.source = local
     }
 
     function closeDocument() {
+        savePosition()
+        restoreTimer.stop()
+        saveTimer.stop()
+        passwordDialog.close()
         contentsDrawer.close()
+        marksDrawer.close()
         searchOpen = false
         focusMode = false
         reading = false
         currentDocument = ""
+        restoring = true
         pdfDocument.source = ""
+        pdfDocument.password = ""
+        activeSource = ""
+        restoring = false
+    }
+
+    onClosing: savePosition()
+
+    Connections {
+        target: readingStore
+        function onChanged() { window.savedMarks = readingStore.bookmarks(window.activeSource) }
+        function onStorageError(message) {
+            window.messageText = message
+            messageDialog.open()
+        }
+    }
+
+    Timer {
+        id: saveTimer
+        interval: 700
+        onTriggered: window.savePosition()
+    }
+
+    Timer {
+        id: restoreTimer
+        interval: 100
+        onTriggered: {
+            if (pdfDocument.status !== PdfDocument.Ready) return
+            var state = readingStore.state(window.activeSource)
+            pdfView.renderScale = state.zoom === undefined ? 1 : Math.max(0.4, Math.min(3, state.zoom))
+            pdfView.goToPage(Math.max(0, Math.min(pdfDocument.pageCount - 1, Number(state.page) || 0)))
+            window.restoring = false
+            saveTimer.restart()
+        }
     }
 
     Shortcut {
@@ -70,13 +133,13 @@ ApplicationWindow {
     Shortcut {
         sequence: "Ctrl++"
         enabled: window.reading
-        onActivated: window.zoomPercent = Math.min(300, window.zoomPercent + 10)
+        onActivated: pdfView.renderScale = Math.min(3, pdfView.renderScale + 0.1)
     }
 
     Shortcut {
         sequence: "Ctrl+-"
         enabled: window.reading
-        onActivated: window.zoomPercent = Math.max(40, window.zoomPercent - 10)
+        onActivated: pdfView.renderScale = Math.max(0.4, pdfView.renderScale - 0.1)
     }
 
     Shortcut {
@@ -98,6 +161,13 @@ ApplicationWindow {
 
     PdfDocument {
         id: pdfDocument
+
+        onStatusChanged: {
+            if (status === PdfDocument.Ready) {
+                passwordDialog.close()
+                restoreTimer.restart()
+            }
+        }
 
         onPasswordRequired: {
             passwordField.text = ""
@@ -121,6 +191,9 @@ ApplicationWindow {
     LibraryHome {
         anchors.fill: parent
         visible: !window.reading
+        recentDocuments: window.recentDocuments
+        onDocumentRequested: function(url) { window.openDocument(url) }
+        onForgetRequested: function(url) { readingStore.forget(url) }
         onBrowseRequested: openDialog.open()
     }
 
@@ -149,13 +222,15 @@ ApplicationWindow {
             onBackRequested: window.closeDocument()
             onOpenRequested: openDialog.open()
             onContentsRequested: contentsDrawer.open()
+            onMarksRequested: marksDrawer.open()
+            onPageRequested: function(page) { pdfView.goToPage(page) }
             onSearchRequested: {
                 window.searchOpen = !window.searchOpen
                 if (window.searchOpen)
                     searchField.forceActiveFocus()
             }
-            onZoomOutRequested: window.zoomPercent = Math.max(40, window.zoomPercent - 10)
-            onZoomInRequested: window.zoomPercent = Math.min(300, window.zoomPercent + 10)
+            onZoomOutRequested: pdfView.renderScale = Math.max(0.4, pdfView.renderScale - 0.1)
+            onZoomInRequested: pdfView.renderScale = Math.min(3, pdfView.renderScale + 0.1)
             onFocusModeRequested: window.focusMode = !window.focusMode
         }
 
@@ -167,7 +242,9 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             document: pdfDocument
             searchString: searchField.text
-            renderScale: window.zoomPercent / 100.0
+            clip: true
+            onCurrentPageChanged: if (!window.restoring) saveTimer.restart()
+            onRenderScaleChanged: if (!window.restoring) saveTimer.restart()
         }
 
         Rectangle {
@@ -319,6 +396,16 @@ ApplicationWindow {
         }
     }
 
+    MarksDrawer {
+        id: marksDrawer
+        parent: window.contentItem
+        marks: window.savedMarks
+        currentPage: pdfView.currentPage
+        documentReady: pdfDocument.status === PdfDocument.Ready
+        onToggleRequested: function(page) { readingStore.toggleBookmark(window.activeSource, page) }
+        onPageRequested: function(page) { pdfView.goToPage(page) }
+    }
+
     DropArea {
         anchors.fill: parent
         z: 100
@@ -333,14 +420,20 @@ ApplicationWindow {
 
     Dialog {
         id: passwordDialog
+        width: Math.min(380, window.width - 40)
         modal: true
         anchors.centerIn: parent
         title: "PDF protegido"
         standardButtons: Dialog.Ok | Dialog.Cancel
-        onAccepted: pdfDocument.password = passwordField.text
+        closePolicy: Popup.NoAutoClose
+        onRejected: window.closeDocument()
+        onOpened: passwordField.forceActiveFocus()
+        onAccepted: {
+            pdfDocument.password = passwordField.text
+            passwordField.text = ""
+        }
 
         contentItem: ColumnLayout {
-            width: 340
             spacing: 10
 
             Label {
@@ -355,6 +448,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 echoMode: TextInput.Password
                 placeholderText: "Contraseña"
+                onAccepted: passwordDialog.accept()
             }
         }
 
@@ -366,16 +460,16 @@ ApplicationWindow {
     }
 
     Dialog {
-        id: unsupportedDialog
+        id: messageDialog
+        width: Math.min(400, window.width - 40)
         modal: true
         anchors.centerIn: parent
-        title: "Formato no disponible"
+        title: "MurSchol Reader"
         standardButtons: Dialog.Ok
 
         contentItem: Label {
-            width: 360
             padding: 18
-            text: "Esta versión de MurSchol Reader abre PDF reales. EPUB, MOBI y otros formatos se activarán únicamente cuando tengan un motor de lectura estable."
+            text: window.messageText
             color: "#C9C0B6"
             wrapMode: Text.Wrap
         }

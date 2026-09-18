@@ -4,118 +4,52 @@ import QtQuick.Layouts
 
 Drawer {
     id: root
+    property var marks: []
+    property int currentPage: -1
+    property bool documentReady: false
+    signal pageRequested(int page)
+    signal toggleRequested(int page)
     edge: Qt.RightEdge
-    width: Math.min(330, parent ? parent.width * 0.36 : 330)
+    width: Math.min(360, parent ? parent.width - 40 : 360)
+    height: parent ? parent.height : 600
     modal: true
-    dim: true
-    interactive: true
-
-    background: Rectangle {
-        color: "#f50b1926"
-        border.color: "#2e5669"
-    }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
-        spacing: 10
-
-        RowLayout {
+        Label { text: "Mis marcadores"; font.pixelSize: 20 }
+        Button {
             Layout.fillWidth: true
-            Label {
-                Layout.fillWidth: true
-                text: "Mis marcas"
-                color: "white"
-                font.pixelSize: 18
-                font.bold: true
-            }
-            ToolButton { text: "×"; onClicked: root.close() }
+            text: root.marks.indexOf(root.currentPage) >= 0 ? "Quitar marcador de esta página" : "Marcar esta página"
+            enabled: root.documentReady && root.currentPage >= 0
+            onClicked: root.toggleRequested(root.currentPage)
         }
-
-        TabBar {
-            id: tabs
+        Label {
             Layout.fillWidth: true
-            TabButton { text: "Subrayados" }
-            TabButton { text: "Notas" }
-            TabButton { text: "Marcadores" }
+            visible: root.marks.length === 0
+            text: "Todavía no hay marcadores en este documento."
+            wrapMode: Text.Wrap
         }
-
-        StackLayout {
+        ListView {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            currentIndex: tabs.currentIndex
-
-            ListView {
-                clip: true
-                spacing: 8
-                model: [
-                    "El ser humano, desde la concepción… · p. 12",
-                    "La vida es un don que precede… · p. 28",
-                    "Toda persona es un fin… · p. 67"
-                ]
-                delegate: Rectangle {
-                    required property string modelData
-                    width: ListView.view.width
-                    height: 54
-                    radius: 12
-                    color: "#142c39"
-                    border.color: "#315467"
-                    Label {
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        text: modelData
-                        color: "#dfeaed"
-                        font.pixelSize: 10
-                        wrapMode: Text.Wrap
-                    }
+            clip: true
+            model: root.marks
+            delegate: RowLayout {
+                required property int modelData
+                width: ListView.view.width
+                Button {
+                    Layout.fillWidth: true
+                    text: "Página " + (modelData + 1)
+                    onClicked: { root.pageRequested(modelData); root.close() }
                 }
-            }
-
-            ListView {
-                clip: true
-                spacing: 8
-                model: [
-                    "Reflexión personal · p. 12",
-                    "Relacionar con Evangelium Vitae · p. 45"
-                ]
-                delegate: Rectangle {
-                    required property string modelData
-                    width: ListView.view.width
-                    height: 54
-                    radius: 12
-                    color: "#142c39"
-                    border.color: "#315467"
-                    Label {
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        text: modelData
-                        color: "#dfeaed"
-                        font.pixelSize: 10
-                        wrapMode: Text.Wrap
-                    }
-                }
-            }
-
-            ListView {
-                clip: true
-                spacing: 8
-                model: ["Importante · p. 12"]
-                delegate: Rectangle {
-                    required property string modelData
-                    width: ListView.view.width
-                    height: 54
-                    radius: 12
-                    color: "#142c39"
-                    border.color: "#315467"
-                    Label {
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        text: modelData
-                        color: "#dfeaed"
-                        font.pixelSize: 10
-                    }
+                ToolButton {
+                    text: "×"
+                    Accessible.name: "Eliminar marcador"
+                    onClicked: root.toggleRequested(modelData)
                 }
             }
         }
+        Button { text: "Cerrar"; onClicked: root.close() }
     }
 }

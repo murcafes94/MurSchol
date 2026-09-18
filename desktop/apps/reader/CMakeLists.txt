@@ -12,6 +12,8 @@ qt_standard_project_setup(REQUIRES 6.4)
 
 qt_add_executable(murschol-reader
     src/main.cpp
+    src/ReadingStore.cpp
+    src/ReadingStore.h
 )
 
 qt_add_qml_module(murschol-reader
@@ -45,7 +47,24 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Lector PDF de escritorio para Linux")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_DEBIAN_PACKAGE_SECTION "office")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtqml-workerscript, qml6-module-qtquick-window, qml6-module-qtquick-templates, qml6-module-qtqml, qml6-module-qtquick-dialogs, qml6-module-qtquick-pdf")
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set(CPACK_GENERATOR "DEB")
 include(CPack)
+
+include(CTest)
+if(BUILD_TESTING)
+    find_package(Qt6 REQUIRED COMPONENTS Test)
+    qt_add_executable(reader-test tests/reader_test.cpp src/ReadingStore.cpp src/ReadingStore.h)
+    target_include_directories(reader-test PRIVATE src)
+    target_link_libraries(reader-test PRIVATE Qt6::Test Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Pdf)
+    qt_add_resources(reader-test reader_test_qml PREFIX "/MurScholReader" FILES
+        qml/Main.qml
+        qml/components/ReaderTopBar.qml
+        qml/components/ContentsDrawer.qml
+        qml/components/MarksDrawer.qml
+        qml/components/LibraryHome.qml)
+    add_test(NAME reader-flow COMMAND reader-test)
+    set_tests_properties(reader-flow PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_BACKEND=software" TIMEOUT 30)
+endif()

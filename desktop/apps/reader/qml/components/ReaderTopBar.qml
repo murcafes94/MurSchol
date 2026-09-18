@@ -11,6 +11,8 @@ Rectangle {
     property int zoomPercent: 100
     property bool focusMode: false
 
+    signal pageRequested(int page)
+    signal marksRequested()
     signal backRequested()
     signal openRequested()
     signal contentsRequested()
@@ -64,10 +66,40 @@ Rectangle {
             elide: Text.ElideMiddle
         }
 
-        Label {
-            text: root.pageCount > 0 ? root.currentPage + " / " + root.pageCount : "—"
-            color: "#A79E94"
-            font.pixelSize: 11
+        ToolButton {
+            text: "‹"
+            enabled: root.currentPage > 1
+            onClicked: root.pageRequested(root.currentPage - 2)
+            ToolTip.visible: hovered
+            ToolTip.text: "Página anterior"
+        }
+
+        SpinBox {
+            from: 1
+            to: Math.max(1, root.pageCount)
+            value: Math.max(1, root.currentPage)
+            editable: true
+            enabled: root.pageCount > 0
+            onValueModified: root.pageRequested(value - 1)
+            Accessible.name: "Página"
+        }
+
+        Label { text: "/ " + root.pageCount; color: "#A79E94" }
+
+        ToolButton {
+            text: "›"
+            enabled: root.currentPage < root.pageCount
+            onClicked: root.pageRequested(root.currentPage)
+            ToolTip.visible: hovered
+            ToolTip.text: "Página siguiente"
+        }
+
+        ToolButton {
+            text: "☆"
+            enabled: root.pageCount > 0
+            onClicked: root.marksRequested()
+            ToolTip.visible: hovered
+            ToolTip.text: "Marcadores personales"
         }
 
         ToolButton {

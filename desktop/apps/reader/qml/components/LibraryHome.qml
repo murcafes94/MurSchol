@@ -5,6 +5,9 @@ import QtQuick.Layouts
 Item {
     id: root
 
+    property var recentDocuments: []
+    signal documentRequested(url url)
+    signal forgetRequested(url url)
     signal browseRequested()
 
     Rectangle {
@@ -102,57 +105,27 @@ Item {
             }
         }
 
-        RowLayout {
+        Label { text: "Lecturas recientes"; color: "#F3EEE5"; font.pixelSize: 16 }
+        ListView {
             Layout.fillWidth: true
-            spacing: 10
-
-            Repeater {
-                model: [
-                    { title: "Multipágina", text: "Desplázate por todo el documento sin cargar una interfaz falsa." },
-                    { title: "Búsqueda real", text: "Busca texto dentro del PDF y salta entre coincidencias." },
-                    { title: "Modo estudio", text: "Zoom, índice y concentración sin paneles permanentes." }
-                ]
-
-                delegate: Rectangle {
-                    required property var modelData
+            Layout.preferredHeight: Math.min(180, contentHeight)
+            clip: true
+            model: root.recentDocuments
+            ScrollBar.vertical: ScrollBar {}
+            delegate: RowLayout {
+                required property var modelData
+                width: ListView.view.width
+                Button {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 112
-                    radius: 18
-                    color: "#11151C"
-                    border.color: "#35312D"
-
-                    ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 14
-                        spacing: 6
-
-                        Label {
-                            Layout.fillWidth: true
-                            text: modelData.title
-                            color: "#E3BB78"
-                            font.pixelSize: 12
-                            font.bold: true
-                        }
-
-                        Label {
-                            Layout.fillWidth: true
-                            text: modelData.text
-                            color: "#A79E94"
-                            font.pixelSize: 9
-                            wrapMode: Text.Wrap
-                        }
-                    }
+                    text: modelData.title + (modelData.available ? " · página " + (Number(modelData.page) + 1) : " · archivo no disponible")
+                    onClicked: root.documentRequested(modelData.url)
+                }
+                ToolButton {
+                    text: "×"
+                    Accessible.name: "Quitar de recientes"
+                    onClicked: root.forgetRequested(modelData.url)
                 }
             }
-        }
-
-        Label {
-            Layout.fillWidth: true
-            text: "EPUB, MOBI y otros formatos se añadirán cuando tengan un motor real; no se muestran como disponibles antes de tiempo."
-            color: "#7F766D"
-            font.pixelSize: 9
-            wrapMode: Text.Wrap
-            horizontalAlignment: Text.AlignHCenter
         }
     }
 }

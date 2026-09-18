@@ -10,6 +10,7 @@ Drawer {
 
     edge: Qt.LeftEdge
     width: Math.min(340, parent ? parent.width * 0.36 : 340)
+    height: parent ? parent.height : 600
     modal: true
     dim: true
     interactive: true
@@ -49,34 +50,16 @@ Drawer {
             wrapMode: Text.Wrap
         }
 
-        ListView {
+        TreeView {
             id: tocList
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: 4
             model: root.bookmarkModel
 
-            delegate: Button {
-                width: ListView.view.width
-                height: 44
-                leftPadding: 12 + Math.max(0, Number(model.level)) * 12
-                rightPadding: 10
+            delegate: TreeViewDelegate {
+                implicitWidth: tocList.width
                 text: model.title
-
-                background: Rectangle {
-                    radius: 11
-                    color: parent.hovered ? "#35312D" : "transparent"
-                }
-
-                contentItem: Label {
-                    text: parent.text
-                    color: "#C9C0B6"
-                    font.pixelSize: 10
-                    elide: Text.ElideRight
-                    verticalAlignment: Text.AlignVCenter
-                }
-
                 onClicked: {
                     root.pageRequested(Number(model.page))
                     root.close()
@@ -86,8 +69,8 @@ Drawer {
 
         Label {
             Layout.fillWidth: true
-            Layout.fillHeight: tocList.count === 0
-            visible: tocList.count === 0
+            Layout.fillHeight: tocList.rows === 0
+            visible: tocList.rows === 0
             text: "Este PDF no contiene un índice interno. Puedes navegar desplazándote por las páginas o usar la búsqueda."
             color: "#7F766D"
             font.pixelSize: 10
