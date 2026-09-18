@@ -1,5 +1,9 @@
 #include "ReadingStore.h"
 #include <QGuiApplication>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QQuickWindow>
 #include <QPainter>
 #include <QPdfDocument>
 #include <QPdfWriter>
@@ -120,6 +124,28 @@ private slots:
         QTRY_VERIFY(eval("passwordDialog.visible").toBool());
         eval("passwordDialog.reject()");
         QVERIFY(!root->property("reading").toBool());
+        // The file chooser and drag/drop must route to the same real PDF loader.
+        engine.rootContext()->setContextProperty("testDocument", url);
+        eval("openDialog.selectedFile = testDocument; openDialog.accepted()");
+        QTRY_VERIFY(root->property("reading").toBool());
+        QTRY_VERIFY(!root->property("restoring").toBool());
+        QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        auto *window = qobject_cast<QQuickWindow *>(root);
+        QVERIFY(window);
+        QTest::qWait(100);
+        QVERIFY(window->grabWindow().save("reader-preview.png"));
+        eval("window.closeDocument()");
+        QMimeData mime;
+        mime.setUrls({url});
+        QDragEnterEvent enter(QPoint(200, 200), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+        QGuiApplication::sendEvent(window, &enter);
+        QVERIFY(enter.isAccepted());
+        QDropEvent drop(QPointF(200, 200), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+        QGuiApplication::sendEvent(window, &drop);
+        QVERIFY(drop.isAccepted());
+        QTRY_VERIFY(root->property("reading").toBool());
+        QTRY_VERIFY(!root->property("restoring").toBool());
+        QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
         // A deleted recent entry must report an error without discarding an open PDF.
         open(url);
         QTRY_VERIFY(!root->property("restoring").toBool());
