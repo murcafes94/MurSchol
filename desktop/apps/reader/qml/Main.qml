@@ -322,6 +322,7 @@ ApplicationWindow {
         }
 
         Rectangle {
+            id: documentErrorPanel
             z: 40
             visible: pdfDocument.status === PdfDocument.Error
             width: Math.min(520, parent.width - 60)

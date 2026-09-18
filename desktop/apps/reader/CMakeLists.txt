@@ -60,12 +60,17 @@ if(BUILD_TESTING)
     qt_add_executable(reader-test tests/reader_test.cpp src/ReadingStore.cpp src/ReadingStore.h)
     target_include_directories(reader-test PRIVATE src)
     target_link_libraries(reader-test PRIVATE Qt6::Test Qt6::Gui Qt6::Qml Qt6::Quick Qt6::QuickControls2 Qt6::Pdf)
-    qt_add_resources(reader-test reader_test_qml PREFIX "/MurScholReader" FILES
+    qt_add_qml_module(reader-test
+        URI MurScholReader
+        VERSION 1.0
+        OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-qml/MurScholReader"
+        QML_FILES
         qml/Main.qml
         qml/components/ReaderTopBar.qml
         qml/components/ContentsDrawer.qml
         qml/components/MarksDrawer.qml
         qml/components/LibraryHome.qml
+        RESOURCES
         tests/fixtures/outline.pdf.b64
         tests/fixtures/protected.pdf.b64)
     add_test(NAME reader-flow COMMAND reader-test)

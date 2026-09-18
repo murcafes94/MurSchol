@@ -68,6 +68,8 @@ private slots:
         };
         QTRY_VERIFY_WITH_TIMEOUT(!root->property("restoring").toBool(), 5000);
         QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        QCOMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
+        QVERIFY2(!eval("documentErrorPanel.visible").toBool(), "A loaded PDF must not display the error overlay");
         QCOMPARE(eval("pdfView.currentPage").toInt(), 1);
         QCOMPARE(eval("pdfView.renderScale").toDouble(), 1.4);
         eval("pdfView.goToPage(2)");
@@ -118,6 +120,8 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(eval("pdfDocument.status === PdfDocument.Ready").toBool(), 5000);
         QTRY_VERIFY(!root->property("restoring").toBool());
         QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        QCOMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
+        QVERIFY2(!eval("documentErrorPanel.visible").toBool(), "A loaded PDF must not display the error overlay");
         QVERIFY(!eval("passwordDialog.visible").toBool());
         eval("window.closeDocument()");
         open(fixture("protected"));
@@ -130,6 +134,8 @@ private slots:
         QTRY_VERIFY(root->property("reading").toBool());
         QTRY_VERIFY(!root->property("restoring").toBool());
         QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        QCOMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
+        QVERIFY2(!eval("documentErrorPanel.visible").toBool(), "A loaded PDF must not display the error overlay");
         auto *window = qobject_cast<QQuickWindow *>(root);
         QVERIFY(window);
         QTest::qWait(100);
@@ -146,6 +152,8 @@ private slots:
         QTRY_VERIFY(root->property("reading").toBool());
         QTRY_VERIFY(!root->property("restoring").toBool());
         QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        QCOMPARE(eval("pdfDocument.status").toInt(), int(QPdfDocument::Status::Ready));
+        QVERIFY2(!eval("documentErrorPanel.visible").toBool(), "A loaded PDF must not display the error overlay");
         // A deleted recent entry must report an error without discarding an open PDF.
         open(url);
         QTRY_VERIFY(!root->property("restoring").toBool());
