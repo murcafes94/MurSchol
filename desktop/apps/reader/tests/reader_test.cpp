@@ -69,7 +69,7 @@ private slots:
         eval("pdfView.goToPage(2)");
         QTRY_COMPARE(eval("pdfView.currentPage").toInt(), 2);
         eval("searchField.text = 'searchable'");
-        QTRY_VERIFY(eval("pdfView.searchModel.count").toInt() >= 2);
+        QTRY_VERIFY(eval("pdfView.searchModel.rowCount()").toInt() >= 2);
         eval("pdfView.searchForward()");
         eval("contentsDrawer.open(); marksDrawer.open()");
         QTest::qWait(100);
@@ -86,6 +86,47 @@ private slots:
         eval("window.messageText = 'Test'; messageDialog.open(); passwordDialog.open()");
         QTest::qWait(100);
         eval("passwordDialog.close(); messageDialog.close()");
+        auto fixture = [&](const QString &name) {
+            QFile input(":/MurScholReader/tests/fixtures/" + name + ".pdf.b64");
+            if (!input.open(QIODevice::ReadOnly)) return QUrl();
+            const QString destination = dir.filePath(name + ".pdf");
+            QFile output(destination);
+            if (!output.open(QIODevice::WriteOnly)) return QUrl();
+            output.write(QByteArray::fromBase64(input.readAll()));
+            output.close();
+            return QUrl::fromLocalFile(destination);
+        };
+        auto open = [&](const QUrl &source) {
+            engine.rootContext()->setContextProperty("testDocument", source);
+            eval("window.openDocument(testDocument)");
+        };
+        open(fixture("outline"));
+        QTRY_VERIFY_WITH_TIMEOUT(!root->property("restoring").toBool(), 5000);
+        QCOMPARE(eval("bookmarkModel.rowCount()").toInt(), 2);
+        eval("contentsDrawer.open()");
+        QTest::qWait(200);
+        eval("contentsDrawer.close()");
+        open(fixture("protected"));
+        QTRY_VERIFY(eval("passwordDialog.visible").toBool());
+        eval("passwordField.text = 'wrong'; passwordDialog.accept()");
+        QTRY_VERIFY(eval("passwordDialog.visible").toBool());
+        eval("passwordField.text = 'reader-test'; passwordDialog.accept()");
+        QTRY_VERIFY_WITH_TIMEOUT(eval("pdfDocument.status === PdfDocument.Ready").toBool(), 5000);
+        QTRY_VERIFY(!root->property("restoring").toBool());
+        QCOMPARE(eval("pdfDocument.pageCount").toInt(), 3);
+        QVERIFY(!eval("passwordDialog.visible").toBool());
+        eval("window.closeDocument()");
+        open(fixture("protected"));
+        QTRY_VERIFY(eval("passwordDialog.visible").toBool());
+        eval("passwordDialog.reject()");
+        QVERIFY(!root->property("reading").toBool());
+        // A deleted recent entry must report an error without discarding an open PDF.
+        open(url);
+        QTRY_VERIFY(!root->property("restoring").toBool());
+        open(QUrl::fromLocalFile(dir.filePath("missing.pdf")));
+        QVERIFY(eval("messageDialog.visible").toBool());
+        QVERIFY(root->property("reading").toBool());
+        eval("messageDialog.close(); window.closeDocument()");
         QVERIFY2(warnings.isEmpty(), qPrintable(warnings.join('\n')));
     }
 };

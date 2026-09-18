@@ -684,7 +684,6 @@ ApplicationWindow {
                                     selectionColor: root.accent
                                     selectedTextColor: "#FFFFFF"
                                     font.pixelSize: 13
-                                    lineHeight: 1.35
                                     padding: 18
                                     background: Rectangle {
                                         radius: 18

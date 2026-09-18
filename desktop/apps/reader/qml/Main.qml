@@ -162,7 +162,7 @@ ApplicationWindow {
     PdfDocument {
         id: pdfDocument
 
-        onStatusChanged: {
+        onStatusChanged: function(status) {
             if (status === PdfDocument.Ready) {
                 passwordDialog.close()
                 restoreTimer.restart()

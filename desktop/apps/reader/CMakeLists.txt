@@ -47,7 +47,8 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Lector PDF de escritorio para Linux")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_DEBIAN_PACKAGE_SECTION "office")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtqml-workerscript, qml6-module-qtquick-window, qml6-module-qtquick-templates, qml6-module-qtqml, qml6-module-qtquick-dialogs, qml6-module-qtquick-pdf")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "qt6-qpa-plugins, qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtqml-workerscript, qml6-module-qtquick-window, qml6-module-qtquick-templates, qml6-module-qtqml, qml6-module-qtquick-dialogs, qml6-module-qtquick-pdf")
+set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "qt6-wayland, qt6-gtk-platformtheme")
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set(CPACK_GENERATOR "DEB")
@@ -64,7 +65,9 @@ if(BUILD_TESTING)
         qml/components/ReaderTopBar.qml
         qml/components/ContentsDrawer.qml
         qml/components/MarksDrawer.qml
-        qml/components/LibraryHome.qml)
+        qml/components/LibraryHome.qml
+        tests/fixtures/outline.pdf.b64
+        tests/fixtures/protected.pdf.b64)
     add_test(NAME reader-flow COMMAND reader-test)
     set_tests_properties(reader-flow PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_BACKEND=software" TIMEOUT 30)
 endif()
